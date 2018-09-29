@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -48,7 +47,7 @@ public class Login extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly. I.E. if they are no longer signed in, display the sign in page.
         FirebaseUser currentUser = myAuth.getCurrentUser();
-        // updateUI(currentUser);
+        gotoDashboard(currentUser);
     }
 
     public void signIn(View view) {
@@ -73,7 +72,7 @@ public class Login extends AppCompatActivity {
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
-                Log.w("Sign in error.", "Google sign in failed", e);
+                Log.w("Sign in error.", "Google sign in failed: " + e.getMessage(), e);
                 // ...
             }
         }
@@ -90,7 +89,7 @@ public class Login extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("Sign in", "signInWithCredential:success");
                     FirebaseUser user = myAuth.getCurrentUser();
-                    updateUI(user); // This is currently not going to a new activity, just changing the layout. Primarily for demonstration purposes.
+                    gotoDashboard(user); // This is currently not going to a new activity, just changing the layout. Primarily for demonstration purposes.
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("Sign in", "signInWithCredential:failure", task.getException());
@@ -101,9 +100,11 @@ public class Login extends AppCompatActivity {
     }
 
     // This is just an example of loading a new screen (poorly) once sign in has been completed
-    private void updateUI(FirebaseUser user) {
-        setContentView(R.layout.activity_dashboard);
-        TextView text = findViewById(R.id.userName);
-        text.setText(user.getDisplayName());
+    private void gotoDashboard(FirebaseUser user) {
+        if (user != null) {
+            Intent dashboardIntent = new Intent(this, Dashboard.class);
+
+            startActivity(dashboardIntent);
+        }
     }
 }
