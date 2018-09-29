@@ -36,7 +36,7 @@ public class Login extends AppCompatActivity {
         myAuth = FirebaseAuth.getInstance();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("437851907844-l489p5c8tgka6aos1dut4dnec9o3letv.apps.googleusercontent.com")  // may need to add the server's client ID here, or get the value dynamically.
+                .requestIdToken(getString(R.string.web_client_id))  // may need to add the server's client ID here, or get the value dynamically.
                 .requestEmail()
                 .build();
 
