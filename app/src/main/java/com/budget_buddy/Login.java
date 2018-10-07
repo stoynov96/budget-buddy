@@ -16,7 +16,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
@@ -25,14 +24,12 @@ public class Login extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
 
     private GoogleSignInClient mGoogleSignInClient;
-    private FirebaseAuth myAuth;
+    private BBUser currentUser = BBUser.GetInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        myAuth = FirebaseAuth.getInstance();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.web_client_id))  // may need to add the server's client ID here, or get the value dynamically.
@@ -45,9 +42,13 @@ public class Login extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly. I.E. if they are no longer signed in, display the sign in page.
-        FirebaseUser currentUser = myAuth.getCurrentUser();
-        gotoDashboard(currentUser);
+        // TODO: Check if user is signed in (non-null) and update UI accordingly. I.E. if they are no longer signed in, display the sign in page.
+        if(currentUser.GetUser() != null) {
+            gotoDashboard(currentUser.GetUser());
+        }
+        else {
+            // TODO: If they are no longer signed in, go to the sign in page
+        }
     }
 
     public void signIn(View view) {
@@ -56,7 +57,7 @@ public class Login extends AppCompatActivity {
     }
 
     public void signOut(View view) {
-        FirebaseAuth.getInstance().signOut();
+        currentUser.SignOut();
     }
 
     @Override
@@ -71,35 +72,34 @@ public class Login extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
-                Log.w("Sign in error.", "Google sign in failed: " + e.getMessage(), e);
+                // TODO: Google Sign In failed, update UI appropriately
+                Log.w("Sign in message:", "Google sign in failed: " + e.getMessage(), e);
                 // ...
             }
         }
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
-        Log.d("Sign in", "firebaseAuthWithGoogle: " + account.getId());
+        Log.d("Sign in message:", "firebaseAuthWithGoogle: " + account.getId());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        myAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        Task task = currentUser.SignIn(credential);
+        task.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
-                    Log.d("Sign in", "signInWithCredential:success");
-                    FirebaseUser user = myAuth.getCurrentUser();
-                    gotoDashboard(user); // This is currently not going to a new activity, just changing the layout. Primarily for demonstration purposes.
+                    Log.d("Sign in message:", "signInWithCredential:success");
+                    currentUser.Initialize();
+                    gotoDashboard(currentUser.GetUser());
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w("Sign in", "signInWithCredential:failure", task.getException());
+                    // TODO: If sign in fails, display a message to the user.
+                    Log.w("Sign in message:", "signInWithCredential:failure", task.getException());
                     // updateUI(null);
                 }
-            }
-        });
+            }});
     }
 
-    // This is just an example of loading a new screen (poorly) once sign in has been completed
     private void gotoDashboard(FirebaseUser user) {
         if (user != null) {
             Intent dashboardIntent = new Intent(this, Dashboard.class);
