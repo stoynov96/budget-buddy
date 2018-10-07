@@ -1,15 +1,33 @@
 package com.budget_buddy;
 
+import com.budget_buddy.config.DataConfig;
+import com.budget_buddy.exception.InvalidDataLabelException;
+import com.budget_buddy.utils.Data.DataNode;
+import com.budget_buddy.utils.Data.TableReader;
+import com.budget_buddy.utils.Data.TableWriter;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.Task;
+
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-class BBUser {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+class BBUser implements DataNode {
     // The singleton class object used for referencing throughout the program.
     private static final BBUser ourInstance = new BBUser();
+    // Used to write user data to Firebase
+    private final TableWriter tableWriter;
+    // Used to read user data from Firebase
+    private final TableReader tableReader;
+    // Path in the database to the users section
+    private final List<String> userPath;
     // Used for signing in and other functions that need to authenticate a user's credentials.
     private FirebaseAuth authentication;
     // This is the user in the database, used directly to make Firebase function calls on a Firebase user.
@@ -17,9 +35,22 @@ class BBUser {
     // The user's name as entered in the database.
     private String userName;
     // Current level of the user (NYI)
-    public int budgetLevel;
+    private long budgetLevel = -1;
     // Current score of the user (NYI)
-    public int budgetScore;
+    private long budgetScore = -1;
+    // Monthly Savings Goal (this is how much the user hopes to save throughout the month)
+    private long savingsGoal = -1;
+    // Rent (in dollars, should we worry about cents at all?)
+    private long rent = -1;
+    // other expenses (maybe we should store as an array but simpler as a lump sum)
+    private long otherExpenses = -1;
+    // Primary income
+    private long primaryIncome = -1;
+    // Other income
+    private long otherIncome = -1;
+    // Suggested daily spending amount
+    // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
+    private long suggestedSpendingAmount = -1;
 
     static BBUser GetInstance() {
         return ourInstance;
@@ -36,11 +67,19 @@ class BBUser {
         authentication.signOut();
     }
 
-    public void Initialize() {
+    public void Initialize() throws InvalidDataLabelException {
         user = authentication.getCurrentUser();
         if(user != null) {
             userName = user.getDisplayName();
             // TODO: Add other initialization her as appropriate
+        }
+        try {
+            LatchToDatabase();
+        }
+        catch (InvalidDataLabelException idle) {
+            throw new InvalidDataLabelException(
+                    "Could not initialize user. It could be that the username was empty?",
+                    idle);
         }
     }
 
@@ -54,8 +93,105 @@ class BBUser {
         }
     }
 
+    public long getBudgetLevel() {
+        return this.budgetLevel;
+    }
+    public long getBudgetScore() {
+        return this.budgetScore;
+    }
+    public long getSavingsGoal() {
+        return savingsGoal;
+    }
+    public long getRent() {
+        return rent;
+    }
+    public long getOtherExpenses() {
+        return otherExpenses;
+    }
+    public long getPrimaryIncome() {
+        return primaryIncome;
+    }
+    public long getOtherIncome() {
+        return otherIncome;
+    }
+    public long getSuggestedSpendingAmount() {
+        return suggestedSpendingAmount;
+    }
+
+
+    public boolean updateSavingsGoal(int newGoal) {
+        return false;
+    }
+
+    /**
+     * Writes user info to the database
+     * @throws InvalidDataLabelException thrown if userpath contains invalid labels
+     */
+    public void WriteUserInfo() throws InvalidDataLabelException {
+        // Todo: We really need to check if user already exists,
+        // but I am not sure this should be done here
+        tableWriter.WriteData(userPath, this, userName);
+    }
+
+    /**
+     * Latches onto the database so that every time data is changed over there
+     * those changes are reflected in this object
+     * @throws InvalidDataLabelException thrown if userpath contains invalid labels
+     */
+    public void LatchToDatabase() throws InvalidDataLabelException {
+        List<String> latchPath = new ArrayList<>(userPath);
+        latchPath.add(userName);
+        tableReader.Latch(latchPath, this);
+    }
+
+    @Override
+    public Map<String, Object> ToMap() {
+        return new HashMap<String, Object>() {{
+            put("BudgetLevel", budgetLevel);
+            put("BudgetScore", budgetScore);
+            put("SavingsGoal", savingsGoal);
+            put("Rent", rent);
+            put("OtherExpenses", otherExpenses);
+            put("PrimaryIncome", primaryIncome);
+            put("OtherIncome", otherIncome);
+            // suggestedSpending should probably be calculated on the spot
+        }};
+    }
+
+    @Override
+    public void GetFromMap(Map<String, Object> map) {
+        budgetLevel = (long) map.get("BudgetLevel");
+        budgetScore = (long) map.get("BudgetScore");
+        savingsGoal = (long) map.get("SavingsGoal");
+        rent        = (long) map.get("Rent");
+        otherExpenses = (long) map.get("OtherExpenses");
+        otherIncome = (long) map.get("OtherIncome");
+    }
+
+    @Override
+    public void OnDataChange() {
+        // Add custom logic here to be executed when user data changes
+        // as a result of a database read
+        // Do not add anything if this is expected to be overridden
+    }
+
+    // Only for testing purposes
+    BBUser SetUsername(String userName) {
+        this.userName = userName;
+        return this;
+    }
+    BBUser SetBudgetLevel(long budgetLevel) {
+        this.budgetLevel = budgetLevel;
+        return this;
+    }
+
     private BBUser() {
         authentication = FirebaseAuth.getInstance();
         userName = "";
+        tableWriter = new TableWriter();
+        tableReader = new TableReader();
+        userPath = new ArrayList<String>() {{
+            add(DataConfig.DataLabels.USERS);
+        }};
     }
 }

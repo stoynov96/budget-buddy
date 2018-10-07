@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 
+import com.budget_buddy.exception.InvalidDataLabelException;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -78,7 +80,6 @@ public class Login extends AppCompatActivity {
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
         Log.d("Sign in message:", "firebaseAuthWithGoogle: " + account.getId());
-
         Task task = currentUser.SignIn(account);
 
         task.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -87,8 +88,12 @@ public class Login extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("Sign in message:", "signInWithCredential:success");
-                    currentUser.Initialize();
-
+                    try {
+                        currentUser.Initialize();
+                    }
+                    catch (InvalidDataLabelException idle) {
+                        // TODO: IMPORTANT: Handle this exception
+                    }
                     gotoDashboard(currentUser);
 
                 } else {
@@ -98,7 +103,6 @@ public class Login extends AppCompatActivity {
                 }
             }});
     }
-
 
     private void gotoDashboard(BBUser user) {
         if (user.GetUser() != null) {

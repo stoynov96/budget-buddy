@@ -27,18 +27,18 @@ public class TableReader {
     }
 
     /**
-     * Latches onto a particular child given as a list of labels.
+     * Latches onto a particular child given as a list of path.
      * As data in the database is changed, so will the values in that object
-     * @param labels List of labels to reference to the database child
+     * @param path List of labels to reference to the database child
      * @param data {@link DataNode} to latch to the database
      * @throws InvalidDataLabelException Thrown if an invalid label is used
      */
-    public void Latch(List<String> labels, final DataNode data)
+    public void Latch(List<String> path, final DataNode data)
             throws InvalidDataLabelException {
         // Todo: we should validate if there actually is data at this label.
         // Todo: (cont.) the problem with doing it the obvious way is outlined here:
         // https://stackoverflow.com/questions/37397205/google-firebase-check-if-child-exists
-        String label = joinLabels(labels);
+        final String label = joinLabels(path);
         mDatabase.child(label).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -55,28 +55,32 @@ public class TableReader {
     }
 
     /**
-     * Latches onto a particular child given as a label under the root.
+     * Latches onto a particular child given as a path under the root.
      * As data in the database is changed, so will the values in that object
-     * @param label Label to reference the database child
+     * @param path Path of labels to reference the database child
      * @param data {@link DataNode} to latch to the database
-     * @throws InvalidDataLabelException Thrown if an invalid label is used
+     * @throws InvalidDataLabelException Thrown if an invalid path is used
      */
-    public void Latch(final String label, final DataNode data)
+    public void Latch(final String path, final DataNode data)
             throws InvalidDataLabelException {
-        List<String> labels = new ArrayList<String>() {{ add(label); }};
+        List<String> labels = new ArrayList<String>() {{ add(path); }};
         Latch(labels, data);
     }
 
-    // Todo: this is code repetition from TableWriter. Maybe we should define this method externally
+    // This won't check the last label - that is supposed to be the final object label
     private String joinLabels(List<String> labels) throws InvalidDataLabelException {
         StringBuilder labelsSb = new StringBuilder();
         String deliminator = "";
+        String lastLabel = DataConfig.DataLabels.USERS; // some dummy valid label
 
         for(String label : labels) {
-            DataConfig.DataLabels.VerifyLabel(label);
+            DataConfig.DataLabels.VerifyLabel(lastLabel);
+
             labelsSb.append(deliminator);
             deliminator = "/";
+
             labelsSb.append(label);
+            lastLabel = label;
         }
         return labelsSb.toString();
     }
