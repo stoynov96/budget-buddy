@@ -25,29 +25,29 @@ public class TableWriter {
     }
 
     /**
-     * Writes data to the database with a specified label
-     * @param label Label under which to write the data
+     * Writes data to the database with a specified path
+     * @param path Path under which to write the data
      * @param data {@link DataNode} to write to the database
-     * @param push Whether to push with a new key
-     *             (use false if the key is already provided in labels)
-     * @throws InvalidDataLabelException Thrown if an invalid label is used
+     * @param label Label to write data under
+     *             (leave null if one should be generated automatically)
+     * @throws InvalidDataLabelException Thrown if an invalid path is used
      */
-    public void WriteData(final String label, DataNode data, boolean push)
+    public void WriteData(final String path, DataNode data, String label)
             throws InvalidDataLabelException{
-        this.WriteData(new ArrayList<String>() {{ add(label); }}, data, push);
+        this.WriteData(new ArrayList<String>() {{ add(path); }}, data, label);
     }
 
     /**
      * Writes data nested under a number of labels
-     * @param labels List of labels to nest data under
+     * @param path Path of labels to nest data under
      * @param data {@link DataNode} to write to the database
-     * @param push Whether to push with a new key
-     *             (use false if the key is already provided in labels)
+     * @param label Label to write data under
+     *              (leave null if one should be generated automatically)
      * @throws InvalidDataLabelException Thrown if an invalid label is used
      */
-    public void WriteData(List<String> labels, DataNode data, boolean push)
+    public void WriteData(List<String> path, DataNode data, String label)
             throws InvalidDataLabelException {
-        String label = joinLabels(labels);
+        String fullPath = joinLabels(path);
 
         OnCompleteListener<Void> listener = new OnCompleteListener<Void>() {
             @Override
@@ -59,10 +59,10 @@ public class TableWriter {
         };
 
         // Write the data
-        if (push)
-            mDatabase.child(label).push().setValue(data.ToMap());
+        if (label == null)
+            mDatabase.child(fullPath).push().setValue(data.ToMap());
         else
-            mDatabase.child(label).setValue(data.ToMap());
+            mDatabase.child(fullPath).child(label).setValue(data.ToMap());
     }
 
     private String joinLabels(List<String> labels) throws InvalidDataLabelException {
