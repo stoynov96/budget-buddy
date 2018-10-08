@@ -9,17 +9,14 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class Dashboard extends AppCompatActivity {
 
-    FirebaseAuth mAuth;
-    FirebaseUser user;
+    BBUser currentUser = BBUser.GetInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
-        mAuth = FirebaseAuth.getInstance();
-        user = mAuth.getCurrentUser();
 
         TextView userNameTextView = findViewById(R.id.userName);
-        userNameTextView.setText("User: " + user.getDisplayName());
+        userNameTextView.setText("User: " + currentUser.GetUserName());
     }
 }
