@@ -1,9 +1,17 @@
 package com.budget_buddy;
 
+<<<<<<< HEAD
+=======
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+>>>>>>> BBUserClass
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+<<<<<<< HEAD
+=======
+import com.google.firebase.auth.GoogleAuthProvider;
+>>>>>>> BBUserClass
 
 class BBUser {
     // The singleton class object used for referencing throughout the program.
@@ -25,7 +33,8 @@ class BBUser {
     FirebaseUser GetUser() {return user;}
     String GetUserName() {return userName;}
 
-    public Task SignIn(AuthCredential credential) {
+    public Task SignIn(GoogleSignInAccount account) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         return authentication.signInWithCredential(credential);
     }
 
