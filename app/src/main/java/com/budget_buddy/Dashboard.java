@@ -17,6 +17,6 @@ public class Dashboard extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         TextView userNameTextView = findViewById(R.id.userName);
-        userNameTextView.setText("User: " + currentUser.GetUserName());
+        userNameTextView.setText(currentUser.GetUserName());
     }
 }
