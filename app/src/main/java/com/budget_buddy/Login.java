@@ -15,11 +15,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-<<<<<<< HEAD
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-=======
->>>>>>> BBUserClass
 
 public class Login extends AppCompatActivity {
 
@@ -84,12 +79,8 @@ public class Login extends AppCompatActivity {
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
         Log.d("Sign in message:", "firebaseAuthWithGoogle: " + account.getId());
 
-<<<<<<< HEAD
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        Task task = currentUser.SignIn(credential);
-=======
         Task task = currentUser.SignIn(account);
->>>>>>> BBUserClass
+
         task.addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -97,11 +88,9 @@ public class Login extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("Sign in message:", "signInWithCredential:success");
                     currentUser.Initialize();
-<<<<<<< HEAD
-                    gotoDashboard(currentUser.GetUser());
-=======
+
                     gotoDashboard(currentUser);
->>>>>>> BBUserClass
+
                 } else {
                     // TODO: If sign in fails, display a message to the user.
                     Log.w("Sign in message:", "signInWithCredential:failure", task.getException());
@@ -110,13 +99,9 @@ public class Login extends AppCompatActivity {
             }});
     }
 
-<<<<<<< HEAD
-    private void gotoDashboard(FirebaseUser user) {
-        if (user != null) {
-=======
+
     private void gotoDashboard(BBUser user) {
         if (user.GetUser() != null) {
->>>>>>> BBUserClass
             Intent dashboardIntent = new Intent(this, Dashboard.class);
 
             startActivity(dashboardIntent);
