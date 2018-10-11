@@ -52,6 +52,17 @@ public class TableReaderTest {
         assertEquals(expected, user.ToMap());
     }
 
+    @Test(expected = InvalidDataLabelException.class)
+    public void testInvalidLabel() throws InvalidDataLabelException {
+        tableReader = new TableReader();
+        DummyUser user = new DummyUser("noname", 0.24);
+        List<String> labels = new ArrayList<>();
+        labels.add(DataConfig.DataLabels.TEST);
+        labels.add(DataConfig.DataLabels.USERS);
+        labels.add("InvalidLabel");
+        tableReader.Latch(labels, user);
+    }
+
     @AfterClass
     public static void ConcludeTesting() throws InterruptedException {
         TimeUnit.SECONDS.sleep(3);
