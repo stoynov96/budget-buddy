@@ -21,8 +21,8 @@ public class TableWriterTest {
     @Test
     public void testWrite() throws InvalidDataLabelException {
         tableWriter = new TableWriter();
-        DummyUser user = new DummyUser("testUName", 235.21);
-        tableWriter.WriteData(DataConfig.DataLabels.TEST, user, true);
+        DummyUser user = new DummyUser("testUName", 235);
+        tableWriter.WriteData(DataConfig.DataLabels.TEST, user, false);
     }
 
     @Test

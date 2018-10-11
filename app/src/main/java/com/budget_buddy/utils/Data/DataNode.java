@@ -8,4 +8,9 @@ public interface DataNode {
      * @return Map to be written to the database
      */
     Map<String, Object> ToMap();
+
+    /**
+     * Assigns values to this DataNode from a map
+     */
+    void GetFromMap(Map<String, Object> map);
 }

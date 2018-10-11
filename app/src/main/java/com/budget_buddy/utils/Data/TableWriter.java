@@ -1,7 +1,11 @@
 package com.budget_buddy.utils.Data;
 
+import android.support.annotation.NonNull;
+
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -13,7 +17,8 @@ public class TableWriter {
     private DatabaseReference mDatabase;
 
     /**
-     * Initializes a TableWriter with a default instance of a {@link DatabaseReference}
+     * Initializes a {@link TableWriter} with a default instance
+     * of a {@link DatabaseReference}
      */
     public TableWriter() {
         this.mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -41,8 +46,19 @@ public class TableWriter {
      * @throws InvalidDataLabelException Thrown if an invalid label is used
      */
     public void WriteData(List<String> labels, DataNode data, boolean push)
-            throws InvalidDataLabelException{
+            throws InvalidDataLabelException {
         String label = joinLabels(labels);
+
+        OnCompleteListener<Void> listener = new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isCanceled()) {
+                    // Todo: add logic here to handle cancelled writes
+                }
+            }
+        };
+
+        // Write the data
         if (push)
             mDatabase.child(label).push().setValue(data.ToMap());
         else
