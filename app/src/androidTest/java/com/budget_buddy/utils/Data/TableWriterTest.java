@@ -1,4 +1,4 @@
-package com.budget_buddy.utils;
+package com.budget_buddy.utils.Data;
 
 import android.support.test.runner.AndroidJUnit4;
 
@@ -22,15 +22,15 @@ public class TableWriterTest {
     public void testWrite() throws InvalidDataLabelException {
         tableWriter = new TableWriter();
         DummyUser user = new DummyUser("testUName", 235.21);
-        tableWriter.WriteData(DataConfig.DataLabels.USERS, user, true);
+        tableWriter.WriteData(DataConfig.DataLabels.TEST, user, true);
     }
 
     @Test
     public void testWriteNested() throws InvalidDataLabelException {
         tableWriter = new TableWriter();
         List<String> labels = new ArrayList<String>() {{
+            add(DataConfig.DataLabels.TEST);
             add(DataConfig.DataLabels.USERS);
-            add(DataConfig.DataLabels.TEST_NESTED);
         }};
         DummyUser user = new DummyUser("testUName", 235.21);
         tableWriter.WriteData(labels, user, true);
@@ -40,8 +40,8 @@ public class TableWriterTest {
     public void testInvalidLabel() throws InvalidDataLabelException {
         tableWriter = new TableWriter();
         List<String> labels = new ArrayList<String>() {{
+            add(DataConfig.DataLabels.TEST);
             add(DataConfig.DataLabels.USERS);
-            add(DataConfig.DataLabels.TEST_NESTED);
             add("InvalidLabel");
         }};
         DummyUser user = new DummyUser("testUName", 235.21);

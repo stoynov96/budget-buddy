@@ -1,7 +1,6 @@
-package com.budget_buddy.utils;
+package com.budget_buddy.utils.Data;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class is only here because firebase wants some class to write data. Disregard

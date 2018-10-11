@@ -1,4 +1,4 @@
-package com.budget_buddy.utils;
+package com.budget_buddy.utils.Data;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.budget_buddy.utils;
+package com.budget_buddy.utils.Data;
 
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
