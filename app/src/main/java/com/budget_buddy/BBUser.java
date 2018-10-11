@@ -44,6 +44,16 @@ class BBUser {
         }
     }
 
+    public boolean IsLoggedIn() {
+        user = authentication.getInstance().getCurrentUser();
+        if(user != null) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
     private BBUser() {
         authentication = FirebaseAuth.getInstance();
         userName = "";
