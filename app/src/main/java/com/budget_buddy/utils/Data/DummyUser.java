@@ -40,4 +40,12 @@ public class DummyUser implements DataNode {
             budget = (double) budgetO;
         }
     }
+
+    /**
+     * This can be overridden for each specific object to insert custom logic
+     */
+    @Override
+    public void OnDataChange() {
+
+    }
 }

@@ -13,4 +13,10 @@ public interface DataNode {
      * Assigns values to this DataNode from a map
      */
     void GetFromMap(Map<String, Object> map);
+
+    /**
+     * Function to trigger when data this node is latched onto has changed.
+     * This can be overridden for each specific object to insert custom logic
+     */
+    void OnDataChange();
 }

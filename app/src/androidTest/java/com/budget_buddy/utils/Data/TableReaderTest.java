@@ -24,32 +24,40 @@ public class TableReaderTest {
     @Test
     public void testLatch() throws InvalidDataLabelException, InterruptedException {
         tableReader = new TableReader();
-        DummyUser user = new DummyUser("noname", 0.24);
+        final Map<String, Object> expected = new HashMap<String, Object>() {{
+            put("mapLabelun", "testUName");
+            put("mapLabelB", 235.0);
+        }};
+        DummyUser user = new DummyUser("noname", 0.24) {
+            // Check if the data is as expected whenever it changes
+            @Override
+            public void OnDataChange() {
+                assertEquals(expected, ToMap());
+            }
+        };
+
         tableReader.Latch(DataConfig.DataLabels.TEST, user);
-
-        TimeUnit.SECONDS.sleep(2); // give it some time to update
-
-        Map<String, Object> expected = new HashMap<>();
-        expected.put("mapLabelun", "testUName");
-        expected.put("mapLabelB", 235.0);
-        assertEquals(expected, user.ToMap());
     }
 
     @Test
     public void testLatchNested() throws InvalidDataLabelException, InterruptedException {
         tableReader = new TableReader();
-        DummyUser user = new DummyUser("noname", 0.24);
+        final Map<String, Object> expected = new HashMap<String, Object>() {{
+            put("mapLabelun", "testUName");
+            put("mapLabelB", 235.0);
+        }};
+        DummyUser user = new DummyUser("noname", 0.24) {
+            // Check if the data is as expected whenever it changes
+            @Override
+            public void OnDataChange() {
+                assertEquals(expected, ToMap());
+            }
+        };
+
         List<String> labels = new ArrayList<>();
         labels.add(DataConfig.DataLabels.TEST);
         labels.add(DataConfig.DataLabels.USERS);
         tableReader.Latch(labels, user);
-
-        TimeUnit.SECONDS.sleep(2); // give it some time to update
-
-        Map<String, Object> expected = new HashMap<>();
-        expected.put("mapLabelun", "testUName");
-        expected.put("mapLabelB", 235.0);
-        assertEquals(expected, user.ToMap());
     }
 
     @Test(expected = InvalidDataLabelException.class)
@@ -61,6 +69,15 @@ public class TableReaderTest {
         labels.add(DataConfig.DataLabels.USERS);
         labels.add("InvalidLabel");
         tableReader.Latch(labels, user);
+
+        user = new DummyUser("noname", 0.24) {
+            @Override
+            public void OnDataChange() {
+                assertEquals("asd", "ewt");
+            }
+        };
+
+        user.OnDataChange();
     }
 
     @AfterClass

@@ -36,7 +36,7 @@ public class TableReader {
     public void Latch(List<String> labels, final DataNode data)
             throws InvalidDataLabelException {
         // Todo: we should validate if there actually is data at this label.
-        // Todo: (cont.) to problem with doing it the obvious way is outlined here:
+        // Todo: (cont.) the problem with doing it the obvious way is outlined here:
         // https://stackoverflow.com/questions/37397205/google-firebase-check-if-child-exists
         String label = joinLabels(labels);
         mDatabase.child(label).addValueEventListener(new ValueEventListener() {
@@ -44,6 +44,7 @@ public class TableReader {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Map<String, Object> map = (Map)dataSnapshot.getValue();
                 data.GetFromMap(map);
+                data.OnDataChange();
             }
 
             @Override
