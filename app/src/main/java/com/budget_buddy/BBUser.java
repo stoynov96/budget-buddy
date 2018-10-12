@@ -17,9 +17,22 @@ class BBUser {
     // The user's name as entered in the database.
     private String userName;
     // Current level of the user (NYI)
-    public int budgetLevel;
+    private int budgetLevel = -1;
     // Current score of the user (NYI)
-    public int budgetScore;
+    private int budgetScore = -1;
+    // Monthly Savings Goal (this is how much the user hopes to save throughout the month)
+    private int savingsGoal = -1;
+    // Rent (in dollars, should we worry about cents at all?)
+    private int rent = -1;
+    // other expenses (maybe we should store as an array but simpler as a lump sum)
+    private int otherExpenses = -1;
+    // Primary income
+    private int primaryIncome = -1;
+    // Other income
+    private int otherIncome = -1;
+    // Suggested daily spending amount
+    // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
+    private int suggestedSpendingAmount = -1;
 
     static BBUser GetInstance() {
         return ourInstance;
@@ -52,6 +65,19 @@ class BBUser {
         else {
             return false;
         }
+    }
+
+    public int getSavingsGoal() {
+        if (savingsGoal == -1) {
+            // fetch from server
+        }
+
+        return savingsGoal;
+    }
+
+    public boolean updateSavingsGoal(int newGoal) {
+
+        return false;
     }
 
     private BBUser() {
