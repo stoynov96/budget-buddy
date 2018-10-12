@@ -40,7 +40,7 @@ public class Login extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         // TODO: Check if user is signed in (non-null) and update UI accordingly. I.E. if they are no longer signed in, display the sign in page.
-        if(currentUser.GetUser() != null) {
+        if(currentUser.IsLoggedIn()) {
             gotoDashboard(currentUser);
         }
         else {
