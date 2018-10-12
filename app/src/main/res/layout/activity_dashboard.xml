@@ -22,11 +22,31 @@
         android:layout_width="289dp"
         android:layout_height="30dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/profile"
-        app:layout_constraintEnd_toStartOf="@+id/profile"
+        app:layout_constraintBottom_toBottomOf="@+id/profileImage"
+        app:layout_constraintEnd_toStartOf="@+id/profileImage"
         app:layout_constraintHorizontal_bias="0.676"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/profile"
-        app:layout_constraintVertical_bias="0.13" />
+        app:layout_constraintTop_toTopOf="@+id/profileImage"
+        app:layout_constraintVertical_bias="0.8" />
+
+    <TextView
+        android:id="@+id/rankTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Budget Peasent"
+        app:layout_constraintStart_toStartOf="@+id/experienceBar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/experienceProgessFraction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toEndOf="@+id/rankTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="(300/800)" />
+
 </android.support.constraint.ConstraintLayout>
