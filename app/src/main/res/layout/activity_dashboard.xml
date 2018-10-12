@@ -12,6 +12,7 @@
         android:layout_height="52dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="16dp"
+        android:contentDescription="@string/profile_image_string_common_google_play_services_enable_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/sym_def_app_icon" />
@@ -35,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Budget Peasant"
+        android:text="@string/budget_peasant"
         app:layout_constraintStart_toStartOf="@+id/experienceBar"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -48,5 +49,29 @@
         app:layout_constraintStart_toEndOf="@+id/rankTitle"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="(300/800)" />
+
+    <ImageButton
+        android:id="@+id/manualEntry"
+        android:layout_width="178dp"
+        android:layout_height="92dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/manual_reciept_entry"
+        android:onClick="gotoEntryMethodFor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_receipt_black_48dp" />
+
+    <ImageButton
+        android:id="@+id/cameraEntry"
+        android:layout_width="178dp"
+        android:layout_height="92dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/camera_entry"
+        android:onClick="gotoEntryMethodFor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_photo_camera_black_24dp" />
 
 </android.support.constraint.ConstraintLayout>
