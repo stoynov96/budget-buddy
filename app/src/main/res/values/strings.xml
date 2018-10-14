@@ -4,4 +4,13 @@
     <string name="budget_peasant">Budget Peasant</string>
     <string name="profile_image_string_common_google_play_services_enable_button">profile image @string/common_google_play_services_enable_button</string>
     <string name="camera_entry">camera entry</string>
+    <string-array name="day_abbreviations">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tues</item>
+        <item>Wed</item>
+        <item>Thurs</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
 </resources>
