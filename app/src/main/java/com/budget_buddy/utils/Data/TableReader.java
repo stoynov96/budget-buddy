@@ -43,8 +43,10 @@ public class TableReader {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Map<String, Object> map = (Map)dataSnapshot.getValue();
-                data.GetFromMap(map);
-                data.OnDataChange();
+                if (map != null) {
+                    data.GetFromMap(map);
+                    data.OnDataChange();
+                }
             }
 
             @Override
