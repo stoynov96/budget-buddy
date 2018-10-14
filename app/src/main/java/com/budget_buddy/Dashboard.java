@@ -9,15 +9,21 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.budget_buddy.animations.ExperienceBarAnimation;
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.lang.reflect.Array;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -85,18 +91,40 @@ public class Dashboard extends AppCompatActivity {
 
         BarDataSet dataSet = new BarDataSet(entries, "");
 
+        // set colors
+        dataSet.setColor(getResources().getColor(R.color.colorPrimary, this.getTheme()));
+        dataSet.setBarBorderColor(getResources().getColor(R.color.colorPrimaryDark, this.getTheme()));
+        dataSet.setBarBorderWidth(2.5f);
+
         BarData barData = new BarData(dataSet);
-        barData.setBarWidth(1);
+        barData.setBarWidth(0.85f);
+
         chart.setData(barData);
+        chart.setFitBars(true);
 
+        IValueFormatter valueFormatter = new IValueFormatter() {
 
+            private DecimalFormat mFormat = new DecimalFormat("###,###,##0.00");
+
+            @Override
+            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+                return "$" + mFormat.format(value);
+            }
+        };
+
+        barData.setValueFormatter(valueFormatter);
+
+        // disable touch gestures
         chart.setDragEnabled(false);
         chart.setScaleEnabled(false);
         chart.setTouchEnabled(false);
-        //chart.setDrawGridBackground(false);
-        chart.setDrawMarkers(false);
 
+        // remove label
+        chart.getDescription().setEnabled(false);
+
+        // make the daily allowance line
         LimitLine dailyAllowance = new LimitLine(4.0f, "Daily allowance");
+        dailyAllowance.setLineColor(getResources().getColor(R.color.colorAccent, this.getTheme()));
         chart.getAxisLeft().addLimitLine(dailyAllowance);
 
         // don't show the grid
@@ -104,7 +132,10 @@ public class Dashboard extends AppCompatActivity {
         chart.getAxisLeft().setDrawGridLines(false);
         chart.getAxisRight().setEnabled(false);
 
-        IAxisValueFormatter formatter = new IAxisValueFormatter() {
+        // draw labels on bottom
+        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        IAxisValueFormatter axisValueFormatter = new IAxisValueFormatter() {
 
             private String[] days = getResources().getStringArray(R.array.day_abbreviations);
 
@@ -118,9 +149,13 @@ public class Dashboard extends AppCompatActivity {
             }
         };
 
-        chart.getXAxis().setValueFormatter(formatter);
+        chart.getXAxis().setValueFormatter(axisValueFormatter);
 
-        chart.invalidate();
+        chart.getLegend().setEnabled(false);
+
+        //chart.animateX(2000);
+        chart.animateY( 2000, Easing.EasingOption.EaseInOutExpo);
+
 
     }
 
