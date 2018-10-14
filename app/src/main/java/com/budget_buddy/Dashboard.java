@@ -69,7 +69,7 @@ public class Dashboard extends AppCompatActivity {
         BarChart chart = new BarChart(this);
         chart.setId(R.id.bar_graph_view);
 
-        ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataDigestLayout);
+        ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataGraphLayout);
         cl.addView(chart,0,500);
 
         ConstraintSet constraintSet = new ConstraintSet();
