@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.budget_buddy.animations.ExperienceBarAnimation;
+
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
@@ -22,12 +23,10 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Date;
 
 public class Dashboard extends AppCompatActivity {
 
@@ -53,6 +52,7 @@ public class Dashboard extends AppCompatActivity {
         experienceProgressText = findViewById(R.id.experienceProgessFraction);
         experienceBarAnimation = new ExperienceBarAnimation(experienceBar, experienceProgressText);
         experienceBarAnimation.setProgress(1675);
+
     }
 
     public void gotoEntryMethodFor(View view) {
@@ -101,7 +101,6 @@ public class Dashboard extends AppCompatActivity {
 
         chart.setData(barData);
         chart.setFitBars(true);
-
         IValueFormatter valueFormatter = new IValueFormatter() {
 
             private DecimalFormat mFormat = new DecimalFormat("###,###,##0.00");
@@ -134,14 +133,12 @@ public class Dashboard extends AppCompatActivity {
 
         // draw labels on bottom
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-
         IAxisValueFormatter axisValueFormatter = new IAxisValueFormatter() {
 
             private String[] days = getResources().getStringArray(R.array.day_abbreviations);
 
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-
                 Calendar calendar = Calendar.getInstance();
                 // this graph will only show previous 7 days
                 int today = calendar.get(Calendar.DAY_OF_WEEK);
