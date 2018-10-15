@@ -84,8 +84,13 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.applyTo(cl);
 
         List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, 250));
+        entries.add(new BarEntry(0, 235));
         BarDataSet barDataSet = new BarDataSet(entries, "");
+
+        // set colors
+        barDataSet.setColor(getResources().getColor(R.color.colorPrimary, this.getTheme()));
+        barDataSet.setBarBorderColor(getResources().getColor(R.color.colorPrimaryDark, this.getTheme()));
+        barDataSet.setBarBorderWidth(2.5f);
 
         BarData barData = new BarData(barDataSet);
 
@@ -111,14 +116,15 @@ public class Dashboard extends AppCompatActivity {
         // don't draw xAxis labels
         xAxis.setDrawLabels(false);
 
-        // take care of top and bottom labels
+        // set axis scale to the max price of the item
+        bottomAxis.setAxisMinimum(0);
+        bottomAxis.setAxisMaximum(300);
         topAxis.setAxisMinimum(0);
         topAxis.setAxisMaximum(300);
-        bottomAxis.setDrawLabels(false);
+        // take care of top and bottom labels
+        topAxis.setDrawLabels(false);
 
-        progressBar.getViewPortHandler().fitScreen();
-
-        progressBar.invalidate();
+        progressBar.animateY(getResources().getInteger(R.integer.dashboard_animation_time), Easing.EasingOption.EaseInOutExpo);
     }
 
     private void addChart() {
