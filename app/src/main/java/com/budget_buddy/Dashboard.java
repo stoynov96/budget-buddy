@@ -11,8 +11,10 @@ import android.widget.TextView;
 import com.budget_buddy.animations.ExperienceBarAnimation;
 
 import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -44,6 +46,7 @@ public class Dashboard extends AppCompatActivity {
 
         setupExperienceBar();
         addChart();
+        addProgressBar();
     }
 
     private void setupExperienceBar() {
@@ -65,19 +68,73 @@ public class Dashboard extends AppCompatActivity {
         }
     }
 
+    private void addProgressBar() {
+        HorizontalBarChart progressBar = new HorizontalBarChart(this);
+        progressBar.setId(R.id.progress_bar_view);
+
+        ConstraintLayout cl = findViewById(R.id.dataBreakdownLayout);
+        cl.addView(progressBar, 0, 200);
+
+        ConstraintSet constraintSet = new ConstraintSet();
+
+        constraintSet.clone(cl);
+        constraintSet.connect(progressBar.getId(), ConstraintSet.LEFT, cl.getId(),ConstraintSet.LEFT, 8);
+        constraintSet.connect(progressBar.getId(), ConstraintSet.RIGHT, cl.getId(),ConstraintSet.RIGHT, 8);
+        constraintSet.connect(progressBar.getId(),ConstraintSet.BOTTOM, cl.getId(),ConstraintSet.BOTTOM, 0);
+        constraintSet.applyTo(cl);
+
+        List<BarEntry> entries = new ArrayList<>();
+        entries.add(new BarEntry(0, 250));
+        BarDataSet barDataSet = new BarDataSet(entries, "");
+
+        BarData barData = new BarData(barDataSet);
+
+        progressBar.setData(barData);
+        progressBar.setFitBars(true);
+
+        // remove legend
+        progressBar.getLegend().setEnabled(false);
+        // remove description
+        progressBar.getDescription().setEnabled(false);
+
+        // get axes
+        XAxis xAxis = progressBar.getXAxis();
+        YAxis topAxis = progressBar.getAxisLeft();
+        YAxis bottomAxis = progressBar.getAxisRight();
+        // don't show the grid
+        topAxis.setDrawAxisLine(true);
+        xAxis.setDrawGridLines(false);
+        topAxis.setDrawGridLines(false);
+
+        // don't draw line along xAxis
+        xAxis.setDrawAxisLine(false);
+        // don't draw xAxis labels
+        xAxis.setDrawLabels(false);
+
+        // take care of top and bottom labels
+        topAxis.setAxisMinimum(0);
+        topAxis.setAxisMaximum(300);
+        bottomAxis.setDrawLabels(false);
+
+        progressBar.getViewPortHandler().fitScreen();
+
+        progressBar.invalidate();
+    }
+
     private void addChart() {
         BarChart chart = new BarChart(this);
         chart.setId(R.id.bar_graph_view);
 
         ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataGraphLayout);
-        cl.addView(chart,0,500);
+        cl.addView(chart,0,0);
 
         ConstraintSet constraintSet = new ConstraintSet();
 
         constraintSet.clone(cl);
         constraintSet.connect(chart.getId(), ConstraintSet.LEFT, cl.getId(),ConstraintSet.LEFT, 8);
         constraintSet.connect(chart.getId(), ConstraintSet.RIGHT, cl.getId(),ConstraintSet.RIGHT, 8);
-        constraintSet.connect(chart.getId(),ConstraintSet.BOTTOM, cl.getId(),ConstraintSet.BOTTOM, 8);
+        constraintSet.connect(chart.getId(),ConstraintSet.BOTTOM, cl.getId(),ConstraintSet.BOTTOM, 0);
+        constraintSet.connect(chart.getId(), ConstraintSet.TOP, cl.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
         List<BarEntry> entries = new ArrayList<BarEntry>();
