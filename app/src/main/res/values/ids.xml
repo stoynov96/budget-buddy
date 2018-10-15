@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="bar_graph_view" type="id" />
+    <item name="progress_bar_view" type="id" />
+    <item name="progress_bar_description" type="id" />
 </resources>

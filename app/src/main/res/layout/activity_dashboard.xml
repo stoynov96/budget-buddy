@@ -8,13 +8,12 @@
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/profileExperienceLayout"
-        android:layout_width="395dp"
+        android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/dataDigestLayout"
+        app:layout_constraintBottom_toTopOf="@+id/dataBreakdownLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -67,59 +66,85 @@
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/dataDigestLayout"
-        android:layout_width="395dp"
-        android:layout_height="400dp"
+        android:id="@+id/dataBreakdownLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/dataEntryButtonsLayout"
+        app:layout_constraintBottom_toTopOf="@+id/dataGraphLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileExperienceLayout">
+
+
+        <TextView
+            android:id="@+id/welcomeMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/default_welcome_message"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/dataGraphLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:minHeight="200dp"
+        app:layout_constraintBottom_toTopOf="@+id/dataEntryButtonsLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dataBreakdownLayout">
 
 
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/dataEntryButtonsLayout"
-        android:layout_width="395dp"
-        android:layout_height="94dp"
+        android:layout_width="0dp"
+        android:layout_height="85dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dataDigestLayout">
+        app:layout_constraintTop_toBottomOf="@+id/dataGraphLayout">
 
         <ImageButton
             android:id="@+id/manualEntry"
-            android:layout_width="178dp"
+            android:layout_width="0dp"
             android:layout_height="92dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
             android:contentDescription="@string/manual_reciept_entry"
             android:onClick="gotoEntryMethodFor"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/cameraEntry"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_receipt_black_48dp" />
 
         <ImageButton
             android:id="@+id/cameraEntry"
-            android:layout_width="178dp"
+            android:layout_width="0dp"
             android:layout_height="92dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:contentDescription="@string/camera_entry"
             android:onClick="gotoEntryMethodFor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/manualEntry"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_photo_camera_black_48dp" />
     </android.support.constraint.ConstraintLayout>
