@@ -105,6 +105,7 @@ public class Dashboard extends AppCompatActivity {
         barDataSet.setBarBorderWidth(2.5f);
 
         BarData barData = new BarData(barDataSet);
+        barData.setDrawValues(false);
 
         progressBar.setData(barData);
         progressBar.setFitBars(true);
