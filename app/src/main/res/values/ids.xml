@@ -2,4 +2,5 @@
 <resources>
     <item name="bar_graph_view" type="id" />
     <item name="progress_bar_view" type="id" />
+    <item name="progress_bar_description" type="id" />
 </resources>

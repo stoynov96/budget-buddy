@@ -1,6 +1,5 @@
 package com.budget_buddy;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -38,6 +37,9 @@ public class Dashboard extends AppCompatActivity {
     TextView experienceProgressText;
     ExperienceBarAnimation experienceBarAnimation;
 
+    HorizontalBarChart progressBar;
+    TextView progressBarDescription;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +57,6 @@ public class Dashboard extends AppCompatActivity {
         experienceProgressText = findViewById(R.id.experienceProgessFraction);
         experienceBarAnimation = new ExperienceBarAnimation(experienceBar, experienceProgressText);
         experienceBarAnimation.setProgress(1675);
-
     }
 
     public void gotoEntryMethodFor(View view) {
@@ -69,18 +70,29 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void addProgressBar() {
+        // create description view
+        progressBarDescription = new TextView(this);
+        progressBarDescription.setId(R.id.progress_bar_description);
+        progressBarDescription.setText(this.getString(R.string.goal, 300 - 235));
+
         HorizontalBarChart progressBar = new HorizontalBarChart(this);
         progressBar.setId(R.id.progress_bar_view);
 
         ConstraintLayout cl = findViewById(R.id.dataBreakdownLayout);
         cl.addView(progressBar, 0, 200);
+        cl.addView(progressBarDescription, 0, 50);
 
         ConstraintSet constraintSet = new ConstraintSet();
 
         constraintSet.clone(cl);
+        // constrain bar to bottom and sides
         constraintSet.connect(progressBar.getId(), ConstraintSet.LEFT, cl.getId(),ConstraintSet.LEFT, 8);
         constraintSet.connect(progressBar.getId(), ConstraintSet.RIGHT, cl.getId(),ConstraintSet.RIGHT, 8);
         constraintSet.connect(progressBar.getId(),ConstraintSet.BOTTOM, cl.getId(),ConstraintSet.BOTTOM, 0);
+        // constrain description to bar and sides
+        constraintSet.connect(progressBarDescription.getId(),ConstraintSet.LEFT, progressBar.getId(), ConstraintSet.LEFT,0);
+        constraintSet.connect(progressBarDescription.getId(),ConstraintSet.RIGHT, progressBar.getId(), ConstraintSet.RIGHT,0);
+        constraintSet.connect(progressBarDescription.getId(), ConstraintSet.BOTTOM, progressBar.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
         List<BarEntry> entries = new ArrayList<>();
@@ -215,8 +227,6 @@ public class Dashboard extends AppCompatActivity {
 
         //chart.animateX(2000);
         chart.animateY( 2000, Easing.EasingOption.EaseInOutExpo);
-
-
     }
 
 }

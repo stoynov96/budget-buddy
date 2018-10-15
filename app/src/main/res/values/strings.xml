@@ -6,7 +6,7 @@
     <string name="camera_entry">camera entry</string>
     <string name="default_welcome_message">Here\'s a breakdown of your budgeting this month.</string>
     <string name="under_budget">You\'ve gone under budget %1$i days this past week.</string>
-    <string name="goal">With your leftover savings, you\'re $%1$i away from your goal!</string>
+    <string name="goal">With your leftover savings, you\'re $%1$d away from your goal!</string>
     <string name="goal_product">That %1$s almost yours!</string>
     <string-array name="day_abbreviations">
         <item>Sun</item>
