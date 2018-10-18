@@ -63,6 +63,7 @@ public class Login extends AppCompatActivity {
 
     public void signOut(View view) {
         currentUser.SignOut();
+        mGoogleSignInClient.signOut();
     }
 
     @Override
