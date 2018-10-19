@@ -8,7 +8,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.budget_buddy.animations.ExperienceBarAnimation;
-import android.content.Intent;
+import com.budget_buddy.charts.GoalProgressBar;
+import android.content.Intent
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
@@ -77,7 +78,7 @@ public class Dashboard extends AppCompatActivity {
         progressBarDescription.setId(R.id.progress_bar_description);
         progressBarDescription.setText(this.getString(R.string.goal, 300 - 235));
 
-        HorizontalBarChart progressBar = new HorizontalBarChart(this);
+        GoalProgressBar progressBar = new GoalProgressBar(this);
         progressBar.setId(R.id.progress_bar_view);
 
         ConstraintLayout cl = findViewById(R.id.dataBreakdownLayout);
@@ -112,32 +113,12 @@ public class Dashboard extends AppCompatActivity {
         progressBar.setData(barData);
         progressBar.setFitBars(true);
 
+        progressBar.setGoal(300);
+
         // remove legend
         progressBar.getLegend().setEnabled(false);
         // remove description
         progressBar.getDescription().setEnabled(false);
-
-        // get axes
-        XAxis xAxis = progressBar.getXAxis();
-        YAxis topAxis = progressBar.getAxisLeft();
-        YAxis bottomAxis = progressBar.getAxisRight();
-        // don't show the grid
-        topAxis.setDrawAxisLine(true);
-        xAxis.setDrawGridLines(false);
-        topAxis.setDrawGridLines(false);
-
-        // don't draw line along xAxis
-        xAxis.setDrawAxisLine(false);
-        // don't draw xAxis labels
-        xAxis.setDrawLabels(false);
-
-        // set axis scale to the max price of the item
-        bottomAxis.setAxisMinimum(0);
-        bottomAxis.setAxisMaximum(300);
-        topAxis.setAxisMinimum(0);
-        topAxis.setAxisMaximum(300);
-        // take care of top and bottom labels
-        topAxis.setDrawLabels(false);
 
         progressBar.animateY(getResources().getInteger(R.integer.dashboard_animation_time), Easing.EasingOption.EaseInOutExpo);
     }
