@@ -9,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.budget_buddy.animations.ExperienceBarAnimation;
 import com.budget_buddy.charts.GoalProgressBar;
+import android.content.Intent
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
@@ -62,7 +63,8 @@ public class Dashboard extends AppCompatActivity {
 
     public void gotoEntryMethodFor(View view) {
         if(view.getId() == R.id.manualEntry) {
-
+            Intent manualEntryIntent = new Intent(this, ManualEntry.class);
+            startActivity(manualEntryIntent);
         } else if (view.getId() == R.id.cameraEntry) {
 
         } else {
