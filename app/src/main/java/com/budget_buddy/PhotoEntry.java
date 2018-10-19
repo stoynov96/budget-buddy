@@ -41,7 +41,6 @@ public class PhotoEntry extends AppCompatActivity {
     }
 
     public void openCamera() {
-        Log.i("Cat", "daughter baby girl");
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
             String cameraId = manager.getCameraIdList()[0];
