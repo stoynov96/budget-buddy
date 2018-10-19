@@ -25,9 +25,6 @@ public class GoalProgressBar extends HorizontalBarChart {
         // don't draw xAxis labels
         xAxis.setDrawLabels(false);
 
-        // TODO: just set this on the dashboard
-        setGoal(300);
-
         // take care of top and bottom labels
         topAxis.setDrawLabels(false);
     }

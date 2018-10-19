@@ -111,6 +111,8 @@ public class Dashboard extends AppCompatActivity {
         progressBar.setData(barData);
         progressBar.setFitBars(true);
 
+        progressBar.setGoal(300);
+
         // remove legend
         progressBar.getLegend().setEnabled(false);
         // remove description
