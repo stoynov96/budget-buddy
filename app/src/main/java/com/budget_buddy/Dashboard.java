@@ -1,5 +1,6 @@
 package com.budget_buddy;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -63,7 +64,8 @@ public class Dashboard extends AppCompatActivity {
         if(view.getId() == R.id.manualEntry) {
 
         } else if (view.getId() == R.id.cameraEntry) {
-
+            Intent cameraEntryIntent = new Intent(this, PhotoEntry.class);
+            startActivity(cameraEntryIntent);
         } else {
             return;
         }
