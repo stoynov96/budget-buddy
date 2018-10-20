@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/purchaseDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -16,7 +16,7 @@
         android:hint="@string/purchase_date_hint"
         android:inputType="date"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/purchaseNameField" />
+        app:layout_constraintTop_toBottomOf="@+id/purchaseName" />
 
     <TextView
         android:id="@+id/purchaseDateTitle"
@@ -26,18 +26,18 @@
         android:layout_marginEnd="8dp"
         android:gravity="center"
         android:text="@string/purchase_date_title"
-        app:layout_constraintBottom_toBottomOf="@+id/editText"
-        app:layout_constraintEnd_toStartOf="@+id/editText"
+        app:layout_constraintBottom_toBottomOf="@+id/purchaseDate"
+        app:layout_constraintEnd_toStartOf="@+id/purchaseDate"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/editText" />
+        app:layout_constraintTop_toTopOf="@+id/purchaseDate" />
 
     <EditText
-        android:id="@+id/purchaseNameField"
+        android:id="@+id/purchaseName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="23dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
         android:hint="@string/purchase_name_hint"
@@ -54,14 +54,14 @@
         android:layout_marginEnd="8dp"
         android:gravity="center"
         android:text="@string/purchase_name_title"
-        app:layout_constraintBottom_toBottomOf="@+id/purchaseNameField"
-        app:layout_constraintEnd_toStartOf="@+id/purchaseNameField"
+        app:layout_constraintBottom_toBottomOf="@+id/purchaseName"
+        app:layout_constraintEnd_toStartOf="@+id/purchaseName"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/purchaseNameField" />
+        app:layout_constraintTop_toTopOf="@+id/purchaseName" />
 
     <EditText
-        android:id="@+id/editText3"
+        android:id="@+id/purchaseAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
@@ -69,7 +69,7 @@
         android:ems="10"
         android:inputType="number"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+        app:layout_constraintTop_toBottomOf="@+id/purchaseDate" />
 
     <TextView
         android:id="@+id/purchaseAmountTitle"
@@ -79,13 +79,13 @@
         android:layout_marginEnd="8dp"
         android:gravity="center"
         android:text="@string/purchase_amount_title"
-        app:layout_constraintBottom_toBottomOf="@+id/editText3"
-        app:layout_constraintEnd_toStartOf="@+id/editText3"
+        app:layout_constraintBottom_toBottomOf="@+id/purchaseAmount"
+        app:layout_constraintEnd_toStartOf="@+id/purchaseAmount"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/editText3" />
+        app:layout_constraintTop_toTopOf="@+id/purchaseAmount" />
 
     <EditText
-        android:id="@+id/editText4"
+        android:id="@+id/purchaseNote"
         android:layout_width="0dp"
         android:layout_height="200dp"
         android:layout_marginStart="8dp"
@@ -106,15 +106,15 @@
         android:text="@string/purchase_description_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText3" />
+        app:layout_constraintTop_toBottomOf="@+id/purchaseAmount" />
 
     <ImageButton
         android:id="@+id/imageButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
-        android:layout_marginEnd="64dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="54dp"
+        android:onClick="DataEntry"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

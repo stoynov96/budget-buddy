@@ -1,5 +1,6 @@
 package com.budget_buddy;
 
+
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.budget_buddy.utils.Data.DataNode;
@@ -134,6 +135,26 @@ class BBUser implements DataNode {
     }
 
     /**
+     * This function writes a new expenditure to the database. The current structure is to write
+     * to the Users/'username'/Purchases section, and the items are stored by their purchase date.
+     * For example, if you buy a Nintendo Switch on 10/10/18 and your username is Budget Buddy, it will
+     * be in the database at Users/Budget Buddy/Purchases/'unique key'/.
+     * @param name The name of the item purchased.
+     * @param date The date the item was purchased.
+     * @param amount The amount the item cost.
+     * @throws InvalidDataLabelException thrown if userpath contains invalid label.
+     */
+    public void WriteNewExpenditure(String name, String date, String amount, String note) throws InvalidDataLabelException {
+        Map<String, Object> userData = new HashMap<>();
+        date = date.replace("/", "-");
+        userData.put("Item Name", name);
+        userData.put("Purchase Date", date);
+        userData.put("Purchase Amount", amount);
+        userData.put("Purchase Note", note);
+        tableWriter.WriteExpenditure(userPath.get(0), userData, "/"+userName+"/Purchases/"+date);
+    }
+
+    /**
      * Latches onto the database so that every time data is changed over there
      * those changes are reflected in this object
      * @throws InvalidDataLabelException thrown if userpath contains invalid labels
@@ -143,6 +164,7 @@ class BBUser implements DataNode {
         latchPath.add(userName);
         tableReader.Latch(latchPath, this);
     }
+
 
     @Override
     public Map<String, Object> ToMap() {
