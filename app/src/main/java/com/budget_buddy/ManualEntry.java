@@ -54,6 +54,11 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         user.WriteNewExpenditure(name.getText().toString(), date.getText().toString(), amount.getText().toString(), note.getText().toString());
     }
 
+    /**
+     * This function is called when tapping the date field. Instead of focusing on the field,
+     * a date picker dialog pops up.
+     * @param view
+     */
     public void displayDatepicker(View view) {
         DialogFragment datePickerFragment = new DatePickerFragment();
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");

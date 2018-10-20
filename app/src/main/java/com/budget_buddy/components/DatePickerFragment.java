@@ -13,6 +13,9 @@ import java.util.Calendar;
 // https://developer.android.com/guide/topics/ui/controls/pickers
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
+    /**
+     * The activity displaying the date picker dialog can be an OnDateSetListener.
+     */
     public interface OnDateSetListener {
         void onDateSet(DatePicker view, int year, int month, int day);
     }
@@ -43,6 +46,13 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
+    /**
+     * Called when the user presses "OK" on the date dialog
+     * @param view
+     * @param year
+     * @param month
+     * @param day
+     */
     public void onDateSet(DatePicker view, int year, int month, int day) {
         if (onDateSetListener != null) {
             onDateSetListener.onDateSet(view, year, month, day);
