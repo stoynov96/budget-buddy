@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.budget_buddy.animations.ExperienceBarAnimation;
 import com.budget_buddy.charts.GoalProgressBar;
 
+import com.budget_buddy.utils.Data.MyCallback;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -139,14 +141,28 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.connect(chart.getId(), ConstraintSet.TOP, cl.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
-        List<BarEntry> entries = new ArrayList<BarEntry>();
-        entries.add(new BarEntry(1, 5));
-        entries.add(new BarEntry(2, 3));
-        entries.add(new BarEntry(3, 8));
-        entries.add(new BarEntry(4, 7));
-        entries.add(new BarEntry(5, 2));
-        entries.add(new BarEntry(6, 1));
-        entries.add(new BarEntry(7, 5));
+        final List<BarEntry> entries = new ArrayList<BarEntry>();
+
+        for(int i = 1; i < 8; i++) {
+            entries.add(new BarEntry(i, 0));
+        }
+
+        MyCallback callback = new MyCallback() {
+            @Override
+            public void onCallback(int index, int value) {
+                Log.d("DASHDATA: ", index + ", " + value);
+                float currentValue = entries.get(index).getY();
+                BarEntry entry = new BarEntry(index, value+currentValue);
+                entries.add(index, entry);
+            }
+
+            @Override
+            public void onCallback(String key, String value) {
+
+            }
+        };
+
+        currentUser.GetWeeklySpending(callback);
 
         BarDataSet dataSet = new BarDataSet(entries, "");
 

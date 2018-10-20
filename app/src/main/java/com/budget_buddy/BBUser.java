@@ -1,9 +1,12 @@
 package com.budget_buddy;
 
 
+import android.util.Log;
+
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.budget_buddy.utils.Data.DataNode;
+import com.budget_buddy.utils.Data.MyCallback;
 import com.budget_buddy.utils.Data.TableReader;
 import com.budget_buddy.utils.Data.TableWriter;
 
@@ -15,8 +18,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -119,7 +124,6 @@ class BBUser implements DataNode {
         return suggestedSpendingAmount;
     }
 
-
     public boolean updateSavingsGoal(int newGoal) {
         return false;
     }
@@ -152,6 +156,25 @@ class BBUser implements DataNode {
         userData.put("Purchase Amount", amount);
         userData.put("Purchase Note", note);
         tableWriter.WriteExpenditure(userPath.get(0), userData, "/"+userName+"/Purchases/"+date);
+    }
+
+    public void GetWeeklySpending(final MyCallback callback) {
+        String path = userPath.get(0) + "/" + userName + "/Purchases/";
+
+        MyCallback callbackInner = new MyCallback() {
+            @Override
+            public void onCallback(String key, String value) {
+                Log.d("BBDATA: ", key + ", " + value);
+                callback.onCallback(0, 1);
+            }
+
+            @Override
+            public void onCallback(int index, int key) {
+
+            }
+        };
+
+        tableReader.WeeklyExpenditures(path, callbackInner);
     }
 
     /**
