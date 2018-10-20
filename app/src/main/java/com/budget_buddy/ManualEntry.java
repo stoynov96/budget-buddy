@@ -1,10 +1,12 @@
 package com.budget_buddy;
 
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.budget_buddy.components.DatePickerFragment;
 import com.budget_buddy.exception.InvalidDataLabelException;
 
 public class ManualEntry extends AppCompatActivity {
@@ -30,5 +32,10 @@ public class ManualEntry extends AppCompatActivity {
         EditText amount = findViewById(R.id.purchaseAmount);
         EditText note = findViewById(R.id.purchaseNote);
         user.WriteNewExpenditure(name.getText().toString(), date.getText().toString(), amount.getText().toString(), note.getText().toString());
+    }
+
+    public void displayDatepicker(View view) {
+        DialogFragment datePickerFragment = new DatePickerFragment();
+        datePickerFragment.show(getSupportFragmentManager(), "datePicker");
     }
 }
