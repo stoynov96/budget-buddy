@@ -26,11 +26,14 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.google.firebase.database.DataSnapshot;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Dashboard extends AppCompatActivity {
 
@@ -126,7 +129,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void addChart() {
-        BarChart chart = new BarChart(this);
+        final BarChart chart = new BarChart(this);
         chart.setId(R.id.bar_graph_view);
 
         ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataGraphLayout);
@@ -143,21 +146,26 @@ public class Dashboard extends AppCompatActivity {
 
         final List<BarEntry> entries = new ArrayList<BarEntry>();
 
-        for(int i = 1; i < 8; i++) {
+        for(int i = 0; i < 7; i++) {
             entries.add(new BarEntry(i, 0));
         }
 
         MyCallback callback = new MyCallback() {
             @Override
-            public void onCallback(int index, int value) {
-                Log.d("DASHDATA: ", index + ", " + value);
-                float currentValue = entries.get(index).getY();
-                BarEntry entry = new BarEntry(index, value+currentValue);
-                entries.add(index, entry);
+            public void onCallback(int [] weeklySpending) {
+                for(int i = 0; i < 7; i++) {
+                    entries.add(new BarEntry(i, weeklySpending[6-i]));
+                }
+                BarDataSet dataSet = new BarDataSet(entries, "");
+                BarData barData = new BarData(dataSet);
+                barData.setBarWidth(0.85f);
+                chart.setData(barData);
+                chart.setFitBars(true);
+
             }
 
             @Override
-            public void onCallback(String key, String value) {
+            public void onCallback(HashMap<String, Object> map) {
 
             }
         };

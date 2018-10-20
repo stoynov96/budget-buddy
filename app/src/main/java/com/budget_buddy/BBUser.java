@@ -1,6 +1,7 @@
 package com.budget_buddy;
 
 
+
 import android.util.Log;
 
 import com.budget_buddy.config.DataConfig;
@@ -18,8 +19,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -149,27 +154,71 @@ class BBUser implements DataNode {
      * @throws InvalidDataLabelException thrown if userpath contains invalid label.
      */
     public void WriteNewExpenditure(String name, String date, String amount, String note) throws InvalidDataLabelException {
-        Map<String, Object> userData = new HashMap<>();
         date = date.replace("/", "-");
-        userData.put("Item Name", name);
-        userData.put("Purchase Date", date);
-        userData.put("Purchase Amount", amount);
-        userData.put("Purchase Note", note);
-        tableWriter.WriteExpenditure(userPath.get(0), userData, "/"+userName+"/Purchases/"+date);
+        Expenditure expenditure = new Expenditure(name, date, amount, note);
+        tableWriter.WriteExpenditure(userPath.get(0), expenditure, "/"+userName+"/Purchases/"+date);
     }
 
     public void GetWeeklySpending(final MyCallback callback) {
-        String path = userPath.get(0) + "/" + userName + "/Purchases/";
+        String path = userPath.get(0) + "/" + userName + "/";
 
         MyCallback callbackInner = new MyCallback() {
-            @Override
-            public void onCallback(String key, String value) {
-                Log.d("BBDATA: ", key + ", " + value);
-                callback.onCallback(0, 1);
+            String [] validDates = CreateValidDates();
+
+            private String [] CreateValidDates() {
+                Calendar calendar = GregorianCalendar.getInstance();
+                DateFormat formatter = new SimpleDateFormat("MM-dd-yy");
+                String date;
+                Date weekOld;
+                String [] dates = new String[7];
+
+                for(int i = 1; i <=7; i++){
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.DAY_OF_YEAR, -i);
+                    weekOld = calendar.getTime();
+                    date = formatter.format(weekOld);
+                    dates[i-1] = date;
+                }
+                return dates;
+            }
+
+            private int FindRelativeDay(String [] validDates, String date) {
+                int location = -1;
+
+                for(int i = 0; i < validDates.length; i++) {
+                    if (validDates[i].equals(date)) {
+                        location = i;
+                    }
+                }
+
+                return location;
             }
 
             @Override
-            public void onCallback(int index, int key) {
+            public void onCallback(HashMap<String, Object> map) {
+                Iterator iterator = map.entrySet().iterator();
+                int [] expenditures = {0, 0, 0, 0, 0, 0, 0};
+
+                while (iterator.hasNext()) {
+                    Map.Entry pair = (Map.Entry)iterator.next();
+                    Log.d("BBUSER: ", pair.getValue().getClass().toString());
+                    HashMap<String, String> expenditureMap = (HashMap<String, String>)pair.getValue();
+                    String date = expenditureMap.get("date");
+
+                    int index = FindRelativeDay(validDates, date);
+                    // Data is part of the last 7 days, add it to the array
+                    if(index != -1) {
+                        int amount = Integer.valueOf(expenditureMap.get("amount"));
+                        expenditures[index] = expenditures[index] + amount;
+                    }
+                }
+
+                callback.onCallback(expenditures);
+
+            }
+
+            @Override
+            public void onCallback(int [] expenditures) {
 
             }
         };
