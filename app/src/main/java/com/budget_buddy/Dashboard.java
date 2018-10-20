@@ -10,7 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.budget_buddy.animations.ExperienceBarAnimation;
 import com.budget_buddy.charts.GoalProgressBar;
-import android.content.Intent
+import android.content.Intent;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
