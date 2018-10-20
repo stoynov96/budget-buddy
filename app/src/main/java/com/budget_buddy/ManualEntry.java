@@ -37,8 +37,12 @@ public class ManualEntry extends AppCompatActivity {
 
         if(name == "" || date == "" || amount == "") {
             Log.i("Purchase attempt", "Invalid input");
+            // TODO : display message
             return;
         }
         user.WriteNewExpenditure(name, date, amount, notes);
+
+        // end purchase entry
+        finish();
     }
 }
