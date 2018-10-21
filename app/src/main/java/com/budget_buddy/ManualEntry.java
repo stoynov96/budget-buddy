@@ -2,6 +2,7 @@ package com.budget_buddy;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -25,10 +26,23 @@ public class ManualEntry extends AppCompatActivity {
      * @throws InvalidDataLabelException
      */
     public void DataEntry(View view) throws InvalidDataLabelException {
-        EditText name = findViewById(R.id.purchaseName);
-        EditText date = findViewById(R.id.purchaseDate);
-        EditText amount = findViewById(R.id.purchaseAmount);
-        EditText note = findViewById(R.id.purchaseNote);
-        user.WriteNewExpenditure(name.getText().toString(), date.getText().toString(), amount.getText().toString(), note.getText().toString());
+        EditText nameField = findViewById(R.id.purchaseName);
+        EditText dateField = findViewById(R.id.purchaseDate);
+        EditText amountField = findViewById(R.id.purchaseAmount);
+        EditText notesField = findViewById(R.id.purchaseNote);
+        String name = nameField.getText().toString();
+        String date = dateField.getText().toString();
+        String amount = amountField.getText().toString();
+        String notes = notesField.getText().toString();
+
+        if(name == "" || date == "" || amount == "") {
+            Log.i("Purchase attempt", "Invalid input");
+            // TODO : display message
+            return;
+        }
+        user.WriteNewExpenditure(name, date, amount, notes);
+
+        // end purchase entry
+        finish();
     }
 }
