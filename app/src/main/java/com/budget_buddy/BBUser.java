@@ -182,12 +182,18 @@ class BBUser implements DataNode {
 
     @Override
     public void GetFromMap(Map<String, Object> map) {
-        budgetLevel = (long) map.get("BudgetLevel");
-        budgetScore = (long) map.get("BudgetScore");
-        savingsGoal = (long) map.get("SavingsGoal");
-        rent        = (long) map.get("Rent");
-        otherExpenses = (long) map.get("OtherExpenses");
-        otherIncome = (long) map.get("OtherIncome");
+        Object temp = map.get("BudgetLevel");
+        budgetLevel = temp != null ? (long) temp : -1;
+        temp = map.get("BudgetScore");
+        budgetScore = temp != null ? (long) temp : -1;
+        temp = map.get("SavingsGoal");
+        savingsGoal = temp != null ? (long) temp : -1;
+        temp = map.get("Rent");
+        rent = temp != null ? (long) temp : -1;
+        temp = map.get("OtherExpenses");
+        otherExpenses = temp != null ? (long) temp : -1;
+        temp = map.get("OtherIncome");
+        otherIncome = temp != null ? (long) temp : -1;
     }
 
     @Override
