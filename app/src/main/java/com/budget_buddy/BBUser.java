@@ -13,6 +13,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,8 +76,12 @@ class BBUser implements DataNode {
     public void Initialize() throws InvalidDataLabelException {
         user = authentication.getCurrentUser();
         if(user != null) {
+            Log.d("IFBB", userPath.toString());
             userName = user.getDisplayName();
+            tableReader.CheckForExistingUser(userPath.get(0), userName);
             // TODO: Add other initialization her as appropriate
+        } else {  // user does not exist, create new user
+
         }
         try {
             LatchToDatabase();
@@ -262,12 +267,12 @@ class BBUser implements DataNode {
 
     @Override
     public void GetFromMap(Map<String, Object> map) {
-        budgetLevel = (long) map.get("BudgetLevel");
-        budgetScore = (long) map.get("BudgetScore");
-        savingsGoal = (long) map.get("SavingsGoal");
+        budgetLevel = (long) map.get("Budget Level");
+        budgetScore = (long) map.get("Budget Score");
+        savingsGoal = (long) map.get("Savings Goal");
         rent        = (long) map.get("Rent");
-        otherExpenses = (long) map.get("OtherExpenses");
-        otherIncome = (long) map.get("OtherIncome");
+        otherExpenses = (long) map.get("Other Expenses");
+        otherIncome = (long) map.get("Other Income");
     }
 
     @Override

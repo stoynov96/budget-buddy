@@ -1,6 +1,8 @@
 package com.budget_buddy.utils.Data;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.google.firebase.database.ChildEventListener;
@@ -133,6 +135,43 @@ public class TableReader {
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {
+
+            }
+        });
+    }
+
+    /**
+     * This function checks if the user is already in the database or not. If not, it creates a new
+     * user and gives it some data points with initial values of -1.
+     * @param path The pathname to Users in the database
+     * @param name The username (this should be the key eventually) to check for.
+     */
+    public void CheckForExistingUser(final String path, final String name) {
+        Query myQueryReference = mDatabase.child(path);
+        myQueryReference.orderByKey().equalTo(name).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) { // user not in the DB, create a new one
+                    Map<String, Object> newUser = new HashMap<>();
+                    Map<String, Object> userData = new HashMap<>();
+
+                    newUser.put(name, userData);
+                    userData.put("User Name", name);
+                    userData.put("Budget Level", -1);
+                    userData.put("Budget Score", -1);
+                    userData.put("Savings Goal", -1);
+                    userData.put("Rent", -1);
+                    userData.put("Other Expenses", -1);
+                    userData.put("Primary Income", -1);
+                    userData.put("Other Income", -1);
+                    userData.put("Suggested Spending Amount", -1);
+
+                    mDatabase.child(path).child(name).setValue(userData);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
