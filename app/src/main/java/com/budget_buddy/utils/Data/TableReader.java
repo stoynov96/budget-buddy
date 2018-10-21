@@ -1,13 +1,8 @@
 package com.budget_buddy.utils.Data;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
-
-import com.budget_buddy.Expenditure;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -15,15 +10,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
-import java.lang.reflect.Array;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +88,17 @@ public class TableReader {
         return labelsSb.toString();
     }
 
+    /**
+     * Currently pulls everything in the "Purchases" category of a Firebase user. We need either 1)
+     * better callbacks on Dashboard/a way to update the graph or 2) some restructuring of the database.
+     * Due to how the listeners work, if we try to get something from purchases on a specific date,
+     * it will send a callback for each item. You cannot combine search criteria, i.e. you cannot do
+     * equalTo("Name").startAt("date").endAt("date2");. So right now this is how it has to be done. I'm
+     * not sure how we could structure the database differently to easily facilitate a more concise read,
+     * and I think having update functionality for the graph makes more sense anyway.
+     * @param path The path to the user in Firebase.
+     * @param callback A callback object to return the retrieved data.
+     */
     public void WeeklyExpenditures(String path, final MyCallback callback) {
         Query myQueryReference = mDatabase.child(path).orderByKey().equalTo("Purchases");
 
@@ -108,12 +106,14 @@ public class TableReader {
             HashMap<String, Object>  map = new HashMap<>();
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+                // this iterates through purchases until it gets each date - purchases HashMap,
+                // which is then added to map to be sent back to BBUser.
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     for(DataSnapshot snapshot2 : snapshot.getChildren()) {
                         map.put(snapshot2.getKey(), snapshot2.getValue());
                     }
                 }
-                callback.onCallback(map);
+                callback.OnCallback(map);
             }
 
             @Override

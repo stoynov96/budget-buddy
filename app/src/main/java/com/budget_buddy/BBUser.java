@@ -1,24 +1,18 @@
 package com.budget_buddy;
 
-
-
 import android.util.Log;
-
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.budget_buddy.utils.Data.DataNode;
 import com.budget_buddy.utils.Data.MyCallback;
 import com.budget_buddy.utils.Data.TableReader;
 import com.budget_buddy.utils.Data.TableWriter;
-
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.Task;
-
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -151,6 +145,7 @@ class BBUser implements DataNode {
      * @param name The name of the item purchased.
      * @param date The date the item was purchased.
      * @param amount The amount the item cost.
+     * @param note Any optional note the user enters for the purchase.
      * @throws InvalidDataLabelException thrown if userpath contains invalid label.
      */
     public void WriteNewExpenditure(String name, String date, String amount, String note) throws InvalidDataLabelException {
@@ -159,14 +154,23 @@ class BBUser implements DataNode {
         tableWriter.WriteExpenditure(userPath.get(0), expenditure, "/"+userName+"/Purchases/"+date);
     }
 
+    /**
+     * This function parses the returned Purchases data from Firebase. It gets only items that fall
+     * within the last 7 days and adds the expenditure amount for each day to an array. The array
+     * is sent back to Dashboard where the data can be used to populate the bar chart.
+     * @param callback The callback used to return the array of expenditures to the calling procedure.
+     */
     public void GetWeeklySpending(final MyCallback callback) {
         String path = userPath.get(0) + "/" + userName + "/";
 
         MyCallback callbackInner = new MyCallback() {
+            // Stores a list of valid dates based on the last 7 days.
             String [] validDates = CreateValidDates();
 
+            // This function creates an array of dates for the previous week, i.e. 1-1-01 to 1-7-01
             private String [] CreateValidDates() {
                 Calendar calendar = GregorianCalendar.getInstance();
+                // TODO: Change this to yyyy-mm-dd format?
                 DateFormat formatter = new SimpleDateFormat("MM-dd-yy");
                 String date;
                 Date weekOld;
@@ -182,6 +186,10 @@ class BBUser implements DataNode {
                 return dates;
             }
 
+            // This function finds which day a purchase occurred on, relative to the last 7 days.
+            // It returns the index to use when adding a purchase amount to the expenditures array
+            // if the purchase happened within the last 7 days. Otherwise, it returns -1 to indicate
+            // that we need to ignore this purchase.
             private int FindRelativeDay(String [] validDates, String date) {
                 int location = -1;
 
@@ -195,7 +203,7 @@ class BBUser implements DataNode {
             }
 
             @Override
-            public void onCallback(HashMap<String, Object> map) {
+            public void OnCallback(HashMap<String, Object> map) {
                 Iterator iterator = map.entrySet().iterator();
                 int [] expenditures = {0, 0, 0, 0, 0, 0, 0};
 
@@ -213,12 +221,12 @@ class BBUser implements DataNode {
                     }
                 }
 
-                callback.onCallback(expenditures);
+                callback.OnCallback(expenditures);
 
             }
 
             @Override
-            public void onCallback(int [] expenditures) {
+            public void OnCallback(int [] expenditures) {
 
             }
         };

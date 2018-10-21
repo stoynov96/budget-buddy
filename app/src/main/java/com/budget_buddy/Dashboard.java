@@ -146,13 +146,17 @@ public class Dashboard extends AppCompatActivity {
 
         final List<BarEntry> entries = new ArrayList<BarEntry>();
 
+        // This is initializing the bars to 0 since we do not have data from Firebase yet.
         for(int i = 0; i < 7; i++) {
             entries.add(new BarEntry(i, 0));
         }
 
+        // Idea for how a callback can be used on the data to update/draw the graph. Aside from
+        // using a callback for this, I think we may want to consider an update callback somewhere in Dashboard
+        // to make the database reading better, and to make this update as data is added
         MyCallback callback = new MyCallback() {
             @Override
-            public void onCallback(int [] weeklySpending) {
+            public void OnCallback(int [] weeklySpending) {
                 for(int i = 0; i < 7; i++) {
                     entries.add(new BarEntry(i, weeklySpending[6-i]));
                 }
@@ -165,7 +169,7 @@ public class Dashboard extends AppCompatActivity {
             }
 
             @Override
-            public void onCallback(HashMap<String, Object> map) {
+            public void OnCallback(HashMap<String, Object> map) {
 
             }
         };
@@ -236,5 +240,4 @@ public class Dashboard extends AppCompatActivity {
         //chart.animateX(2000);
         chart.animateY( 2000, Easing.EasingOption.EaseInOutExpo);
     }
-
 }
