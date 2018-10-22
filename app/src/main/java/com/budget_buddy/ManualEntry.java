@@ -9,7 +9,6 @@ import com.budget_buddy.exception.InvalidDataLabelException;
 import android.util.Log;
 import android.widget.DatePicker;
 import com.budget_buddy.components.DatePickerFragment;
-import com.budget_buddy.exception.InvalidDataLabelException;
 import java.text.DateFormat;
 import java.util.Calendar;
 
@@ -18,8 +17,6 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
     BBUser user = BBUser.GetInstance();
 
     private EditText purchaseDateField;
-
-    BBUser user = BBUser.GetInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,20 +74,5 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
     public void displayDatepicker(View view) {
         DialogFragment datePickerFragment = new DatePickerFragment();
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
-    }
-
-    /**
-     * This function is called when pressing the button on the manual data entry screen. Sends the
-     * fields to the WriteNewExpenditure function in the BBUser class to add the purchase to the
-     * database.
-     * @param view
-     * @throws InvalidDataLabelException
-     */
-    public void DataEntry(View view) throws InvalidDataLabelException {
-        EditText name = findViewById(R.id.purchaseName);
-        EditText date = findViewById(R.id.purchaseDate);
-        EditText amount = findViewById(R.id.purchaseAmount);
-        EditText note = findViewById(R.id.purchaseNote);
-        user.WriteNewExpenditure(name.getText().toString(), date.getText().toString(), amount.getText().toString(), note.getText().toString());
     }
 }
