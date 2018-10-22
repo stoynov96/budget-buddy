@@ -1,14 +1,13 @@
 package com.budget_buddy.utils.Data;
 
 import android.support.annotation.NonNull;
-
+import com.budget_buddy.Expenditure;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +87,7 @@ public class TableWriter {
      * @throws InvalidDataLabelException
      */
     // TODO: Probably needs some error checking at some point.
-    public void WriteExpenditure(String path, Map<String, Object> map, String label) throws InvalidDataLabelException {
-        mDatabase.child(path).child(label).push().setValue(map);
+    public void WriteExpenditure(String path, Expenditure expenditure, String label) throws InvalidDataLabelException {
+        mDatabase.child(path).child(label).push().setValue(expenditure);
     }
 }

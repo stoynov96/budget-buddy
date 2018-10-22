@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.budget_buddy.animations.ExperienceBarAnimation;
 import com.budget_buddy.charts.GoalProgressBar;
 
+import com.budget_buddy.utils.Data.MyCallback;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -24,11 +26,14 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.google.firebase.database.DataSnapshot;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Dashboard extends AppCompatActivity {
 
@@ -124,7 +129,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void addChart() {
-        BarChart chart = new BarChart(this);
+        final BarChart chart = new BarChart(this);
         chart.setId(R.id.bar_graph_view);
 
         ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataGraphLayout);
@@ -139,14 +144,37 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.connect(chart.getId(), ConstraintSet.TOP, cl.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
-        List<BarEntry> entries = new ArrayList<BarEntry>();
-        entries.add(new BarEntry(1, 5));
-        entries.add(new BarEntry(2, 3));
-        entries.add(new BarEntry(3, 8));
-        entries.add(new BarEntry(4, 7));
-        entries.add(new BarEntry(5, 2));
-        entries.add(new BarEntry(6, 1));
-        entries.add(new BarEntry(7, 5));
+        final List<BarEntry> entries = new ArrayList<BarEntry>();
+
+        // This is initializing the bars to 0 since we do not have data from Firebase yet.
+        for(int i = 0; i < 7; i++) {
+            entries.add(new BarEntry(i, 0));
+        }
+
+        // Idea for how a callback can be used on the data to update/draw the graph. Aside from
+        // using a callback for this, I think we may want to consider an update callback somewhere in Dashboard
+        // to make the database reading better, and to make this update as data is added
+        MyCallback callback = new MyCallback() {
+            @Override
+            public void OnCallback(int [] weeklySpending) {
+                for(int i = 0; i < 7; i++) {
+                    entries.add(new BarEntry(i, weeklySpending[6-i]));
+                }
+                BarDataSet dataSet = new BarDataSet(entries, "");
+                BarData barData = new BarData(dataSet);
+                barData.setBarWidth(0.85f);
+                chart.setData(barData);
+                chart.setFitBars(true);
+
+            }
+
+            @Override
+            public void OnCallback(HashMap<String, Object> map) {
+
+            }
+        };
+
+        currentUser.GetWeeklySpending(callback);
 
         BarDataSet dataSet = new BarDataSet(entries, "");
 
@@ -212,5 +240,4 @@ public class Dashboard extends AppCompatActivity {
         //chart.animateX(2000);
         chart.animateY( 2000, Easing.EasingOption.EaseInOutExpo);
     }
-
 }
