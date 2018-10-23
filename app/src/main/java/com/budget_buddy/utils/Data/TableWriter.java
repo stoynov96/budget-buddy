@@ -1,6 +1,7 @@
 package com.budget_buddy.utils.Data;
 
 import android.support.annotation.NonNull;
+import com.budget_buddy.Expenditure;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.google.android.gms.tasks.OnCompleteListener;

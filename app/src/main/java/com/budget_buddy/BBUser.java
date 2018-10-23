@@ -155,7 +155,6 @@ class BBUser implements DataNode {
     public void WriteNewExpenditure(String name, String date, String amount, String note) throws InvalidDataLabelException {
         date = date.replace("/", "-");
         Expenditure expenditure = new Expenditure(name, date, amount, note);
-        //tableWriter.WriteExpenditure(userPath.get(0), expenditure, "/"+userName+"/Purchases/"+date);
         tableWriter.WriteData(userPath, expenditure, "/"+userName+"/Purchases/"+date);
     }
 

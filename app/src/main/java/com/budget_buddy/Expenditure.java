@@ -6,7 +6,6 @@ package com.budget_buddy;
 // then manipulate them using class functions.
 
 import com.budget_buddy.utils.Data.DataNode;
-
 import java.util.HashMap;
 import java.util.Map;
 
