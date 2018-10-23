@@ -10,7 +10,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TableWriter {
 
@@ -62,7 +61,7 @@ public class TableWriter {
         if (label == null)
             mDatabase.child(fullPath).push().setValue(data.ToMap());
         else
-            mDatabase.child(fullPath).child(label).setValue(data.ToMap());
+            mDatabase.child(fullPath).child(label).push().setValue(data.ToMap());
     }
 
     private String joinLabels(List<String> labels) throws InvalidDataLabelException {
@@ -76,18 +75,5 @@ public class TableWriter {
             labelsSb.append(label);
         }
         return labelsSb.toString();
-    }
-
-    /**
-     * This function adds a purchase to the database, saved based on the purchase date.
-     * @param path The path to the Users in the database.
-     * @param map Hashmap containing the data to add to the database. Maps an identifier to a value, such
-     *            as Item Name : Nintendo Swtich.
-     * @param label The sub-path to write the data to. Currently this is going to /UserName/Purchases/'Data'/'Item'.
-     * @throws InvalidDataLabelException
-     */
-    // TODO: Probably needs some error checking at some point.
-    public void WriteExpenditure(String path, Expenditure expenditure, String label) throws InvalidDataLabelException {
-        mDatabase.child(path).child(label).push().setValue(expenditure);
     }
 }

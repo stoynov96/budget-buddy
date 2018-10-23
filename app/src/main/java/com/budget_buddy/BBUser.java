@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -153,9 +154,16 @@ class BBUser implements DataNode {
      * @throws InvalidDataLabelException thrown if userpath contains invalid label.
      */
     public void WriteNewExpenditure(String name, String date, String amount, String note) throws InvalidDataLabelException {
-        date = date.replace("/", "-");
-        Expenditure expenditure = new Expenditure(name, date, amount, note);
-        tableWriter.WriteExpenditure(userPath.get(0), expenditure, "/"+userName+"/Purchases/"+date);
+        DateFormat inputFormat = new SimpleDateFormat("MMM dd, yyyy");
+        DateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date oldDate = inputFormat.parse(date);
+            String formattedDate = outputFormat.format(oldDate);
+            Expenditure expenditure = new Expenditure(name, formattedDate, amount, note);
+            tableWriter.WriteData(userPath, expenditure, "/"+userName+"/Purchases/"+formattedDate);}
+        catch (ParseException e1) {
+            Log.d("Parse error", e1.toString());
+        }
     }
 
     /**
@@ -174,8 +182,7 @@ class BBUser implements DataNode {
             // This function creates an array of dates for the previous week, i.e. 1-1-01 to 1-7-01
             private String [] CreateValidDates() {
                 Calendar calendar = GregorianCalendar.getInstance();
-                // TODO: Change this to yyyy-mm-dd format?
-                DateFormat formatter = new SimpleDateFormat("MM-dd-yy");
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 String date;
                 Date weekOld;
                 String [] dates = new String[7];
@@ -210,18 +217,16 @@ class BBUser implements DataNode {
             public void OnCallback(HashMap<String, Object> map) {
                 Iterator iterator = map.entrySet().iterator();
                 int [] expenditures = {0, 0, 0, 0, 0, 0, 0};
+                Expenditure expenditure = new Expenditure("","","","");
 
                 while (iterator.hasNext()) {
                     Map.Entry pair = (Map.Entry)iterator.next();
-                    Log.d("BBUSER: ", pair.getValue().getClass().toString());
-                    HashMap<String, String> expenditureMap = (HashMap<String, String>)pair.getValue();
-                    String date = expenditureMap.get("date");
-
-                    int index = FindRelativeDay(validDates, date);
+                    HashMap<String, Object> expenditureMap = (HashMap<String, Object>)pair.getValue();
+                    expenditure.GetFromMap(expenditureMap);
+                    int index = FindRelativeDay(validDates, expenditure.GetDate());
                     // Data is part of the last 7 days, add it to the array
                     if(index != -1) {
-                        int amount = Integer.valueOf(expenditureMap.get("amount"));
-                        expenditures[index] = expenditures[index] + amount;
+                        expenditures[index] = expenditures[index] + Integer.valueOf(expenditure.GetAmount());
                     }
                 }
 
