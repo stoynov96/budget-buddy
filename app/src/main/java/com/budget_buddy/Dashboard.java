@@ -71,6 +71,7 @@ public class Dashboard extends AppCompatActivity {
         public void OnProfileSet() {
             if(ProfileNeedsSetup()) {
                 // display profile setup dialog
+                Log.i("Profile", "needs set up");
             } else {
                 SetExperience(currentUser.getBudgetScore());
                 SetSavingsGoal(currentUser.getSavingsGoal());
