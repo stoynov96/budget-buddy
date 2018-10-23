@@ -146,16 +146,15 @@ public class TableReader {
      * @param path The pathname to Users in the database
      * @param name The username (this should be the key eventually) to check for.
      */
-    public void CheckForExistingUser(final String path, final String name) {
+    public void CheckForExistingUser(final String path, final String userID, final String name) {
         Query myQueryReference = mDatabase.child(path);
-        myQueryReference.orderByKey().equalTo(name).addListenerForSingleValueEvent(new ValueEventListener() {
+        myQueryReference.orderByKey().equalTo(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.exists()) { // user not in the DB, create a new one
                     Map<String, Object> newUser = new HashMap<>();
                     Map<String, Object> userData = new HashMap<>();
-
-                    newUser.put(name, userData);
+                    newUser.put(userID, userData);
                     userData.put("User Name", name);
                     userData.put("Budget Level", -1);
                     userData.put("Budget Score", -1);
@@ -166,7 +165,7 @@ public class TableReader {
                     userData.put("Other Income", -1);
                     userData.put("Suggested Spending Amount", -1);
 
-                    mDatabase.child(path).child(name).setValue(userData);
+                    mDatabase.child(path).child(userID).setValue(userData);
                 }
             }
 

@@ -76,9 +76,8 @@ class BBUser implements DataNode {
     public void Initialize() throws InvalidDataLabelException {
         user = authentication.getCurrentUser();
         if(user != null) {
-            Log.d("IFBB", userPath.toString());
             userName = user.getDisplayName();
-            tableReader.CheckForExistingUser(userPath.get(0), userName);
+            tableReader.CheckForExistingUser(userPath.get(0), user.getUid(), userName);
             // TODO: Add other initialization her as appropriate
         } else {  // user does not exist, create new user
 
@@ -160,7 +159,7 @@ class BBUser implements DataNode {
             Date oldDate = inputFormat.parse(date);
             String formattedDate = outputFormat.format(oldDate);
             Expenditure expenditure = new Expenditure(name, formattedDate, amount, note);
-            tableWriter.WriteData(userPath, expenditure, "/"+userName+"/Purchases/"+formattedDate);}
+            tableWriter.WriteData(userPath, expenditure, "/"+user.getUid()+"/Purchases/"+formattedDate);}
         catch (ParseException e1) {
             Log.d("Parse error", e1.toString());
         }
@@ -173,7 +172,7 @@ class BBUser implements DataNode {
      * @param callback The callback used to return the array of expenditures to the calling procedure.
      */
     public void GetWeeklySpending(final MyCallback callback) {
-        String path = userPath.get(0) + "/" + userName + "/";
+        String path = userPath.get(0) + "/" + user.getUid() + "/";
 
         MyCallback callbackInner = new MyCallback() {
             // Stores a list of valid dates based on the last 7 days.
