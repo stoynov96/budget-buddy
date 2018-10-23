@@ -44,7 +44,41 @@ public class Dashboard extends AppCompatActivity {
     ExperienceBarAnimation experienceBarAnimation;
 
     HorizontalBarChart progressBar;
+    BarChart chart;
     TextView progressBarDescription;
+
+    // Idea for how a callback can be used on the data to update/draw the graph. Aside from
+    // using a callback for this, I think we may want to consider an update callback somewhere in Dashboard
+    // to make the database reading better, and to make this update as data is added
+    MyCallback callback = new MyCallback() {
+        @Override
+        public void OnCallback(int [] weeklySpending) {
+            for(int i = 0; i < 7; i++) {
+                entries.add(new BarEntry(i, weeklySpending[6-i]));
+            }
+            BarDataSet dataSet = new BarDataSet(entries, "");
+            BarData barData = new BarData(dataSet);
+            barData.setBarWidth(0.85f);
+            chart.setData(barData);
+            chart.setFitBars(true);
+
+        }
+
+        @Override
+        public void OnCallback(HashMap<String, Object> map) {
+
+        }
+
+        @Override
+        public void OnProfileSet() {
+            if(ProfileNeedsSetup()) {
+                // display profile setup dialog
+            } else {
+                SetExperience(currentUser.getBudgetScore());
+                SetSavingsGoal(currentUser.getSavingsGoal());
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +109,24 @@ public class Dashboard extends AppCompatActivity {
         } else {
             return;
         }
+    }
+
+    private void SetExperience(long experience) {
+
+    }
+
+    private void SetSavingsGoal(long goal) {
+
+    }
+
+    private boolean ProfileNeedsSetup() {
+        // check if any one of these is negative, for now rent is required
+        if(currentUser.getPrimaryIncome() < 0 || currentUser.getRent() < 0 || currentUser.getSavingsGoal() < 0) {
+            return true;
+        }
+        // might add other checks later
+
+        return false;
     }
 
     private void addProgressBar() {
@@ -129,7 +181,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void addChart() {
-        final BarChart chart = new BarChart(this);
+        chart = new BarChart(this);
         chart.setId(R.id.bar_graph_view);
 
         ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataGraphLayout);
@@ -150,29 +202,6 @@ public class Dashboard extends AppCompatActivity {
         for(int i = 0; i < 7; i++) {
             entries.add(new BarEntry(i, 0));
         }
-
-        // Idea for how a callback can be used on the data to update/draw the graph. Aside from
-        // using a callback for this, I think we may want to consider an update callback somewhere in Dashboard
-        // to make the database reading better, and to make this update as data is added
-        MyCallback callback = new MyCallback() {
-            @Override
-            public void OnCallback(int [] weeklySpending) {
-                for(int i = 0; i < 7; i++) {
-                    entries.add(new BarEntry(i, weeklySpending[6-i]));
-                }
-                BarDataSet dataSet = new BarDataSet(entries, "");
-                BarData barData = new BarData(dataSet);
-                barData.setBarWidth(0.85f);
-                chart.setData(barData);
-                chart.setFitBars(true);
-
-            }
-
-            @Override
-            public void OnCallback(HashMap<String, Object> map) {
-
-            }
-        };
 
         currentUser.GetWeeklySpending(callback);
 

@@ -24,4 +24,9 @@ public interface MyCallback {
      * @param map The HashMap of (key, value) pairs from Firebase.
      */
     void OnCallback(HashMap<String, Object> map);
+
+    /**
+     * This function is called when all of the properties in the BBUser singleton are set.
+     */
+    void OnProfileSet();
 }

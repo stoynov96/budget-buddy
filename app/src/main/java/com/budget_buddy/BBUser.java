@@ -57,6 +57,10 @@ class BBUser implements DataNode {
     // Suggested daily spending amount
     // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
     private long suggestedSpendingAmount = -1;
+    // holds callbacks relevant to the UI, triggered on data loads
+    private MyCallback userInterfaceCallback;
+    // hash table that holds all of the purchase amounts by dates
+    private Map<String, long> purchaseCalendar = new Map<String, long>();
 
     static BBUser GetInstance() {
         return ourInstance;
@@ -238,6 +242,9 @@ class BBUser implements DataNode {
             public void OnCallback(int [] expenditures) {
 
             }
+
+            @Override
+            public void OnProfileSet() {}
         };
 
         tableReader.WeeklyExpenditures(path, callbackInner);
@@ -283,6 +290,7 @@ class BBUser implements DataNode {
         otherExpenses = temp != null ? (long) temp : -1;
         temp = map.get("Other Income");
         otherIncome = temp != null ? (long) temp : -1;
+        UICallback.OnProfileSet();
     }
 
     @Override
