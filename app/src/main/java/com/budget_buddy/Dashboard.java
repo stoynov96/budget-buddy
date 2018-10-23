@@ -45,11 +45,10 @@ public class Dashboard extends AppCompatActivity {
 
     HorizontalBarChart progressBar;
     BarChart chart;
+    final List<BarEntry> entries = new ArrayList<BarEntry>();
     TextView progressBarDescription;
 
-    // Idea for how a callback can be used on the data to update/draw the graph. Aside from
-    // using a callback for this, I think we may want to consider an update callback somewhere in Dashboard
-    // to make the database reading better, and to make this update as data is added
+    // Here's a more permanent home for the callback
     MyCallback callback = new MyCallback() {
         @Override
         public void OnCallback(int [] weeklySpending) {
@@ -61,7 +60,6 @@ public class Dashboard extends AppCompatActivity {
             barData.setBarWidth(0.85f);
             chart.setData(barData);
             chart.setFitBars(true);
-
         }
 
         @Override
@@ -85,7 +83,7 @@ public class Dashboard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-
+        currentUser.setUserInterfaceCallback(callback);
         setupExperienceBar();
         addChart();
         addProgressBar();
@@ -195,8 +193,6 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.connect(chart.getId(),ConstraintSet.BOTTOM, cl.getId(),ConstraintSet.BOTTOM, 0);
         constraintSet.connect(chart.getId(), ConstraintSet.TOP, cl.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
-
-        final List<BarEntry> entries = new ArrayList<BarEntry>();
 
         // This is initializing the bars to 0 since we do not have data from Firebase yet.
         for(int i = 0; i < 7; i++) {
