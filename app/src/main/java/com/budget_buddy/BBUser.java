@@ -187,12 +187,12 @@ class BBUser implements DataNode {
                 Date weekOld;
                 String [] dates = new String[7];
 
-                for(int i = 1; i <=7; i++){
+                for(int i = 0; i < 7; i++){
                     calendar.setTime(new Date());
                     calendar.add(Calendar.DAY_OF_YEAR, -i);
                     weekOld = calendar.getTime();
                     date = formatter.format(weekOld);
-                    dates[i-1] = date;
+                    dates[i] = date;
                 }
                 return dates;
             }
