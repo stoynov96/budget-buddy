@@ -229,7 +229,7 @@ public class Dashboard extends AppCompatActivity {
                 Calendar calendar = Calendar.getInstance();
                 // this graph will only show previous 7 days
                 int today = calendar.get(Calendar.DAY_OF_WEEK);
-                return days[((int) value + today - 1) % 7];
+                return days[((int) value + today) % 7];
             }
         };
 
