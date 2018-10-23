@@ -155,7 +155,8 @@ class BBUser implements DataNode {
     public void WriteNewExpenditure(String name, String date, String amount, String note) throws InvalidDataLabelException {
         date = date.replace("/", "-");
         Expenditure expenditure = new Expenditure(name, date, amount, note);
-        tableWriter.WriteExpenditure(userPath.get(0), expenditure, "/"+userName+"/Purchases/"+date);
+        //tableWriter.WriteExpenditure(userPath.get(0), expenditure, "/"+userName+"/Purchases/"+date);
+        tableWriter.WriteData(userPath, expenditure, "/"+userName+"/Purchases/"+date);
     }
 
     /**
@@ -175,7 +176,7 @@ class BBUser implements DataNode {
             private String [] CreateValidDates() {
                 Calendar calendar = GregorianCalendar.getInstance();
                 // TODO: Change this to yyyy-mm-dd format?
-                DateFormat formatter = new SimpleDateFormat("MM-dd-yy");
+                DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy");
                 String date;
                 Date weekOld;
                 String [] dates = new String[7];
@@ -210,18 +211,16 @@ class BBUser implements DataNode {
             public void OnCallback(HashMap<String, Object> map) {
                 Iterator iterator = map.entrySet().iterator();
                 int [] expenditures = {0, 0, 0, 0, 0, 0, 0};
+                Expenditure expenditure = new Expenditure("","","","");
 
                 while (iterator.hasNext()) {
                     Map.Entry pair = (Map.Entry)iterator.next();
-                    Log.d("BBUSER: ", pair.getValue().getClass().toString());
-                    HashMap<String, String> expenditureMap = (HashMap<String, String>)pair.getValue();
-                    String date = expenditureMap.get("date");
-
-                    int index = FindRelativeDay(validDates, date);
+                    HashMap<String, Object> expenditureMap = (HashMap<String, Object>)pair.getValue();
+                    expenditure.GetFromMap(expenditureMap);
+                    int index = FindRelativeDay(validDates, expenditure.GetDate());
                     // Data is part of the last 7 days, add it to the array
                     if(index != -1) {
-                        int amount = Integer.valueOf(expenditureMap.get("amount"));
-                        expenditures[index] = expenditures[index] + amount;
+                        expenditures[index] = expenditures[index] + Integer.valueOf(expenditure.GetAmount());
                     }
                 }
 
