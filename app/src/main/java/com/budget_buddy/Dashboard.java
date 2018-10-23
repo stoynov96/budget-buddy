@@ -234,6 +234,8 @@ public class Dashboard extends AppCompatActivity {
         };
 
         chart.getXAxis().setValueFormatter(axisValueFormatter);
+        // set the bottom of the window to y=0
+        chart.getAxisLeft().setAxisMinimum(0);
 
         chart.getLegend().setEnabled(false);
 
