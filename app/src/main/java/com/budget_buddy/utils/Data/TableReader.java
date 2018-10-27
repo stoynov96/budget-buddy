@@ -1,16 +1,19 @@
 package com.budget_buddy.utils.Data;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -85,5 +88,91 @@ public class TableReader {
             lastLabel = label;
         }
         return labelsSb.toString();
+    }
+
+    /**
+     * Currently pulls everything in the "Purchases" category of a Firebase user. We need either 1)
+     * better callbacks on Dashboard/a way to update the graph or 2) some restructuring of the database.
+     * Due to how the listeners work, if we try to get something from purchases on a specific date,
+     * it will send a callback for each item. You cannot combine search criteria, i.e. you cannot do
+     * equalTo("Name").startAt("date").endAt("date2");. So right now this is how it has to be done. I'm
+     * not sure how we could structure the database differently to easily facilitate a more concise read,
+     * and I think having update functionality for the graph makes more sense anyway.
+     * @param path The path to the user in Firebase.
+     * @param callback A callback object to return the retrieved data.
+     */
+    public void WeeklyExpenditures(String path, final MyCallback callback) {
+        Query myQueryReference = mDatabase.child(path).orderByKey().equalTo("Purchases");
+
+        myQueryReference.addChildEventListener(new ChildEventListener() {
+            HashMap<String, Object>  map = new HashMap<>();
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+                // this iterates through purchases until it gets each date - purchases HashMap,
+                // which is then added to map to be sent back to BBUser.
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    for(DataSnapshot snapshot2 : snapshot.getChildren()) {
+                        map.put(snapshot2.getKey(), snapshot2.getValue());
+                    }
+                }
+                callback.OnCallback(map);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String prevChildKey) {
+
+            }
+        });
+    }
+
+    /**
+     * This function checks if the user is already in the database or not. If not, it creates a new
+     * user and gives it some data points with initial values of -1.
+     * @param path The pathname to Users in the database
+     * @param name The username (this should be the key eventually) to check for.
+     */
+    public void CheckForExistingUser(final String path, final String userID, final String name) {
+        Query myQueryReference = mDatabase.child(path);
+        myQueryReference.orderByKey().equalTo(userID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.exists()) { // user not in the DB, create a new one
+                    Map<String, Object> newUser = new HashMap<>();
+                    Map<String, Object> userData = new HashMap<>();
+                    newUser.put(userID, userData);
+                    userData.put("User Name", name);
+                    userData.put("Budget Level", -1);
+                    userData.put("Budget Score", -1);
+                    userData.put("Savings Goal", -1);
+                    userData.put("Rent", -1);
+                    userData.put("Other Expenses", -1);
+                    userData.put("Primary Income", -1);
+                    userData.put("Other Income", -1);
+                    userData.put("Suggested Spending Amount", -1);
+
+                    mDatabase.child(path).child(userID).setValue(userData);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

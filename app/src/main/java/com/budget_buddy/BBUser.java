@@ -2,16 +2,15 @@ package com.budget_buddy;
 
 
 import android.support.annotation.NonNull;
-
+import android.util.Log;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.budget_buddy.utils.Data.DataNode;
+import com.budget_buddy.utils.Data.MyCallback;
 import com.budget_buddy.utils.Data.TableReader;
 import com.budget_buddy.utils.Data.TableWriter;
-
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.Task;
-
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,8 +21,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -81,16 +88,9 @@ class BBUser implements DataNode {
         user = authentication.getCurrentUser();
         if(user != null) {
             userName = user.getDisplayName();
-
-            if (!doesExist()){
-                createUser("1", "2", "3", "4", "5");
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                ref.child("Users").child("readTest - KJ Test").setValue("data for "+ userName + " doesnt exists! Creating user in db");
-            } else {
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                ref.child("Users").child("readTest - KJ Test").setValue("data for "+ userName + " exists!");
-            }
             // TODO: Add other initialization her as appropriate
+        } else {  // user does not exist, create new user
+
         }
         try {
             LatchToDatabase();
@@ -137,7 +137,6 @@ class BBUser implements DataNode {
         return suggestedSpendingAmount;
     }
 
-
     public boolean updateSavingsGoal(int newGoal) {
         return false;
     }
@@ -160,16 +159,97 @@ class BBUser implements DataNode {
      * @param name The name of the item purchased.
      * @param date The date the item was purchased.
      * @param amount The amount the item cost.
+     * @param note Any optional note the user enters for the purchase.
      * @throws InvalidDataLabelException thrown if userpath contains invalid label.
      */
     public void WriteNewExpenditure(String name, String date, String amount, String note) throws InvalidDataLabelException {
-        Map<String, Object> userData = new HashMap<>();
-        date = date.replace("/", "-");
-        userData.put("Item Name", name);
-        userData.put("Purchase Date", date);
-        userData.put("Purchase Amount", amount);
-        userData.put("Purchase Note", note);
-        tableWriter.WriteExpenditure(userPath.get(0), userData, "/"+userName+"/Purchases/"+date);
+        DateFormat inputFormat = new SimpleDateFormat("MMM dd, yyyy");
+        DateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date oldDate = inputFormat.parse(date);
+            String formattedDate = outputFormat.format(oldDate);
+            Expenditure expenditure = new Expenditure(name, formattedDate, amount, note);
+            tableWriter.WriteData(userPath, expenditure, "/"+user.getUid()+"/Purchases/"+formattedDate);}
+        catch (ParseException e1) {
+            Log.d("Parse error", e1.toString());
+        }
+    }
+
+    /**
+     * This function parses the returned Purchases data from Firebase. It gets only items that fall
+     * within the last 7 days and adds the expenditure amount for each day to an array. The array
+     * is sent back to Dashboard where the data can be used to populate the bar chart.
+     * @param callback The callback used to return the array of expenditures to the calling procedure.
+     */
+    public void GetWeeklySpending(final MyCallback callback) {
+        String path = userPath.get(0) + "/" + user.getUid() + "/";
+
+        MyCallback callbackInner = new MyCallback() {
+            // Stores a list of valid dates based on the last 7 days.
+            String [] validDates = CreateValidDates();
+
+            // This function creates an array of dates for the previous week, i.e. 1-1-01 to 1-7-01
+            private String [] CreateValidDates() {
+                Calendar calendar = GregorianCalendar.getInstance();
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                String date;
+                Date weekOld;
+                String [] dates = new String[7];
+
+                for(int i = 0; i < 7; i++){
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.DAY_OF_YEAR, -i);
+                    weekOld = calendar.getTime();
+                    date = formatter.format(weekOld);
+                    dates[i] = date;
+                }
+                return dates;
+            }
+
+            // This function finds which day a purchase occurred on, relative to the last 7 days.
+            // It returns the index to use when adding a purchase amount to the expenditures array
+            // if the purchase happened within the last 7 days. Otherwise, it returns -1 to indicate
+            // that we need to ignore this purchase.
+            private int FindRelativeDay(String [] validDates, String date) {
+                int location = -1;
+
+                for(int i = 0; i < validDates.length; i++) {
+                    if (validDates[i].equals(date)) {
+                        location = i;
+                    }
+                }
+
+                return location;
+            }
+
+            @Override
+            public void OnCallback(HashMap<String, Object> map) {
+                Iterator iterator = map.entrySet().iterator();
+                int [] expenditures = {0, 0, 0, 0, 0, 0, 0};
+                Expenditure expenditure = new Expenditure("","","","");
+
+                while (iterator.hasNext()) {
+                    Map.Entry pair = (Map.Entry)iterator.next();
+                    HashMap<String, Object> expenditureMap = (HashMap<String, Object>)pair.getValue();
+                    expenditure.GetFromMap(expenditureMap);
+                    int index = FindRelativeDay(validDates, expenditure.GetDate());
+                    // Data is part of the last 7 days, add it to the array
+                    if(index != -1) {
+                        expenditures[index] = expenditures[index] + Integer.valueOf(expenditure.GetAmount());
+                    }
+                }
+
+                callback.OnCallback(expenditures);
+
+            }
+
+            @Override
+            public void OnCallback(int [] expenditures) {
+
+            }
+        };
+
+        tableReader.WeeklyExpenditures(path, callbackInner);
     }
 
     /**
@@ -200,12 +280,18 @@ class BBUser implements DataNode {
 
     @Override
     public void GetFromMap(Map<String, Object> map) {
-        budgetLevel = (long) map.get("BudgetLevel");
-        budgetScore = (long) map.get("BudgetScore");
-        savingsGoal = (long) map.get("SavingsGoal");
-        rent        = (long) map.get("Rent");
-        otherExpenses = (long) map.get("OtherExpenses");
-        otherIncome = (long) map.get("OtherIncome");
+        Object temp = map.get("Budget Level");
+        budgetLevel = temp != null ? (long) temp : -1;
+        temp = map.get("Budget Score");
+        budgetScore = temp != null ? (long) temp : -1;
+        temp = map.get("Savings Goal");
+        savingsGoal = temp != null ? (long) temp : -1;
+        temp = map.get("Rent");
+        rent = temp != null ? (long) temp : -1;
+        temp = map.get("Other Expenses");
+        otherExpenses = temp != null ? (long) temp : -1;
+        temp = map.get("Other Income");
+        otherIncome = temp != null ? (long) temp : -1;
     }
 
     @Override
