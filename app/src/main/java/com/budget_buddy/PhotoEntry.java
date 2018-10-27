@@ -24,6 +24,7 @@ import android.util.Size;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.codelab.mlkit.GraphicOverlay;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
@@ -36,6 +37,7 @@ import android.view.TextureView;
 import android.view.Surface;
 
 import java.util.Arrays;
+import java.util.List;
 
 // http://coderzpassion.com/android-working-camera2-api/
 
@@ -47,6 +49,7 @@ public class PhotoEntry extends AppCompatActivity {
     private CaptureRequest.Builder previewBuilder;
     private CameraCaptureSession previewSession;
     private ImageReader mImageReader;
+    private com.google.firebase.codelab.mlkit.GraphicOverlay mGraphicOverlay;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -60,8 +63,11 @@ public class PhotoEntry extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_photo_entry);
+
+        mGraphicOverlay = findViewById(R.id.graphic_overlay);
+        Log.i("Image", mGraphicOverlay.toString());
+
         cameraTextureView =(TextureView) findViewById(R.id.textureView);
         cameraTextureView.setSurfaceTextureListener(surfaceTextureListener);
     }
@@ -232,15 +238,19 @@ public class PhotoEntry extends AppCompatActivity {
             public void onSuccess(FirebaseVisionText firebaseVisionText) {
                 String text = firebaseVisionText.getText();
                 Log.i("Image text", text);
-                /*List<FirebaseVisionText.TextBlock> blocks = firebaseVisionText.getTextBlocks();
+                mGraphicOverlay.clear();
+                List<FirebaseVisionText.TextBlock> blocks = firebaseVisionText.getTextBlocks();
 
                 for(int i = 0; i < blocks.size(); i++) {
                     List<FirebaseVisionText.Line> lines = blocks.get(i).getLines();
                     for(int j = 0; j < lines.size(); j++) {
                         List<FirebaseVisionText.Element> elements = lines.get(j).getElements();
-                        for (int k = 0; k < elements.size())
+                        for (int k = 0; k < elements.size(); k++) {
+                            GraphicOverlay.Graphic textGraphic = new com.google.firebase.codelab.mlkit.TextGraphic(mGraphicOverlay, elements.get(k));
+                            mGraphicOverlay.add(textGraphic);
+                        }
                     }
-                }*/
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
