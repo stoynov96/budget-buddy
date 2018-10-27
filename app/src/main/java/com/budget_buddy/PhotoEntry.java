@@ -10,7 +10,6 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
@@ -35,13 +34,8 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import android.util.SparseIntArray;
 import android.view.TextureView;
 import android.view.Surface;
-import android.view.View;
 
-import java.io.File;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 // http://coderzpassion.com/android-working-camera2-api/
 
@@ -51,7 +45,8 @@ public class PhotoEntry extends AppCompatActivity {
     private TextureView cameraTextureView;
     private CameraDevice cameraDevice;
     private CaptureRequest.Builder previewBuilder;
-    private  CameraCaptureSession previewSession;
+    private CameraCaptureSession previewSession;
+    private ImageReader mImageReader;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -71,91 +66,40 @@ public class PhotoEntry extends AppCompatActivity {
         cameraTextureView.setSurfaceTextureListener(surfaceTextureListener);
     }
 
-    public void getPicture(View view) {
-        if(cameraDevice == null) {
-            return;
-        }
-        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-
+    private void setupImageReader() {
         try {
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraDevice.getId());
-
-            if(characteristics != null) {
-
-            }
-
-            ImageReader reader = ImageReader.newInstance(640,480,ImageFormat.YUV_420_888,1);
-            List<Surface> outputSurfaces = new ArrayList<Surface>(2);
-            outputSurfaces.add(reader.getSurface());
-            outputSurfaces.add(new Surface(cameraTextureView.getSurfaceTexture()));
-
-            final CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            captureBuilder.addTarget(reader.getSurface());
-            captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 
             final int rotation = getRotationCompensation(cameraDevice.getId(), this, this);
+            ImageReader.OnImageAvailableListener mImageAvailable = new ImageReader.OnImageAvailableListener() {
 
-            ImageReader.OnImageAvailableListener imageAvailableListener = new ImageReader.OnImageAvailableListener() {
+                int frameModulo = 10;
+                int frameCounter = 0;
                 @Override
                 public void onImageAvailable(ImageReader reader) {
                     Image image = null;
                     try {
                         image = reader.acquireNextImage();
-                        //ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-                        //byte[] bytes = new byte[buffer.capacity()];
-                        FirebaseVisionImage fbImage = FirebaseVisionImage.fromMediaImage(image, rotation);
-                        analyzeImage(fbImage);
-
+                        if(frameCounter % frameModulo == 0) {
+                            FirebaseVisionImage fbImage = FirebaseVisionImage.fromMediaImage(image, rotation);
+                            analyzeImage(fbImage);
+                        }
+                        frameCounter = (frameCounter + 1) % frameModulo;
+                        image.close();
                     } catch (Exception e) {
-                        Log.i("Image", e.toString());
+
                     }
                 }
-
             };
 
-            HandlerThread handlerThread=new HandlerThread("takepicture");
+            HandlerThread handlerThread=new HandlerThread("analyzepicture");
             handlerThread.start();
+            final Handler handler = new Handler(handlerThread.getLooper());
 
-            final Handler handler=new Handler(handlerThread.getLooper());
-            reader.setOnImageAvailableListener(imageAvailableListener,handler);
-
-
-            final CameraCaptureSession.CaptureCallback  previewSSession=new CameraCaptureSession.CaptureCallback() {
-                @Override
-                public void onCaptureStarted(CameraCaptureSession session, CaptureRequest request, long timestamp, long frameNumber) {
-                    super.onCaptureStarted(session, request, timestamp, frameNumber);
-                }
-
-                @Override
-                public void onCaptureCompleted(CameraCaptureSession session, CaptureRequest request, TotalCaptureResult result) {
-                    super.onCaptureCompleted(session, request, result);
-                    startCamera();
-                }
-            };
-
-            cameraDevice.createCaptureSession(outputSurfaces, new CameraCaptureSession.StateCallback() {
-                @Override
-                public void onConfigured(CameraCaptureSession session) {
-
-                    try
-                    {
-                        session.capture(captureBuilder.build(),previewSSession,handler);
-
-                    }catch (Exception e)
-                    {
-
-                    }
-                }
-
-                @Override
-                public void onConfigureFailed(CameraCaptureSession session) {
-
-                }
-            },handler);
-
+            mImageReader.setOnImageAvailableListener(mImageAvailable, handler);
         } catch (Exception e) {
-            Log.i("Image", e.toString());
+
         }
+
     }
 
     public void openCamera() {
@@ -232,6 +176,10 @@ public class PhotoEntry extends AppCompatActivity {
         texture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
         Surface surface = new Surface(texture);
 
+        mImageReader = ImageReader.newInstance(previewSize.getWidth(), previewSize.getHeight(), ImageFormat.YUV_420_888, 1);
+        Surface readerSurface = mImageReader.getSurface();
+
+
         try {
             previewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
         } catch (Exception e) {
@@ -239,12 +187,14 @@ public class PhotoEntry extends AppCompatActivity {
         }
 
         previewBuilder.addTarget(surface);
+        previewBuilder.addTarget(readerSurface);
 
         try {
-            cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
+            cameraDevice.createCaptureSession(Arrays.asList(surface, readerSurface), new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(CameraCaptureSession session) {
                     previewSession = session;
+                    setupImageReader();
                     getChangedPreview();
                 }
 
