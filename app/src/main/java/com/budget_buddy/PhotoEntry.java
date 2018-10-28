@@ -2,6 +2,7 @@ package com.budget_buddy;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -24,7 +25,8 @@ import android.util.Size;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.codelab.mlkit.GraphicOverlay;
+import com.budget_buddy.TextGraphic;
+import com.budget_buddy.GraphicOverlay;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata;
@@ -49,7 +51,7 @@ public class PhotoEntry extends AppCompatActivity {
     private CaptureRequest.Builder previewBuilder;
     private CameraCaptureSession previewSession;
     private ImageReader mImageReader;
-    private com.google.firebase.codelab.mlkit.GraphicOverlay mGraphicOverlay;
+    private GraphicOverlay mGraphicOverlay;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -66,10 +68,10 @@ public class PhotoEntry extends AppCompatActivity {
         setContentView(R.layout.activity_photo_entry);
 
         mGraphicOverlay = findViewById(R.id.graphic_overlay);
-        Log.i("Image", mGraphicOverlay.toString());
 
         cameraTextureView =(TextureView) findViewById(R.id.textureView);
         cameraTextureView.setSurfaceTextureListener(surfaceTextureListener);
+
     }
 
     private void setupImageReader() {
@@ -78,13 +80,14 @@ public class PhotoEntry extends AppCompatActivity {
             final int rotation = getRotationCompensation(cameraDevice.getId(), this, this);
             ImageReader.OnImageAvailableListener mImageAvailable = new ImageReader.OnImageAvailableListener() {
 
-                int frameModulo = 10;
+                final int frameModulo = 5;
                 int frameCounter = 0;
                 @Override
                 public void onImageAvailable(ImageReader reader) {
                     Image image = null;
                     try {
                         image = reader.acquireNextImage();
+
                         if(frameCounter % frameModulo == 0) {
                             FirebaseVisionImage fbImage = FirebaseVisionImage.fromMediaImage(image, rotation);
                             analyzeImage(fbImage);
@@ -192,7 +195,7 @@ public class PhotoEntry extends AppCompatActivity {
         }
     }
 
-    private void analyzeImage(FirebaseVisionImage image) {
+    private void analyzeImage(final FirebaseVisionImage image) {
         FirebaseVisionTextRecognizer textRecognizer = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
         textRecognizer.processImage(image).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
             @Override
@@ -200,6 +203,7 @@ public class PhotoEntry extends AppCompatActivity {
                 String text = firebaseVisionText.getText();
                 Log.i("Image text", text);
                 mGraphicOverlay.clear();
+
                 List<FirebaseVisionText.TextBlock> blocks = firebaseVisionText.getTextBlocks();
 
                 for(int i = 0; i < blocks.size(); i++) {
@@ -207,7 +211,7 @@ public class PhotoEntry extends AppCompatActivity {
                     for(int j = 0; j < lines.size(); j++) {
                         List<FirebaseVisionText.Element> elements = lines.get(j).getElements();
                         for (int k = 0; k < elements.size(); k++) {
-                            GraphicOverlay.Graphic textGraphic = new com.google.firebase.codelab.mlkit.TextGraphic(mGraphicOverlay, elements.get(k));
+                            GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
                             mGraphicOverlay.add(textGraphic);
                         }
                     }

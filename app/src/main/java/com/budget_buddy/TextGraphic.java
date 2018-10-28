@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.firebase.codelab.mlkit;
+package com.budget_buddy;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,13 +21,13 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
-import com.google.firebase.codelab.mlkit.GraphicOverlay.Graphic;
+import com.budget_buddy.GraphicOverlay;
 
 /**
  * Graphic instance for rendering TextBlock position, size, and ID within an associated graphic
  * overlay view.
  */
-public class TextGraphic extends Graphic {
+public class TextGraphic extends GraphicOverlay.Graphic {
 
     private static final String TAG = "TextGraphic";
     private static final int TEXT_COLOR = Color.RED;
@@ -38,7 +38,7 @@ public class TextGraphic extends Graphic {
     private final Paint textPaint;
     private final FirebaseVisionText.Element element;
 
-    public TextGraphic(com.google.firebase.codelab.mlkit.GraphicOverlay overlay, FirebaseVisionText.Element element) {
+    public TextGraphic(GraphicOverlay overlay, FirebaseVisionText.Element element) {
         super(overlay);
 
         this.element = element;
@@ -67,6 +67,11 @@ public class TextGraphic extends Graphic {
 
         // Draws the bounding box around the TextBlock.
         RectF rect = new RectF(element.getBoundingBox());
+        rect.left = translateX(rect.left);
+        rect.top = translateY(rect.top);
+        rect.right = translateX(rect.right);
+        rect.bottom = translateY(rect.bottom);
+
         canvas.drawRect(rect, rectPaint);
 
         // Renders the text at the bottom of the box.
