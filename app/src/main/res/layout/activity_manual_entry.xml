@@ -121,12 +121,12 @@
         app:srcCompat="@drawable/ic_save_black_48dp" />
 
     <Button
-        android:id="@+id/finishButton"
+        android:id="@+id/cancelButton"
         android:layout_width="117dp"
         android:layout_height="60dp"
         android:layout_marginEnd="64dp"
         android:onClick="FinishDataEntry"
-        android:text="Finish"
+        android:text="@string/cancel_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </android.support.constraint.ConstraintLayout>

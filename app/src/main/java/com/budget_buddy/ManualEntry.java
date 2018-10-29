@@ -1,13 +1,17 @@
 package com.budget_buddy;
 
+import android.content.Context;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import android.util.Log;
 import android.widget.DatePicker;
+import android.widget.Toast;
+
 import com.budget_buddy.components.DatePickerFragment;
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -17,6 +21,9 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
     BBUser user = BBUser.GetInstance();
 
     private EditText purchaseDateField;
+    // For Toast
+    private Context context;
+    private Toast toast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +34,7 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         final Calendar calendar = Calendar.getInstance();
         final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
         purchaseDateField.setText(dateFormat.format(calendar.getTime()));
+        context = getApplicationContext();
     }
 
     @Override
@@ -59,12 +67,16 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         amountField.getText().clear();
         notesField.getText().clear();
 
-        if(name == "" || date == "" || amount == "") {
-            Log.i("Purchase attempt", "Invalid input");
-            // TODO : display message
+        if(name.matches("") || date.matches("") || amount.matches("") ) {
+            toast = Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.BOTTOM, 0, 1);
+            toast.show();
             return;
         }
         user.WriteNewExpenditure(name, date, amount, notes);
+        toast = Toast.makeText(context, "Added!", Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.BOTTOM, 0, 1);
+        toast.show();
     }
 
     /**
