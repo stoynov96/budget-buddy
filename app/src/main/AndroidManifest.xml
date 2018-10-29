@@ -20,6 +20,8 @@
         <activity android:name=".PhotoEntry"/>
         <activity android:name=".ManualEntry"
             android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth.NoTitleBar"/>
+        <activity android:name=".UserProfileActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth.NoTitleBar" />
     </application>
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera2.full"/>
