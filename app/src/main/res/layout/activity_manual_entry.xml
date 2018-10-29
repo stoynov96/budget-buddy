@@ -94,7 +94,7 @@
         android:layout_marginEnd="8dp"
         android:ems="10"
         android:inputType="textMultiLine"
-        app:layout_constraintBottom_toTopOf="@+id/imageButton"
+        app:layout_constraintBottom_toTopOf="@+id/saveButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/purchaseDescriptionTitle" />
@@ -111,14 +111,22 @@
         app:layout_constraintTop_toBottomOf="@+id/purchaseAmount" />
 
     <ImageButton
-        android:id="@+id/imageButton"
-        android:layout_width="0dp"
+        android:id="@+id/saveButton"
+        android:layout_width="117dp"
         android:layout_height="60dp"
         android:layout_marginStart="64dp"
-        android:layout_marginEnd="54dp"
         android:onClick="DataEntry"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_save_black_48dp" />
+
+    <Button
+        android:id="@+id/finishButton"
+        android:layout_width="117dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="64dp"
+        android:onClick="FinishDataEntry"
+        android:text="Finish"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </android.support.constraint.ConstraintLayout>

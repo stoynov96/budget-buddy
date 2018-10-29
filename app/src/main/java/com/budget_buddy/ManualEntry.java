@@ -55,13 +55,24 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         String amount = amountField.getText().toString();
         String notes = notesField.getText().toString();
 
+        nameField.getText().clear();
+        amountField.getText().clear();
+        notesField.getText().clear();
+
         if(name == "" || date == "" || amount == "") {
             Log.i("Purchase attempt", "Invalid input");
             // TODO : display message
             return;
         }
         user.WriteNewExpenditure(name, date, amount, notes);
+    }
 
+    /**
+     * This function is called when pressing the finish button on the manual data entry screen. Closes
+     * the manual entry activity.
+     * @param view
+     */
+    public void FinishDataEntry(View view) {
         // end purchase entry
         finish();
     }
