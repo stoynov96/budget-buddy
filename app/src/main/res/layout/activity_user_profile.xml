@@ -10,35 +10,26 @@
         android:id="@+id/data_fields_constraint_layout"
         android:layout_width="368dp"
         android:layout_height="410dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/total_montly_expense_title2"
+            android:id="@+id/user_profile_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/profile_monthly_savings_goal_title"
-            app:layout_constraintEnd_toStartOf="@+id/total_montly_expenses_field2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/total_montly_expenses_field2" />
-
-        <EditText
-            android:id="@+id/total_montly_expenses_field2"
-            android:layout_width="140dp"
-            android:layout_height="30dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:ems="10"
-            android:inputType="numberDecimal"
+            android:gravity="center"
+            android:text="@string/profile_activity_title"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/total_montly_expenses_field" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/total_monthly_income_title"
@@ -46,14 +37,14 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
             android:text="@string/profile_total_income_title"
-            app:layout_constraintEnd_toStartOf="@+id/total_monty_income_field"
+            app:layout_constraintEnd_toStartOf="@+id/total_monthy_income_field"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/total_monty_income_field" />
+            app:layout_constraintTop_toTopOf="@+id/total_monthy_income_field" />
 
         <EditText
-            android:id="@+id/total_monty_income_field"
+            android:id="@+id/total_monthy_income_field"
             android:layout_width="140dp"
             android:layout_height="30dp"
             android:layout_marginEnd="16dp"
@@ -61,22 +52,22 @@
             android:ems="10"
             android:inputType="numberDecimal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/user_profile_title" />
 
         <TextView
-            android:id="@+id/total_montly_expense_title"
+            android:id="@+id/total_monthly_expense_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
             android:text="@string/profile_rent_title"
-            app:layout_constraintEnd_toStartOf="@+id/total_montly_expenses_field"
+            app:layout_constraintEnd_toStartOf="@+id/total_monthly_expenses_field"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/total_montly_expenses_field" />
+            app:layout_constraintTop_toTopOf="@+id/total_monthly_expenses_field" />
 
         <EditText
-            android:id="@+id/total_montly_expenses_field"
+            android:id="@+id/total_monthly_expenses_field"
             android:layout_width="140dp"
             android:layout_height="30dp"
             android:layout_marginEnd="16dp"
@@ -84,7 +75,55 @@
             android:ems="10"
             android:inputType="numberDecimal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/total_monty_income_field" />
+            app:layout_constraintTop_toBottomOf="@+id/total_monthy_income_field" />
+
+        <TextView
+            android:id="@+id/total_other_expenses_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/profile_total_other_expenses_title"
+            app:layout_constraintEnd_toStartOf="@+id/monthly_savings_goal_field"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/total_other_expenses_field" />
+
+        <EditText
+            android:id="@+id/total_other_expenses_field"
+            android:layout_width="140dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/total_monthly_expenses_field" />
+
+        <TextView
+            android:id="@+id/monthly_savings_goal_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/profile_monthly_savings_goal_title"
+            app:layout_constraintEnd_toStartOf="@+id/monthly_savings_goal_field"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/monthly_savings_goal_field" />
+
+        <EditText
+            android:id="@+id/monthly_savings_goal_field"
+            android:layout_width="140dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/total_other_expenses_field" />
 
 
     </android.support.constraint.ConstraintLayout>
@@ -100,6 +139,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/data_fields_constraint_layout">
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="32dp"
+            android:onClick="DataEntry"
+            android:text="@string/cancel_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/saveButton"
+            app:layout_constraintStart_toStartOf="parent"
+             />
+
+        <ImageButton
+            android:id="@+id/saveButton"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="8dp"
+            android:onClick="FinishDataEntry"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/cancelButton"
+            app:layout_constraintTop_toTopOf="@+id/cancelButton"
+            app:srcCompat="@drawable/ic_save_black_48dp" />
 
     </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

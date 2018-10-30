@@ -24,8 +24,10 @@
     <string name="purchase_amount_title">Purchase Amount</string>
     <string name="purchase_description_title">Brief Description (Optional)</string>
     <string name="cancel_button">Cancel</string>
+    <string name="profile_activity_title">User Profile</string>
     <string name="profile_total_income_title">Total monthly income: </string>
     <string name="profile_total_expenses_title">Total monthly expenses: </string>
     <string name="profile_rent_title">Rent: </string>
+    <string name="profile_total_other_expenses_title">Other monthly expenses: </string>
     <string name="profile_monthly_savings_goal_title">Monthly savings goal: </string>
 </resources>
