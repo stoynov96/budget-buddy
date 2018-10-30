@@ -118,7 +118,7 @@ public class PhotoEntry extends AppCompatActivity {
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             previewSize = map.getOutputSizes(SurfaceTexture.class)[0];
-            mGraphicOverlay.setCameraInfo(previewSize.getWidth(), previewSize.getHeight(), characteristics.get(CameraCharacteristics.LENS_FACING));
+            mGraphicOverlay.setCameraInfo(previewSize.getHeight(), previewSize.getWidth(), characteristics.get(CameraCharacteristics.LENS_FACING));
             manager.openCamera(cameraId, stateCallback, null);
         } catch (Exception e) {
 
