@@ -165,7 +165,7 @@ public class Dashboard extends AppCompatActivity {
                 barData.setBarWidth(0.85f);
                 chart.setData(barData);
                 chart.setFitBars(true);
-
+                chart.invalidate();
             }
 
             @Override

@@ -115,6 +115,7 @@ public class TableReader {
                         map.put(snapshot2.getKey(), snapshot2.getValue());
                     }
                 }
+                Log.i("Child added!", "child added");
                 callback.OnCallback(map);
             }
 
@@ -130,7 +131,15 @@ public class TableReader {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-
+                // this iterates through purchases until it gets each date - purchases HashMap,
+                // which is then added to map to be sent back to BBUser.
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    for(DataSnapshot snapshot2 : snapshot.getChildren()) {
+                        map.put(snapshot2.getKey(), snapshot2.getValue());
+                    }
+                }
+                Log.i("Child", "changed");
+                callback.OnCallback(map);
             }
 
             @Override
