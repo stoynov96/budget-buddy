@@ -2,6 +2,7 @@ package com.budget_buddy;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
@@ -53,6 +54,8 @@ public class PhotoEntry extends AppCompatActivity {
     private CameraCaptureSession previewSession;
     private ImageReader mImageReader;
     private GraphicOverlay mGraphicOverlay;
+    // "This" makes it so we can access this activity across internal callbacks
+    private AppCompatActivity This = this;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -280,6 +283,9 @@ public class PhotoEntry extends AppCompatActivity {
                                             price = Double.parseDouble(elements.get(k).getText());
                                             previewSession.stopRepeating();
                                             mImageReader.close();
+                                            Intent manualEntryIntent = new Intent(This, ManualEntry.class);
+                                            manualEntryIntent.putExtra("price", elements.get(k).getText());
+                                            startActivity(manualEntryIntent);
                                             return;
                                         } catch (Exception e) {
 
