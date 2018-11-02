@@ -272,12 +272,8 @@ public class PhotoEntry extends AppCompatActivity {
                                 } else {
 
                                     Rect elBox = elements.get(k).getBoundingBox();
-                                    boolean onSameLine = false;
+                                    // check if this box is on the level as the total box, if so assume this box contains the price
                                     if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom) {
-                                        onSameLine = true;
-                                    }
-
-                                    if (onSameLine) {
 
                                         try {
                                             // when the price is found, stop the camera
