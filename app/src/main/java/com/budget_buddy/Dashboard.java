@@ -72,6 +72,9 @@ public class Dashboard extends AppCompatActivity {
         } else if (view.getId() == R.id.cameraEntry) {
             Intent cameraEntryIntent = new Intent(this, PhotoEntry.class);
             startActivity(cameraEntryIntent);
+        } else if (view.getId() == R.id.profileImageButton) {
+            Intent userProfileViewIntent = new Intent(this, UserProfileActivity.class);
+            startActivity(userProfileViewIntent);
         } else {
             return;
         }
