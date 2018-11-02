@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
@@ -71,7 +72,6 @@ public class PhotoEntry extends AppCompatActivity {
 
         cameraTextureView =(TextureView) findViewById(R.id.textureView);
         cameraTextureView.setSurfaceTextureListener(surfaceTextureListener);
-
     }
 
     private void setupImageReader() {
@@ -111,13 +111,18 @@ public class PhotoEntry extends AppCompatActivity {
 
     }
 
+    /**
+     * Camera2 boilerplate
+     */
     public void openCamera() {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
             String cameraId = manager.getCameraIdList()[0];
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            // The 0th element of the output sizes is supposedly the largest resolution available
             previewSize = map.getOutputSizes(SurfaceTexture.class)[0];
+            // swapping the height and the width is the only way I got accurate boxes
             mGraphicOverlay.setCameraInfo(previewSize.getHeight(), previewSize.getWidth(), characteristics.get(CameraCharacteristics.LENS_FACING));
             manager.openCamera(cameraId, stateCallback, null);
         } catch (Exception e) {
@@ -133,6 +138,10 @@ public class PhotoEntry extends AppCompatActivity {
         }
     }
 
+    /**
+     * This function configures the two surfaces that receive frame buffers and passes them to the previewBuilder.
+     * The camera session is then kicked off and the related threads are initialized in the onConfigured callback.
+     */
     void startCamera() {
         if(cameraDevice == null || !cameraTextureView.isAvailable() || previewSize == null) {
             return;
@@ -198,24 +207,66 @@ public class PhotoEntry extends AppCompatActivity {
     private void analyzeImage(final FirebaseVisionImage image) {
         FirebaseVisionTextRecognizer textRecognizer = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
         textRecognizer.processImage(image).addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+
+            Double price;
+
             @Override
             public void onSuccess(FirebaseVisionText firebaseVisionText) {
                 String text = firebaseVisionText.getText();
                 Log.i("Image text", text);
-                mGraphicOverlay.clear();
 
-                List<FirebaseVisionText.TextBlock> blocks = firebaseVisionText.getTextBlocks();
+                // synchronizing mGraphicOverlay ensures that this section cannot run concurrently, this prevents a race condition
+                // where the boxes are cleared prematurely after the total is found because the next frame is also processed
+                synchronized (mGraphicOverlay) {
 
-                for(int i = 0; i < blocks.size(); i++) {
-                    List<FirebaseVisionText.Line> lines = blocks.get(i).getLines();
-                    for(int j = 0; j < lines.size(); j++) {
-                        List<FirebaseVisionText.Element> elements = lines.get(j).getElements();
-                        for (int k = 0; k < elements.size(); k++) {
-                            GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
-                            mGraphicOverlay.add(textGraphic);
+                    if (price != null) { return; }
+
+                    mGraphicOverlay.clear();
+
+                    List<FirebaseVisionText.TextBlock> blocks = firebaseVisionText.getTextBlocks();
+
+                    Rect totalRect = null;
+
+                    for (int i = 0; i < blocks.size(); i++) {
+                        List<FirebaseVisionText.Line> lines = blocks.get(i).getLines();
+                        for (int j = 0; j < lines.size(); j++) {
+                            List<FirebaseVisionText.Element> elements = lines.get(j).getElements();
+
+                            for (int k = 0; k < elements.size(); k++) {
+                                GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
+                                mGraphicOverlay.add(textGraphic);
+
+                                if (totalRect == null) {
+                                    if (elements.get(k).getText().equals("TOTAL")) {
+                                        totalRect = elements.get(k).getBoundingBox();
+                                    }
+                                } else {
+
+                                    Rect elBox = elements.get(k).getBoundingBox();
+                                    boolean onSameLine = false;
+                                    if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom) {
+                                        onSameLine = true;
+                                    }
+
+                                    if (onSameLine) {
+
+                                        try {
+                                            Log.i("Price", elements.get(k).getText());
+                                            price = Double.parseDouble(elements.get(k).getText());
+                                            //cameraDevice.close();
+                                            previewSession.stopRepeating();
+                                            return;
+                                        } catch (Exception e) {
+
+                                        }
+
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
