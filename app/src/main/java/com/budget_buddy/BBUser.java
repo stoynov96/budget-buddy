@@ -1,5 +1,7 @@
 package com.budget_buddy;
 
+
+import android.support.annotation.NonNull;
 import android.util.Log;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
@@ -13,9 +15,16 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,6 +67,8 @@ class BBUser implements DataNode {
     // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
     private long suggestedSpendingAmount = -1;
 
+    private boolean TEST = false;
+
     static BBUser GetInstance() {
         return ourInstance;
     }
@@ -77,7 +88,6 @@ class BBUser implements DataNode {
         user = authentication.getCurrentUser();
         if(user != null) {
             userName = user.getDisplayName();
-            tableReader.CheckForExistingUser(userPath.get(0), user.getUid(), userName);
             // TODO: Add other initialization her as appropriate
         } else {  // user does not exist, create new user
 
@@ -309,5 +319,41 @@ class BBUser implements DataNode {
         userPath = new ArrayList<String>() {{
             add(DataConfig.DataLabels.USERS);
         }};
+    }
+
+    public void createUser(String otherExp, String otherInc, String primIncome, String savGoal, String rnt)throws InvalidDataLabelException{
+        budgetLevel = 1;
+        budgetScore = 0;
+        savingsGoal = Long.valueOf(savGoal);
+        rent = Long.valueOf(rnt);
+        otherExpenses = Long.valueOf(otherExp);
+        otherIncome = Long.valueOf(otherInc);
+        primaryIncome = Long.valueOf(primIncome);
+
+        tableWriter.WriteData(userPath, this, userName);
+    }
+
+    public boolean doesExist(){
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
+        ref.child("Users").child((userName)).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    TEST = true;
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                    ref.child("Users").child("readTest - KJ Test").setValue("IT EXISTS DOOD");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        ref.child("Users").child(userName).child("read TEST").setValue("blank read - TEST: " + TEST);
+
+        return TEST;
     }
 }

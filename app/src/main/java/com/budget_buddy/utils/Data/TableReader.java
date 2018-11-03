@@ -106,8 +106,8 @@ public class TableReader {
 
         myQueryReference.addChildEventListener(new ChildEventListener() {
             HashMap<String, Object>  map = new HashMap<>();
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+
+            private void handleData(DataSnapshot dataSnapshot) {
                 // this iterates through purchases until it gets each date - purchases HashMap,
                 // which is then added to map to be sent back to BBUser.
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
@@ -115,7 +115,14 @@ public class TableReader {
                         map.put(snapshot2.getKey(), snapshot2.getValue());
                     }
                 }
+
                 callback.OnCallback(map);
+            }
+
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
+                handleData(dataSnapshot);
+                Log.i("Child added!", "child added");
             }
 
             @Override
@@ -130,7 +137,8 @@ public class TableReader {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-
+                handleData(dataSnapshot);
+                Log.i("Child", "changed");
             }
 
             @Override
