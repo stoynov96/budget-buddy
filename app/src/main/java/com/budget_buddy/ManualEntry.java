@@ -35,6 +35,13 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
         purchaseDateField.setText(dateFormat.format(calendar.getTime()));
         context = getApplicationContext();
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null) {
+            String price = extras.getString("price");
+            EditText amountField = findViewById(R.id.purchaseAmount);
+            amountField.setText(price);
+        }
     }
 
     @Override
