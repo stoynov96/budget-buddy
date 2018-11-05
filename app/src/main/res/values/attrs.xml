@@ -6,11 +6,11 @@
 
         <!-- standard attributes, note android: prefix and no format attribute -->
         <attr name="android:imeOptions"/>
-        <attr name="android:inputType"/>
+        <attr name="android:inputType" >
+            <flag name="numberDecimal" value="0x00002002"/>
+        </attr>
         <attr name="android:maxLength" value="10"/>
-
-
-
+        
 
     </declare-styleable>
 </resources>

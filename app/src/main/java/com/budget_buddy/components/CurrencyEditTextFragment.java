@@ -10,6 +10,8 @@ import java.text.NumberFormat;
 
 public class CurrencyEditTextFragment extends AppCompatEditText{
 
+    // TODO Clean code - default styleable
+
     private NumberFormat f = NumberFormat.getCurrencyInstance();
 
     public CurrencyEditTextFragment(Context context) {
