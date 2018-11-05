@@ -1,8 +1,10 @@
 package com.budget_buddy;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
@@ -20,6 +22,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.hardware.camera2.CameraCaptureSession;
 import android.util.Log;
@@ -56,6 +60,7 @@ public class PhotoEntry extends AppCompatActivity {
     private GraphicOverlay mGraphicOverlay;
     // "This" makes it so we can access this activity across internal callbacks
     private AppCompatActivity This = this;
+    private static final int CAMERAREQUEST = 1;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -90,9 +95,39 @@ public class PhotoEntry extends AppCompatActivity {
             previewSize = map.getOutputSizes(SurfaceTexture.class)[0];
             // swapping the height and the width is the only way I got accurate boxes
             mGraphicOverlay.setCameraInfo(previewSize.getHeight(), previewSize.getWidth(), characteristics.get(CameraCharacteristics.LENS_FACING));
-            manager.openCamera(cameraId, stateCallback, null);
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERAREQUEST);
+            }
+            else {
+                // permission already granted
+                manager.openCamera(cameraId, stateCallback, null);
+            }
         } catch (Exception e) {
 
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case CAMERAREQUEST: {
+                try {
+                    CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+                    String cameraId = manager.getCameraIdList()[0];
+                    // permission granted by user, open the camera
+                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        manager.openCamera(cameraId, stateCallback, null);
+                    }
+                    // permission not granted by user, do not open the camera
+                    else {
+
+                    }
+                    return;
+                }
+                catch (Exception e) {
+
+                }
+            }
         }
     }
 

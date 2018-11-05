@@ -159,7 +159,7 @@ public class Dashboard extends AppCompatActivity {
         // to make the database reading better, and to make this update as data is added
         MyCallback callback = new MyCallback() {
             @Override
-            public void OnCallback(int [] weeklySpending) {
+            public void OnCallback(float [] weeklySpending) {
                 for(int i = 0; i < 7; i++) {
                     entries.add(new BarEntry(i, weeklySpending[6-i]));
                 }

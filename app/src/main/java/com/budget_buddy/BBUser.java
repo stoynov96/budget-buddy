@@ -225,7 +225,7 @@ class BBUser implements DataNode {
             @Override
             public void OnCallback(HashMap<String, Object> map) {
                 Iterator iterator = map.entrySet().iterator();
-                int [] expenditures = {0, 0, 0, 0, 0, 0, 0};
+                float [] expenditures = {0, 0, 0, 0, 0, 0, 0};
                 Expenditure expenditure = new Expenditure("","","","");
 
                 while (iterator.hasNext()) {
@@ -235,7 +235,7 @@ class BBUser implements DataNode {
                     int index = FindRelativeDay(validDates, expenditure.GetDate());
                     // Data is part of the last 7 days, add it to the array
                     if(index != -1) {
-                        expenditures[index] = expenditures[index] + Integer.valueOf(expenditure.GetAmount());
+                        expenditures[index] = expenditures[index] + Float.valueOf(expenditure.GetAmount());
                     }
                 }
 
@@ -244,7 +244,7 @@ class BBUser implements DataNode {
             }
 
             @Override
-            public void OnCallback(int [] expenditures) {
+            public void OnCallback(float [] expenditures) {
 
             }
         };
