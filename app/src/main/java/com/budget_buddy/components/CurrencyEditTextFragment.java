@@ -1,29 +1,40 @@
 package com.budget_buddy.components;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.support.v7.widget.AppCompatEditText;
+import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
+
+import com.budget_buddy.R;
+
 import java.text.NumberFormat;
+
 
 public class CurrencyEditTextFragment extends AppCompatEditText{
 
-    // TODO Clean code - default styleable
+    // TODO Clean code - clean view - hide input in xml?
+    private int MAX_LENGTH = 20;
 
     private NumberFormat f = NumberFormat.getCurrencyInstance();
 
     public CurrencyEditTextFragment(Context context) {
         super(context);
+        this.setInputType(EditorInfo.TYPE_CLASS_NUMBER | EditorInfo.TYPE_NUMBER_FLAG_DECIMAL);
+        this.setFilters(new InputFilter[] {new InputFilter.LengthFilter(MAX_LENGTH)});
     }
 
     public CurrencyEditTextFragment(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init(context,attrs);
     }
 
     public CurrencyEditTextFragment(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(context,attrs);
     }
 
     @Override
@@ -59,6 +70,20 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
             }
         }
         return super.onKeyPreIme(keyCode, event);
+    }
+
+    private void init(Context context, AttributeSet attrs){
+        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.CurrencyEditTextFragment);
+
+        int maxLength = array.getIndex((R.styleable.CurrencyEditTextFragment_android_maxLength));
+        this.setInputType(EditorInfo.TYPE_CLASS_NUMBER | EditorInfo.TYPE_NUMBER_FLAG_DECIMAL);
+        if (maxLength == 0) {
+            this.setFilters(new InputFilter[] {new InputFilter.LengthFilter(MAX_LENGTH)});
+        } else {
+            this.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
+        }
+
+        array.recycle();
     }
 
     private String Currency() {
