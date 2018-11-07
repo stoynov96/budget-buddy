@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -44,7 +45,10 @@ import android.util.SparseIntArray;
 import android.view.TextureView;
 import android.view.Surface;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 // http://coderzpassion.com/android-working-camera2-api/
@@ -61,6 +65,8 @@ public class PhotoEntry extends AppCompatActivity {
     // "This" makes it so we can access this activity across internal callbacks
     private AppCompatActivity This = this;
     private static final int CAMERAREQUEST = 1;
+    private static final int MAX_PREVIEW_WIDTH = 1920;
+    private static final int MAX_PREVIEW_HEIGHT = 1080;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -102,6 +108,9 @@ public class PhotoEntry extends AppCompatActivity {
                 // permission already granted
                 manager.openCamera(cameraId, stateCallback, null);
             }
+            Point displaySize = new Point();
+            this.getWindowManager().getDefaultDisplay().getSize(displaySize);
+            Log.i("Screen", "" + displaySize.x);
         } catch (Exception e) {
 
         }
@@ -253,6 +262,54 @@ public class PhotoEntry extends AppCompatActivity {
 
         }
 
+    }
+
+    private void setUpCameraOutput(int width, int height) {
+        Activity activity = this;
+        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+        try {
+            //CameraCharacteristics characteristics = manager.getCameraIdList()[0];
+            Point displaySize = new Point();
+            activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
+            int maxPreviewWidth = displaySize.x;
+            int maxPreviewHeight = displaySize.y;
+
+            if(maxPreviewWidth > MAX_PREVIEW_HEIGHT)
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    private Size chooseOptimalSize(Size[] choices, int textureViewWidth, int textureViewheight, int maxWidth, int maxHeight) {
+        List<Size> bigEnough = new ArrayList<>();
+        List<Size> notBigEnough = new ArrayList<>();
+
+        for (Size option: choices) {
+            if(option.getWidth() <= maxWidth && option.getHeight() <= maxHeight) {
+                if(option.getWidth() >= textureViewWidth && option.getHeight() >= textureViewheight) {
+                    bigEnough.add(option);
+                } else {
+                    notBigEnough.add(option);
+                }
+            }
+        }
+
+        Comparator<Size> compareBySize = new Comparator<Size>() {
+            @Override
+            public int compare(Size o1, Size o2) {
+                return Long.signum((long) o1.getWidth() * o1.getHeight() - (long) o2.getWidth() * o2.getHeight());
+            }
+        }
+
+        if (bigEnough.size() > 0) {
+            return Collections.min(bigEnough, compareBySize);
+        } else if (notBigEnough.size() > 0) {
+            return Collections.max(notBigEnough, compareBySize);
+        }
+
+        Log.e("Size", "Couldn't find any suitable preview size");
+        return choices[0];
     }
 
     /**
