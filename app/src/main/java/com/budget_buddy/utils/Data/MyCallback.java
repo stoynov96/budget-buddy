@@ -15,7 +15,7 @@ public interface MyCallback {
      * @param weeklySpending The array of integers representing how much a user spent on each of the
      *                       last 7 days.
      */
-    void OnCallback(int [] weeklySpending);
+    void OnCallback(float [] weeklySpending);
 
     /**
      * This function is called in TableReader after getting the requested data from Firebase. Returns

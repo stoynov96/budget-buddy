@@ -18,14 +18,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/profileImage"
+        <ImageButton
+            android:id="@+id/profileImageButton"
             android:layout_width="48dp"
             android:layout_height="52dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
             android:contentDescription="@string/profile_image_string_common_google_play_services_enable_button"
+            android:onClick="gotoEntryMethodFor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -37,11 +38,11 @@
             android:layout_width="289dp"
             android:layout_height="30dp"
             android:layout_marginStart="16dp"
-            app:layout_constraintBottom_toBottomOf="@+id/profileImage"
-            app:layout_constraintEnd_toStartOf="@+id/profileImage"
+            app:layout_constraintBottom_toBottomOf="@+id/profileImageButton"
+            app:layout_constraintEnd_toStartOf="@+id/profileImageButton"
             app:layout_constraintHorizontal_bias="0.676"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/profileImage"
+            app:layout_constraintTop_toTopOf="@+id/profileImageButton"
             app:layout_constraintVertical_bias="0.8" />
 
         <TextView

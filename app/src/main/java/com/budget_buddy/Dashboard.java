@@ -51,7 +51,8 @@ public class Dashboard extends AppCompatActivity {
     // Here's a more permanent home for the callback
     MyCallback callback = new MyCallback() {
         @Override
-        public void OnCallback(int [] weeklySpending) {
+        public void OnCallback(float [] weeklySpending) {
+            chart.clear();
             for(int i = 0; i < 7; i++) {
                 entries.add(new BarEntry(i, weeklySpending[6-i]));
             }
@@ -60,6 +61,7 @@ public class Dashboard extends AppCompatActivity {
             barData.setBarWidth(0.85f);
             chart.setData(barData);
             chart.setFitBars(true);
+            chart.invalidate();
         }
 
         @Override
@@ -105,6 +107,9 @@ public class Dashboard extends AppCompatActivity {
         } else if (view.getId() == R.id.cameraEntry) {
             Intent cameraEntryIntent = new Intent(this, PhotoEntry.class);
             startActivity(cameraEntryIntent);
+        } else if (view.getId() == R.id.profileImageButton) {
+            Intent userProfileViewIntent = new Intent(this, UserProfileActivity.class);
+            startActivity(userProfileViewIntent);
         } else {
             return;
         }
