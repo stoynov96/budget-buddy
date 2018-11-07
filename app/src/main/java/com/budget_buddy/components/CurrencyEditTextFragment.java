@@ -11,12 +11,12 @@ import android.view.inputmethod.EditorInfo;
 
 import com.budget_buddy.R;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 
 public class CurrencyEditTextFragment extends AppCompatEditText{
 
-    // TODO Clean code - clean view - hide input in xml?
     private int MAX_LENGTH = 20;
 
     private NumberFormat f = NumberFormat.getCurrencyInstance();
@@ -46,7 +46,7 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
         } else {
             String str = this.getText().toString();
             if (str.contains(f.getCurrency().getSymbol())){
-                this.setText(StripCurrency());
+                this.setText(CleanString());
                 this.setSelection(this.length());
             }
         }
@@ -66,6 +66,7 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
             if (event.getKeyCode() == KeyEvent.KEYCODE_BACK ){
                 dispatchKeyEvent(event);
                 validate();
+                this.clearFocus();
                 return  false;
             }
         }
@@ -75,7 +76,7 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
     private void init(Context context, AttributeSet attrs){
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.CurrencyEditTextFragment);
 
-        int maxLength = array.getIndex((R.styleable.CurrencyEditTextFragment_android_maxLength));
+        int maxLength = array.getIndex((R.styleable.AppCompatTextView.length));
         this.setInputType(EditorInfo.TYPE_CLASS_NUMBER | EditorInfo.TYPE_NUMBER_FLAG_DECIMAL);
         if (maxLength == 0) {
             this.setFilters(new InputFilter[] {new InputFilter.LengthFilter(MAX_LENGTH)});
@@ -94,13 +95,10 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
         return this.getText().toString().replaceAll("[^\\d.]+", "");
     }
 
-
-    private String StripCurrency() {
-        String pattern = "\\" + f.getCurrency().getSymbol();
-        return this.getText().toString().replaceAll(pattern, "");
-    }
-
-    private void validate(){
+    /**
+     * This function validate's the text set in the field as currency for the current locale
+     */
+    public void validate(){
         String str = this.getText().toString();
         if (str.matches("\\.")){
             this.setText( f.format(0));
@@ -113,7 +111,7 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
     }
 
     /**
-     * Return's the value of the string in the field as a double
+     * This function return's the value of the string in the field as a double
      * @return value of string as a double in CurrencyEditTextFragment
      */
     public Double getValue(){

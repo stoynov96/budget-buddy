@@ -41,8 +41,9 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
             String price = extras.getString("price");
-            EditText amountField = findViewById(R.id.purchaseAmount);
+            CurrencyEditTextFragment amountField = findViewById(R.id.purchaseAmount);
             amountField.setText(price);
+            amountField.validate();
         }
     }
 
