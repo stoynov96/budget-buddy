@@ -150,10 +150,4 @@ public class Login extends AppCompatActivity {
     private void closeProgressWheel() {
         wheel.setVisibility(View.GONE);
     }
-
-    public void gotoNewUser(BBUser user) {
-        closeProgressWheel();
-        Intent newUserEntryIntent = new Intent(this, NewUserEntry.class);
-        startActivity(newUserEntryIntent);
-    }
 }
