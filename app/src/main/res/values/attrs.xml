@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CurrencyEditTextFragment">
+
+        <!-- any custom attributes -->
+
+        <!-- standard attributes, note android: prefix and no format attribute -->
+        <attr name="android:imeOptions"/>
+        <attr name="android:inputType" />
+        <attr name="android:maxLength" />
+
+    </declare-styleable>
+</resources>

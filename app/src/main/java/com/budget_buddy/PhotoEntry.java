@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -44,7 +45,10 @@ import android.util.SparseIntArray;
 import android.view.TextureView;
 import android.view.Surface;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 // http://coderzpassion.com/android-working-camera2-api/
@@ -61,6 +65,8 @@ public class PhotoEntry extends AppCompatActivity {
     // "This" makes it so we can access this activity across internal callbacks
     private AppCompatActivity This = this;
     private static final int CAMERAREQUEST = 1;
+    private static final int MAX_PREVIEW_WIDTH = 480;
+    private static final int MAX_PREVIEW_HEIGHT = 640;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -85,14 +91,15 @@ public class PhotoEntry extends AppCompatActivity {
     /**
      * Camera2 boilerplate
      */
-    public void openCamera() {
+    public void openCamera(int width, int height) {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try {
             String cameraId = manager.getCameraIdList()[0];
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             // The 0th element of the output sizes is supposedly the largest resolution available
-            previewSize = map.getOutputSizes(SurfaceTexture.class)[0];
+            //previewSize = map.getOutputSizes(SurfaceTexture.class)[0];
+            setUpCameraOutput(width, height);
             // swapping the height and the width is the only way I got accurate boxes
             mGraphicOverlay.setCameraInfo(previewSize.getHeight(), previewSize.getWidth(), characteristics.get(CameraCharacteristics.LENS_FACING));
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -102,6 +109,9 @@ public class PhotoEntry extends AppCompatActivity {
                 // permission already granted
                 manager.openCamera(cameraId, stateCallback, null);
             }
+            Point displaySize = new Point();
+            this.getWindowManager().getDefaultDisplay().getSize(displaySize);
+            Log.i("Screen", "" + displaySize.x);
         } catch (Exception e) {
 
         }
@@ -256,6 +266,88 @@ public class PhotoEntry extends AppCompatActivity {
     }
 
     /**
+     * This takes the height/width of the textureView and passes those sizes to an output size optimizer.
+     * It finds the max necessary size by determining the max resolution of the device but this resolution is
+     * capped to MAX_PREVIEW_WIDTH x MAX_PREVIEW_HEIGHT (probably 720p or 480p).
+     * Right now, this function just sets the previewSize but it could do other things.
+     * @param width
+     * @param height
+     */
+    private void setUpCameraOutput(int width, int height) {
+        Activity activity = this;
+        CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
+
+        try {
+            //CameraCharacteristics characteristics = manager.getCameraIdList()[0];
+            Point displaySize = new Point();
+            activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
+            int maxPreviewWidth = displaySize.x;
+            int maxPreviewHeight = displaySize.y;
+
+            if(maxPreviewWidth > MAX_PREVIEW_WIDTH) {
+                maxPreviewWidth = MAX_PREVIEW_WIDTH;
+            }
+
+            if(maxPreviewHeight > MAX_PREVIEW_HEIGHT) {
+                maxPreviewHeight = MAX_PREVIEW_HEIGHT;
+            }
+
+            StreamConfigurationMap map = manager.getCameraCharacteristics(manager.getCameraIdList()[0]).get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+
+            previewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), width, height, maxPreviewHeight, maxPreviewWidth);
+            Log.i("Sizing", "size  " +previewSize);
+        } catch (Exception e) {
+
+        }
+    }
+
+    /**
+     * This function iterates through an array of possible output resolutions for the camera.
+     * It looks for all the resolutions (smaller than maxRes) that are at least as large of the texture view
+     * and adds those to bigEnough. All other resolutions are added to the notBigEnough array.
+     * It returns the smallest of the bigEnough resolutions but if none, it returns the largest notBigEnough.
+     * @param choices
+     * @param textureViewWidth
+     * @param textureViewHeight
+     * @param maxHeight
+     * @param maxWidth
+     * @return
+     */
+    private Size chooseOptimalSize(Size[] choices, int textureViewWidth, int textureViewHeight, int maxHeight, int maxWidth) {
+        List<Size> bigEnough = new ArrayList<>();
+        List<Size> notBigEnough = new ArrayList<>();
+
+        for (Size option: choices) {
+            Log.i("Sizing", "option: height: " + option.getHeight() + " width: " + option.getWidth());
+            if(option.getHeight() <= maxWidth && option.getWidth() <= maxHeight) {
+                // compare the height of the option to the width of the texture view and vice versa
+                // since the height is supposedly the smaller dimension
+                if(option.getHeight() >= textureViewWidth && option.getWidth() >= textureViewHeight) {
+                    bigEnough.add(option);
+                } else {
+                    notBigEnough.add(option);
+                }
+            }
+        }
+
+        Comparator<Size> compareBySize = new Comparator<Size>() {
+            @Override
+            public int compare(Size o1, Size o2) {
+                return Long.signum((long) o1.getWidth() * o1.getHeight() - (long) o2.getWidth() * o2.getHeight());
+            }
+        };
+
+        if (bigEnough.size() > 0) {
+            return Collections.min(bigEnough, compareBySize);
+        } else if (notBigEnough.size() > 0) {
+            return Collections.max(notBigEnough, compareBySize);
+        }
+
+        Log.e("Size", "Couldn't find any suitable preview size");
+        return choices[0];
+    }
+
+    /**
      * This function takes in an image and begins analysis on it. See onSuccess() in the OnSuccessListener
      * @param image
      */
@@ -392,7 +484,7 @@ public class PhotoEntry extends AppCompatActivity {
     private TextureView.SurfaceTextureListener surfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            openCamera();
+            openCamera(width, height);
         }
 
         @Override
