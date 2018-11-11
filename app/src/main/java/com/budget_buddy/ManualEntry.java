@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
+
+import com.budget_buddy.components.CurrencyEditTextFragment;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import android.util.Log;
 import android.widget.DatePicker;
@@ -39,8 +41,9 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
             String price = extras.getString("price");
-            EditText amountField = findViewById(R.id.purchaseAmount);
+            CurrencyEditTextFragment amountField = findViewById(R.id.purchaseAmount);
             amountField.setText(price);
+            amountField.validate();
         }
     }
 
@@ -63,11 +66,11 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
     public void DataEntry(View view) throws InvalidDataLabelException {
         EditText nameField = findViewById(R.id.purchaseName);
         EditText dateField = findViewById(R.id.purchaseDate);
-        EditText amountField = findViewById(R.id.purchaseAmount);
+        CurrencyEditTextFragment amountField = findViewById(R.id.purchaseAmount);
         EditText notesField = findViewById(R.id.purchaseNote);
         String name = nameField.getText().toString();
         String date = dateField.getText().toString();
-        String amount = amountField.getText().toString();
+        String amount = amountField.getValue().toString();
         String notes = notesField.getText().toString();
 
         nameField.getText().clear();

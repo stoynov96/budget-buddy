@@ -44,14 +44,49 @@ public class Dashboard extends AppCompatActivity {
     ExperienceBarAnimation experienceBarAnimation;
 
     HorizontalBarChart progressBar;
+    BarChart chart;
+    final List<BarEntry> entries = new ArrayList<BarEntry>();
     TextView progressBarDescription;
+
+    // Here's a more permanent home for the callback
+    MyCallback callback = new MyCallback() {
+        @Override
+        public void OnCallback(float [] weeklySpending) {
+            chart.clear();
+            for(int i = 0; i < 7; i++) {
+                entries.add(new BarEntry(i, weeklySpending[6-i]));
+            }
+            BarDataSet dataSet = new BarDataSet(entries, "");
+            BarData barData = new BarData(dataSet);
+            barData.setBarWidth(0.85f);
+            chart.setData(barData);
+            chart.setFitBars(true);
+            chart.invalidate();
+        }
+
+        @Override
+        public void OnCallback(HashMap<String, Object> map) {
+
+        }
+
+        @Override
+        public void OnProfileSet() {
+            if(ProfileNeedsSetup()) {
+                // display profile setup dialog
+                Log.i("Profile", "needs set up");
+            } else {
+                SetExperience(currentUser.getBudgetScore());
+                SetSavingsGoal(currentUser.getSavingsGoal());
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-
+        currentUser.setUserInterfaceCallback(callback);
         setupExperienceBar();
         addChart();
         addProgressBar();
@@ -78,6 +113,24 @@ public class Dashboard extends AppCompatActivity {
         } else {
             return;
         }
+    }
+
+    private void SetExperience(long experience) {
+
+    }
+
+    private void SetSavingsGoal(long goal) {
+
+    }
+
+    private boolean ProfileNeedsSetup() {
+        // check if any one of these is negative, for now rent is required
+        if(currentUser.getPrimaryIncome() < 0 || currentUser.getRent() < 0 || currentUser.getSavingsGoal() < 0) {
+            return true;
+        }
+        // might add other checks later
+
+        return false;
     }
 
     private void addProgressBar() {
@@ -132,7 +185,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void addChart() {
-        final BarChart chart = new BarChart(this);
+        chart = new BarChart(this);
         chart.setId(R.id.bar_graph_view);
 
         ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataGraphLayout);
@@ -147,35 +200,10 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.connect(chart.getId(), ConstraintSet.TOP, cl.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
-        final List<BarEntry> entries = new ArrayList<BarEntry>();
-
         // This is initializing the bars to 0 since we do not have data from Firebase yet.
         for(int i = 0; i < 7; i++) {
             entries.add(new BarEntry(i, 0));
         }
-
-        // Idea for how a callback can be used on the data to update/draw the graph. Aside from
-        // using a callback for this, I think we may want to consider an update callback somewhere in Dashboard
-        // to make the database reading better, and to make this update as data is added
-        MyCallback callback = new MyCallback() {
-            @Override
-            public void OnCallback(float [] weeklySpending) {
-                for(int i = 0; i < 7; i++) {
-                    entries.add(new BarEntry(i, weeklySpending[6-i]));
-                }
-                BarDataSet dataSet = new BarDataSet(entries, "");
-                BarData barData = new BarData(dataSet);
-                barData.setBarWidth(0.85f);
-                chart.setData(barData);
-                chart.setFitBars(true);
-                chart.invalidate();
-            }
-
-            @Override
-            public void OnCallback(HashMap<String, Object> map) {
-
-            }
-        };
 
         currentUser.GetWeeklySpending(callback);
 
