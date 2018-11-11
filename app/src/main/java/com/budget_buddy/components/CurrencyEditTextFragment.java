@@ -11,12 +11,14 @@ import android.view.inputmethod.EditorInfo;
 
 import com.budget_buddy.R;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 
 public class CurrencyEditTextFragment extends AppCompatEditText{
 
     private int MAX_LENGTH = 20;
+
 
     private NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
 
