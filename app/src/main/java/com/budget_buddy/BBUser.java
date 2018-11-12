@@ -174,6 +174,7 @@ class BBUser implements DataNode {
      * @param callback The callback used to return the array of expenditures to the calling procedure.
      */
     public void GetWeeklySpending(final MyCallback callback) {
+        user = authentication.getInstance().getCurrentUser();
         String path = userPath.get(0) + "/" + user.getUid() + "/";
 
         MyCallback callbackInner = new MyCallback() {
