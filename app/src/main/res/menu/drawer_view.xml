@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:id="@+id/menuNavGrp">
+        <item
+            android:id="@+id/testItem"
+            android:title="test" />
+        <item
+            android:id="@+id/testItem2"
+            android:title="test" />
+        <item
+            android:id="@+id/testItem3"
+            android:title="test" />
+        <item
+            android:id="@+id/testItem4"
+            android:title="test" />
+    </group>
+
+    <group android:id="@+id/logoutGrp">
+        <item
+            android:id="@+id/logoutButton"
+            android:title="Log-out"/>
+    </group>
+
+</menu>

@@ -1,3 +1,34 @@
 <resources>
     <string name="app_name">budget-buddy</string>
+    <string name="manual_reciept_entry">manual reciept entry</string>
+    <string name="budget_peasant">Budget Peasant</string>
+    <string name="profile_image_string_common_google_play_services_enable_button">profile image @string/common_google_play_services_enable_button</string>
+    <string name="camera_entry">camera entry</string>
+    <string name="default_welcome_message">Here\'s a breakdown of your budgeting this month.</string>
+    <string name="under_budget">You\'ve gone under budget %1$i days this past week.</string>
+    <string name="goal">With your leftover savings, you\'re $%1$d away from your goal!</string>
+    <string name="goal_product">That %1$s almost yours!</string>
+    <string-array name="day_abbreviations">
+        <item>Sun</item>
+        <item>Mon</item>
+        <item>Tues</item>
+        <item>Wed</item>
+        <item>Thurs</item>
+        <item>Fri</item>
+        <item>Sat</item>
+    </string-array>
+    <string name="purchase_name_title">Purchase Title</string>
+    <string name="purchase_name_hint">What did you buy?</string>
+    <string name="purchase_date_title">Purchase Date</string>
+    <string name="purchase_date_hint">When did you buy it?</string>
+    <string name="purchase_amount_title">Purchase Amount</string>
+    <string name="purchase_description_title">Brief Description (Optional)</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="profile_activity_title">User Profile</string>
+    <string name="profile_total_income_title">Total monthly income: </string>
+    <string name="profile_total_expenses_title">Total monthly expenses: </string>
+    <string name="profile_rent_title">Rent: </string>
+    <string name="profile_total_other_expenses_title">Other monthly expenses: </string>
+    <string name="profile_monthly_savings_goal_title">Monthly savings goal: </string>
+    <string name="nav_header">Navigation</string>
 </resources>

@@ -36,7 +36,11 @@ public class TableReaderTest {
             }
         };
 
-        tableReader.Latch(DataConfig.DataLabels.TEST, user);
+        List<String> labels = new ArrayList<String>() {{
+            add(DataConfig.DataLabels.TEST);
+            add(DataConfig.DataLabels.TEST_USER);
+        }};
+        tableReader.Latch(labels, user);
     }
 
     @Test
@@ -44,7 +48,7 @@ public class TableReaderTest {
         tableReader = new TableReader();
         final Map<String, Object> expected = new HashMap<String, Object>() {{
             put("mapLabelun", "testUName");
-            put("mapLabelB", 235.0);
+            put("mapLabelB", 235.21);
         }};
         DummyUser user = new DummyUser("noname", 0.24) {
             // Check if the data is as expected whenever it changes
@@ -54,9 +58,11 @@ public class TableReaderTest {
             }
         };
 
-        List<String> labels = new ArrayList<>();
-        labels.add(DataConfig.DataLabels.TEST);
-        labels.add(DataConfig.DataLabels.USERS);
+        List<String> labels = new ArrayList<String>() {{
+            add(DataConfig.DataLabels.TEST);
+            add(DataConfig.DataLabels.USERS);
+            add(DataConfig.DataLabels.TEST_USER);
+        }};
         tableReader.Latch(labels, user);
     }
 
@@ -64,10 +70,12 @@ public class TableReaderTest {
     public void testInvalidLabel() throws InvalidDataLabelException {
         tableReader = new TableReader();
         DummyUser user = new DummyUser("noname", 0.24);
-        List<String> labels = new ArrayList<>();
-        labels.add(DataConfig.DataLabels.TEST);
-        labels.add(DataConfig.DataLabels.USERS);
-        labels.add("InvalidLabel");
+        List<String> labels = new ArrayList<String>() {{
+            add(DataConfig.DataLabels.TEST);
+            add(DataConfig.DataLabels.USERS);
+            add("InvalidLabel");
+            add(DataConfig.DataLabels.TEST_USER);
+        }};
         tableReader.Latch(labels, user);
 
         user = new DummyUser("noname", 0.24) {
