@@ -19,7 +19,8 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
 
     private int MAX_LENGTH = 20;
 
-    private NumberFormat f = NumberFormat.getCurrencyInstance();
+
+    private NumberFormat numberFormat = NumberFormat.getCurrencyInstance();
 
     public CurrencyEditTextFragment(Context context) {
         super(context);
@@ -45,7 +46,7 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
             validate();
         } else {
             String str = this.getText().toString();
-            if (str.contains(f.getCurrency().getSymbol())){
+            if (str.contains(numberFormat.getCurrency().getSymbol())){
                 this.setText(CleanString());
                 this.setSelection(this.length());
             }
@@ -88,10 +89,14 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
     }
 
     private String Currency() {
-        return f.format(getValue());
+        return numberFormat.format(getValue());
     }
 
-    private String CleanString(){
+    /**
+     * This function return's the string in the field as a decimal
+     * @return value of string as a double in CurrencyEditTextFragment
+     */
+    public String CleanString(){
         return this.getText().toString().replaceAll("[^\\d.]+", "");
     }
 
@@ -101,7 +106,7 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
     public void validate(){
         String str = this.getText().toString();
         if (str.matches("\\.")){
-            this.setText( f.format(0));
+            this.setText( numberFormat.format(0));
         } else if (str.isEmpty()) {
             // do nothing
         } else {
@@ -114,7 +119,5 @@ public class CurrencyEditTextFragment extends AppCompatEditText{
      * This function return's the value of the string in the field as a double
      * @return value of string as a double in CurrencyEditTextFragment
      */
-    public Double getValue(){
-        return Double.valueOf(CleanString());
-    }
+    public Double getValue(){ return Double.valueOf(CleanString()); }
 }

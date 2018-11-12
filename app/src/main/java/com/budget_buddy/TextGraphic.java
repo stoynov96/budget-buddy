@@ -37,11 +37,13 @@ public class TextGraphic extends GraphicOverlay.Graphic {
     private final Paint rectPaint;
     private final Paint textPaint;
     private final FirebaseVisionText.Element element;
+    private final FirebaseVisionText.Line line;
 
     public TextGraphic(GraphicOverlay overlay, FirebaseVisionText.Element element) {
         super(overlay);
 
         this.element = element;
+        this.line = null;
 
         rectPaint = new Paint();
         rectPaint.setColor(TEXT_COLOR);
@@ -55,26 +57,58 @@ public class TextGraphic extends GraphicOverlay.Graphic {
         postInvalidate();
     }
 
+    public TextGraphic(GraphicOverlay overlay, FirebaseVisionText.Line line) {
+        super(overlay);
+
+        this.line = line;
+        this.element = null;
+
+        rectPaint = new Paint();
+        rectPaint.setColor(TEXT_COLOR);
+        rectPaint.setStyle(Paint.Style.STROKE);
+        rectPaint.setStrokeWidth(STROKE_WIDTH);
+
+        textPaint = new Paint();
+        textPaint.setColor(TEXT_COLOR);
+        textPaint.setTextSize(TEXT_SIZE);
+        postInvalidate();
+    }
+
     /**
      * Draws the text block annotations for position, size, and raw value on the supplied canvas.
      */
     @Override
     public void draw(Canvas canvas) {
         Log.d(TAG, "on draw text graphic");
-        if (element == null) {
+        if (element == null && line == null) {
             throw new IllegalStateException("Attempting to draw a null text.");
         }
 
-        // Draws the bounding box around the TextBlock.
-        RectF rect = new RectF(element.getBoundingBox());
-        rect.left = translateX(rect.left);
-        rect.top = translateY(rect.top);
-        rect.right = translateX(rect.right);
-        rect.bottom = translateY(rect.bottom);
+        if (line == null) {
+            // Draws the bounding box around the TextBlock.
+            RectF rect = new RectF(element.getBoundingBox());
+            rect.left = translateX(rect.left);
+            rect.top = translateY(rect.top);
+            rect.right = translateX(rect.right);
+            rect.bottom = translateY(rect.bottom);
 
-        canvas.drawRect(rect, rectPaint);
+            canvas.drawRect(rect, rectPaint);
 
-        // Renders the text at the bottom of the box.
-        canvas.drawText(element.getText(), rect.left, rect.bottom, textPaint);
+            // Renders the text at the bottom of the box.
+            canvas.drawText(element.getText(), rect.left, rect.bottom, textPaint);
+        }
+        else if (element == null) {
+            // Draws the bounding box around the TextBlock.
+            RectF rect = new RectF(line.getBoundingBox());
+            rect.left = translateX(rect.left);
+            rect.top = translateY(rect.top);
+            rect.right = translateX(rect.right);
+            rect.bottom = translateY(rect.bottom);
+
+            canvas.drawRect(rect, rectPaint);
+
+            // Renders the text at the bottom of the box.
+            canvas.drawText(line.getText(), rect.left, rect.bottom, textPaint);
+        }
     }
 }
