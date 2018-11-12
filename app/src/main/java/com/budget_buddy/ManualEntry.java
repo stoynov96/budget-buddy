@@ -139,20 +139,25 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         String amount = amountField.getValue().toString();
         String notes = notesField.getText().toString();
 
-        nameField.getText().clear();
-        amountField.getText().clear();
-        notesField.getText().clear();
-
         if(name.matches("") || date.matches("") || amount.matches("") ) {
             toast = Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.BOTTOM, 0, 1);
             toast.show();
+            nameField.getText().clear();
+            amountField.getText().clear();
+            notesField.getText().clear();
             return;
         }
+
+        amountField.validate();
+        amount = amountField.CleanString();
         user.WriteNewExpenditure(name, date, amount, notes);
         toast = Toast.makeText(context, "Added!", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.BOTTOM, 0, 1);
         toast.show();
+        nameField.getText().clear();
+        amountField.getText().clear();
+        notesField.getText().clear();
     }
 
     /**
