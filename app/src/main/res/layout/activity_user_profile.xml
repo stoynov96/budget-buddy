@@ -149,6 +149,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
 
+            android:onClick="cancelEntry"
             android:text="@string/cancel_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/saveButton"
@@ -161,6 +162,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="32dp"
 
+            android:onClick="saveEntry"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/cancelButton"
             app:layout_constraintTop_toTopOf="@+id/cancelButton"
