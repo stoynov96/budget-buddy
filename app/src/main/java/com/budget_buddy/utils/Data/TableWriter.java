@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TableWriter {
 
@@ -62,6 +63,16 @@ public class TableWriter {
             mDatabase.child(fullPath).push().setValue(data.ToMap());
         else
             mDatabase.child(fullPath).child(label).push().setValue(data.ToMap());
+    }
+
+    public void SetData(List<String> path, String label, DataNode data) throws InvalidDataLabelException {
+        String fullPath = joinLabels(path);
+
+        if (label == null) {
+            mDatabase.child(fullPath).setValue(data.ToMap());
+        } else {
+            mDatabase.child(fullPath).child(label).setValue(data.ToMap());
+        }
     }
 
     private String joinLabels(List<String> labels) throws InvalidDataLabelException {
