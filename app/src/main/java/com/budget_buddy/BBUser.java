@@ -140,7 +140,7 @@ class BBUser implements DataNode {
         // Todo: We really need to check if user already exists,
         // but I am not sure this should be done here
         //tableWriter.WriteData(userPath, this, user.getUid());
-        tableWriter.SetData(userPath, user.getUid(), this);
+        tableWriter.SetData(userPath, "/" + user.getUid() + "/User Parameters/", this);
     }
 
     /**
