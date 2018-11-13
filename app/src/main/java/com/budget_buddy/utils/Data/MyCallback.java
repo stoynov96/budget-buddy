@@ -29,4 +29,14 @@ public interface MyCallback {
      * This function is called when all of the properties in the BBUser singleton are set.
      */
     void OnProfileSet();
+
+    /**
+     * This function is called when a new user is added to the database and they must create their account.
+     */
+    void CreateNewUser();
+
+    /** This function is called on sign-in when a user is already in the database, used to go to the
+     * dashboard instead of account creation.
+     */
+    void UserExists();
 }

@@ -58,5 +58,15 @@ public class UserProfileActivity extends AppCompatActivity {
             otherMonthlyExpensesField.setText("$" + (otherExpenses == -1 ? "0.00" : otherExpenses));
             monthlySavingsGoalField.setText("$" + (savingsGoal == -1 ? "0.00" : savingsGoal));
         }
+
+        @Override
+        public void CreateNewUser() {
+
+        }
+
+        @Override
+        public void UserExists() {
+
+        }
     };
 }

@@ -1,9 +1,12 @@
 package com.budget_buddy.utils.Data;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.budget_buddy.UserProfileActivity;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.google.firebase.database.ChildEventListener;
@@ -186,7 +189,7 @@ public class TableReader {
      * @param path The pathname to Users in the database
      * @param name The username (this should be the key eventually) to check for.
      */
-    public void CheckForExistingUser(final String path, final String userID, final String name) {
+    public void CheckForExistingUser(final String path, final String userID, final String name, final MyCallback newUserCallback) {
         Query myQueryReference = mDatabase.child(path);
         myQueryReference.orderByKey().equalTo(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -206,6 +209,11 @@ public class TableReader {
                     userData.put("Suggested Spending Amount", -1);
 
                     mDatabase.child(path).child(userID).setValue(userData);
+                    // if the user is not in the database, then jump to the UserProfileActivity so they can create their budget
+                    newUserCallback.CreateNewUser();
+                }
+                else {
+                    newUserCallback.UserExists();
                 }
             }
 

@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 
 import com.budget_buddy.exception.InvalidDataLabelException;
 
+import com.budget_buddy.utils.Data.MyCallback;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -18,6 +19,8 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+
+import java.util.HashMap;
 
 public class Login extends AppCompatActivity {
 
@@ -96,12 +99,37 @@ public class Login extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("Sign in message:", "signInWithCredential:success");
                     try {
-                        currentUser.Initialize();
+                        MyCallback newUserCallback = new MyCallback() {
+                            @Override
+                            public void OnCallback(float[] weeklySpending) {
+
+                            }
+
+                            @Override
+                            public void OnCallback(HashMap<String, Object> map) {
+
+                            }
+
+                            @Override
+                            public void OnProfileSet() {
+
+                            }
+
+                            @Override
+                            public void CreateNewUser() {
+                                gotoNewUser(currentUser);
+                            }
+
+                            @Override
+                            public void UserExists() {
+                                gotoDashboard(currentUser);
+                            }
+                        };
+                        currentUser.Initialize(newUserCallback);
                     }
                     catch (InvalidDataLabelException idle) {
                         // TODO: IMPORTANT: Handle this exception
                     }
-                    gotoDashboard(currentUser);
                 } else {
                     // TODO: If sign in fails, display a message to the user.
                     Log.w("Sign in message:", "signInWithCredential:failure", task.getException());
@@ -110,6 +138,14 @@ public class Login extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void gotoNewUser(BBUser user) {
+        if (user.GetUser() != null) {
+            Intent newUserIntent = new Intent(this, UserProfileActivity.class);
+            closeProgressWheel();
+            startActivity(newUserIntent);
+        }
     }
 
     private void gotoDashboard(BBUser user) {

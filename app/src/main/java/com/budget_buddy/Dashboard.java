@@ -66,6 +66,16 @@ public class Dashboard extends AppCompatActivity {
                 SetSavingsGoal(currentUser.getSavingsGoal());
             }
         }
+
+        @Override
+        public void CreateNewUser() {
+
+        }
+
+        @Override
+        public void UserExists() {
+
+        }
     };
 
     @Override

@@ -1,5 +1,6 @@
 package com.budget_buddy;
 
+import android.content.Intent;
 import android.util.Log;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
@@ -76,12 +77,12 @@ class BBUser implements DataNode {
         authentication.signOut();
     }
 
-    public void Initialize() throws InvalidDataLabelException {
+    public void Initialize(final MyCallback newUserCallback) throws InvalidDataLabelException {
         user = authentication.getCurrentUser();
         if(user != null) {
             userName = user.getDisplayName();
-            tableReader.CheckForExistingUser(userPath.get(0), user.getUid(), userName);
-            // TODO: Add other initialization her as appropriate
+            tableReader.CheckForExistingUser(userPath.get(0), user.getUid(), userName, newUserCallback);
+            // TODO: Add other initialization here as appropriate
         } else {  // user does not exist, create new user
 
         }
@@ -244,6 +245,16 @@ class BBUser implements DataNode {
 
             @Override
             public void OnProfileSet() {}
+
+            @Override
+            public void CreateNewUser() {
+
+            }
+
+            @Override
+            public void UserExists() {
+
+            }
         };
 
         tableReader.WeeklyExpenditures(path, callbackInner);
