@@ -1,11 +1,14 @@
 package com.budget_buddy;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
+import com.budget_buddy.exception.InvalidDataLabelException;
 import com.budget_buddy.utils.Data.MyCallback;
+import com.budget_buddy.utils.Data.UserParameters;
 
 import java.util.HashMap;
 
@@ -31,11 +34,17 @@ public class UserProfileActivity extends AppCompatActivity {
         currentUser.addUICallback(profileCallback);
     }
 
-    public void saveEntry(View view) {
-
+    public void saveEntry(View view) throws InvalidDataLabelException {
+        UserParameters newParameters = new UserParameters(rentField.getText().toString(), monthlySavingsGoalField.getText().toString(), otherMonthlyExpensesField.getText().toString(), monthlyIncomeField.getText().toString());
+        currentUser.WriteUserParameters(newParameters);
+        Intent dashboardIntent = new Intent(this, Dashboard.class);
+        startActivity(dashboardIntent);
+        finish();
     }
 
     public void cancelEntry(View view) {
+        Intent dashboardIntent = new Intent(this, Dashboard.class);
+        startActivity(dashboardIntent);
         finish();
     }
 

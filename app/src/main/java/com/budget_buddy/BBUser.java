@@ -8,6 +8,7 @@ import com.budget_buddy.utils.Data.DataNode;
 import com.budget_buddy.utils.Data.MyCallback;
 import com.budget_buddy.utils.Data.TableReader;
 import com.budget_buddy.utils.Data.TableWriter;
+import com.budget_buddy.utils.Data.UserParameters;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -54,7 +55,6 @@ class BBUser implements DataNode {
     // Primary income
     private long primaryIncome = -1;
     // Other income
-    private long otherIncome = -1;
     // Suggested daily spending amount
     // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
     private long suggestedSpendingAmount = -1;
@@ -124,9 +124,7 @@ class BBUser implements DataNode {
     public long getPrimaryIncome() {
         return primaryIncome;
     }
-    public long getOtherIncome() {
-        return otherIncome;
-    }
+
     public long getSuggestedSpendingAmount() {
         return suggestedSpendingAmount;
     }
@@ -143,6 +141,16 @@ class BBUser implements DataNode {
         // Todo: We really need to check if user already exists,
         // but I am not sure this should be done here
         tableWriter.WriteData(userPath, this, userName);
+    }
+
+    public void WriteUserParameters(UserParameters parameters) throws InvalidDataLabelException {
+        user = authentication.getInstance().getCurrentUser();
+        try {
+            tableWriter.WriteData(userPath, parameters, "/"+user.getUid()+"/User Parameters/");
+        }
+        catch (Exception e) {
+
+        }
     }
 
     /**
@@ -281,7 +289,6 @@ class BBUser implements DataNode {
             put("Rent", rent);
             put("OtherExpenses", otherExpenses);
             put("PrimaryIncome", primaryIncome);
-            put("OtherIncome", otherIncome);
             // suggestedSpending should probably be calculated on the spot
         }};
     }
@@ -292,15 +299,13 @@ class BBUser implements DataNode {
         budgetLevel = temp != null ? (long) temp : -1;
         temp = map.get("Budget Score");
         budgetScore = temp != null ? (long) temp : -1;
-        temp = map.get("Savings Goal");
+        temp = map.get("Monthly Savings Goal");
         savingsGoal = temp != null ? (long) temp : -1;
         temp = map.get("Rent");
         rent = temp != null ? (long) temp : -1;
-        temp = map.get("Other Expenses");
+        temp = map.get("Other Monthly Expenses");
         otherExpenses = temp != null ? (long) temp : -1;
-        temp = map.get("Other Income");
-        otherIncome = temp != null ? (long) temp : -1;
-        temp = map.get("Primary Income");
+        temp = map.get("Monthly Income");
         primaryIncome = temp != null ? (long) temp : -1;
         //userInterfaceCallback.OnProfileSet();
         for(MyCallback callback: UICallbacks) {

@@ -199,14 +199,9 @@ public class TableReader {
                     Map<String, Object> userData = new HashMap<>();
                     newUser.put(userID, userData);
                     userData.put("User Name", name);
-                    userData.put("Budget Level", -1);
-                    userData.put("Budget Score", -1);
-                    userData.put("Savings Goal", -1);
-                    userData.put("Rent", -1);
-                    userData.put("Other Expenses", -1);
-                    userData.put("Primary Income", -1);
-                    userData.put("Other Income", -1);
-                    userData.put("Suggested Spending Amount", -1);
+                    userData.put("Budget Level", 1);
+                    userData.put("Budget Score", 0);
+                    userData.put("Suggested Spending Amount", 0);
 
                     mDatabase.child(path).child(userID).setValue(userData);
                     // if the user is not in the database, then jump to the UserProfileActivity so they can create their budget
