@@ -416,9 +416,10 @@ public class PhotoEntry extends AppCompatActivity {
                                 //GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
                                 //mGraphicOverlay.add(textGraphic);
 
+                                    String word = elements.get(k).getText();
                                 if (totalRect == null) {
-                                    if (elements.get(k).getText().equalsIgnoreCase("TOTAL") || elements.get(k).getText().equalsIgnoreCase("DUE")
-                                            || elements.get(k).getText().equalsIgnoreCase("AMOUNT") || elements.get(k).getText().equalsIgnoreCase("SALE")) {
+                                    if (word.equalsIgnoreCase("TOTAL") || word.equalsIgnoreCase("DUE")
+                                            || word.equalsIgnoreCase("AMOUNT") || word.equalsIgnoreCase("SALE")) {
                                         totalRect = elements.get(k).getBoundingBox();
                                     }
                                 } else {
@@ -429,15 +430,15 @@ public class PhotoEntry extends AppCompatActivity {
                                     // to keep running until it gets it right
                                     // for now this works fairly well, but we should probably consider other boxes as well, such as immediately below
                                     // again, though, I have yet to find an example receipt where this is the case
-                                    if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom && validPrice.matcher(elements.get(k).getText()).matches() && userIsReady) {
+                                    if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom && validPrice.matcher(word).matches() && userIsReady) {
 
                                         try {
                                             // when the price is found, stop the camera
-                                            price = Double.parseDouble(elements.get(k).getText());
+                                            price = Double.parseDouble(word);
                                             previewSession.stopRepeating();
                                             mImageReader.close();
                                             Intent manualEntryIntent = new Intent(This, ManualEntry.class);
-                                            manualEntryIntent.putExtra("price", elements.get(k).getText());
+                                            manualEntryIntent.putExtra("price", word);
                                             manualEntryIntent.putStringArrayListExtra("options", options);
                                             startActivity(manualEntryIntent);
                                             return;
@@ -472,7 +473,7 @@ public class PhotoEntry extends AppCompatActivity {
                     userIsReady = true;
                     captureButton.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
                     captureButton.invalidate();
-                } else {
+                } else if(event.getAction() == MotionEvent.ACTION_UP) {
                     userIsReady = false;
                     captureButton.getBackground().clearColorFilter();
                     captureButton.invalidate();
