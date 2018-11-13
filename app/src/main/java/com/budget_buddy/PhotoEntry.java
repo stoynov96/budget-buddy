@@ -429,7 +429,7 @@ public class PhotoEntry extends AppCompatActivity {
                                     // to keep running until it gets it right
                                     // for now this works fairly well, but we should probably consider other boxes as well, such as immediately below
                                     // again, though, I have yet to find an example receipt where this is the case
-                                    if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom && validPrice.matcher(elements.get(k).getText()).matches()) {
+                                    if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom && validPrice.matcher(elements.get(k).getText()).matches() && userIsReady) {
 
                                         try {
                                             // when the price is found, stop the camera
