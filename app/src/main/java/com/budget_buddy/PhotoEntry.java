@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -42,11 +43,11 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 
 
 import android.util.SparseIntArray;
+import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.Surface;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.Spinner;
+import android.view.View;
+import android.widget.Button;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -68,11 +69,14 @@ public class PhotoEntry extends AppCompatActivity {
     private CameraCaptureSession previewSession;
     private ImageReader mImageReader;
     private GraphicOverlay mGraphicOverlay;
+    private Button captureButton;
     // "This" makes it so we can access this activity across internal callbacks
     private AppCompatActivity This = this;
     private static final int CAMERAREQUEST = 1;
     private static final int MAX_PREVIEW_WIDTH = 480;
     private static final int MAX_PREVIEW_HEIGHT = 640;
+    // bool set when the user thinks it's a good time to capture the image
+    private boolean userIsReady = false;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -92,6 +96,9 @@ public class PhotoEntry extends AppCompatActivity {
 
         cameraTextureView =(TextureView) findViewById(R.id.textureView);
         cameraTextureView.setSurfaceTextureListener(surfaceTextureListener);
+
+        captureButton = (Button) findViewById(R.id.captureButton);
+        setupCaptureButton();
     }
 
     /**
@@ -409,9 +416,10 @@ public class PhotoEntry extends AppCompatActivity {
                                 //GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
                                 //mGraphicOverlay.add(textGraphic);
 
+                                    String word = elements.get(k).getText();
                                 if (totalRect == null) {
-                                    if (elements.get(k).getText().equalsIgnoreCase("TOTAL") || elements.get(k).getText().equalsIgnoreCase("DUE")
-                                            || elements.get(k).getText().equalsIgnoreCase("AMOUNT") || elements.get(k).getText().equalsIgnoreCase("SALE")) {
+                                    if (word.equalsIgnoreCase("TOTAL") || word.equalsIgnoreCase("DUE")
+                                            || word.equalsIgnoreCase("AMOUNT") || word.equalsIgnoreCase("SALE")) {
                                         totalRect = elements.get(k).getBoundingBox();
                                     }
                                 } else {
@@ -422,15 +430,15 @@ public class PhotoEntry extends AppCompatActivity {
                                     // to keep running until it gets it right
                                     // for now this works fairly well, but we should probably consider other boxes as well, such as immediately below
                                     // again, though, I have yet to find an example receipt where this is the case
-                                    if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom && validPrice.matcher(elements.get(k).getText()).matches()) {
+                                    if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom && validPrice.matcher(word).matches() && userIsReady) {
 
                                         try {
                                             // when the price is found, stop the camera
-                                            price = Double.parseDouble(elements.get(k).getText());
+                                            price = Double.parseDouble(word);
                                             previewSession.stopRepeating();
                                             mImageReader.close();
                                             Intent manualEntryIntent = new Intent(This, ManualEntry.class);
-                                            manualEntryIntent.putExtra("price", elements.get(k).getText());
+                                            manualEntryIntent.putExtra("price", word);
                                             manualEntryIntent.putStringArrayListExtra("options", options);
                                             startActivity(manualEntryIntent);
                                             return;
@@ -450,6 +458,27 @@ public class PhotoEntry extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.i("Image text", "failure");
+            }
+        });
+    }
+
+    /**
+     * This function simply sets the onTouch listener for the button.
+     */
+    private void setupCaptureButton() {
+        captureButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    userIsReady = true;
+                    captureButton.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                    captureButton.invalidate();
+                } else if(event.getAction() == MotionEvent.ACTION_UP) {
+                    userIsReady = false;
+                    captureButton.getBackground().clearColorFilter();
+                    captureButton.invalidate();
+                }
+                return true;
             }
         });
     }

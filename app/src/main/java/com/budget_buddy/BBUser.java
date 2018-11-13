@@ -59,6 +59,7 @@ class BBUser implements DataNode {
     private long suggestedSpendingAmount = -1;
     // holds callbacks relevant to the UI, triggered on data loads
     private MyCallback userInterfaceCallback;
+    private List<MyCallback> UICallbacks = new ArrayList<>();
 
     static BBUser GetInstance() {
         return ourInstance;
@@ -288,7 +289,20 @@ class BBUser implements DataNode {
         otherExpenses = temp != null ? (long) temp : -1;
         temp = map.get("Other Income");
         otherIncome = temp != null ? (long) temp : -1;
-        userInterfaceCallback.OnProfileSet();
+        temp = map.get("Primary Income");
+        primaryIncome = temp != null ? (long) temp : -1;
+        //userInterfaceCallback.OnProfileSet();
+        for(MyCallback callback: UICallbacks) {
+            callback.OnProfileSet();
+        }
+    }
+
+    public void addUICallback(MyCallback callback) {
+        UICallbacks.add(callback);
+        user = authentication.getInstance().getCurrentUser();
+        String path = userPath.get(0) + "/" + user.getUid() + "/";
+
+        tableReader.addListener(path, callback);
     }
 
     public void setUserInterfaceCallback(MyCallback callback) {
