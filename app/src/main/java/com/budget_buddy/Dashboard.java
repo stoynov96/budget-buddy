@@ -4,11 +4,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
+
 import com.budget_buddy.animations.ExperienceBarAnimation;
 import com.budget_buddy.charts.GoalProgressBar;
 
@@ -38,6 +46,7 @@ public class Dashboard extends AppCompatActivity {
     SpendingChart spendingChart;
     final List<BarEntry> entries = new ArrayList<BarEntry>();
     TextView progressBarDescription;
+	DrawerLayout drawerLayout;
 
     // Here's a more permanent home for the callback
     MyCallback callback = new MyCallback() {
@@ -74,6 +83,7 @@ public class Dashboard extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         currentUser.setUserInterfaceCallback(callback);
+        setUpDrawer();
         setupExperienceBar();
         addChart();
         addProgressBar();
@@ -189,5 +199,62 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.applyTo(cl);
 
         currentUser.GetWeeklySpending(callback);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(Gravity.LEFT);
+        } else {
+            drawerLayout.openDrawer(Gravity.LEFT);
+        }
+        return;
+    }
+
+    private void setUpDrawer(){
+        drawerLayout = findViewById(R.id.drawer_layout);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // close drawer when item is tapped
+                        drawerLayout.closeDrawers();
+
+                        switch(menuItem.getItemId()) {
+                            case R.id.logoutButton:
+                                goToLogin();
+                                break;
+                            case R.id.testItem:
+                                // TODO: Other navigation items
+                                break;
+                        }
+
+                        return true;
+                    }
+                });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(Gravity.LEFT);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void goToLogin(){
+        Intent loginIntent = new Intent(this, Login.class);
+        loginIntent.putExtra("dashboard", true);
+        startActivity(loginIntent);
     }
 }

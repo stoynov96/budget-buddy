@@ -1,11 +1,13 @@
 package com.budget_buddy;
 
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.budget_buddy.exception.InvalidDataLabelException;
@@ -24,7 +26,7 @@ public class Login extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
 
     private GoogleSignInClient mGoogleSignInClient;
-    private BBUser currentUser = BBUser.GetInstance();
+    private BBUser currentUser;
     private ProgressBar wheel;
 
     @Override
@@ -41,29 +43,32 @@ public class Login extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        onLaunchSignIn();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        currentUser = BBUser.GetInstance();
+
+        fromDashboard();
+        checkLoggedIn();
+        onLaunchSignIn();
+
         // TODO: Check if user is signed in (non-null) and update UI accordingly. I.E. if they are no longer signed in, display the sign in page.
-        if(currentUser.GetUser() != null) {
+        if(currentUser.IsLoggedIn()) {
             //gotoDashboard(currentUser);
+
         }
         else {
             // TODO: If they are no longer signed in, go to the sign in page
+
         }
     }
+
 
     public void signIn(View view) {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    public void signOut(View view) {
-        currentUser.SignOut();
-        mGoogleSignInClient.signOut();
     }
 
     @Override
@@ -127,7 +132,6 @@ public class Login extends AppCompatActivity {
             GoogleSignInAccount account = task.getResult();
             firebaseAuthWithGoogle(account);
         } else {
-
             task.addOnCompleteListener(this, new OnCompleteListener<GoogleSignInAccount>() {
                 @Override
                 public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
@@ -150,4 +154,27 @@ public class Login extends AppCompatActivity {
     private void closeProgressWheel() {
         wheel.setVisibility(View.GONE);
     }
+
+    private void checkLoggedIn(){
+        if (!currentUser.IsLoggedIn()){
+            findViewById(R.id.button).setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void fromDashboard(){
+        // Check if we are coming from dashboard logout
+        Bundle extras = getIntent().getExtras();
+        if(extras != null && extras.getBoolean("dashboard", false)){
+            currentUser.SignOut();
+            mGoogleSignInClient.signOut();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // do nothing - prevent going back to dashboard if logged out
+        return;
+    }
+
+
 }
