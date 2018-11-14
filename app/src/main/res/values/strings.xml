@@ -2,6 +2,8 @@
     <string name="app_name">Budget Buddy</string>
     <string name="google_sign_in">Google Sign-In</string>
     <string name="google_sign_out">Google Sign-Out</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_out">Sign Out</string>
     <string name="manual_receipt_entry">manual receipt entry</string>
     <string name="budget_peasant">Budget Peasant</string>
     <string name="profile_image_string_common_google_play_services_enable_button">profile image @string/common_google_play_services_enable_button</string>
