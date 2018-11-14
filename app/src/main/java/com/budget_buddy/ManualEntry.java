@@ -136,7 +136,7 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         EditText notesField = findViewById(R.id.purchaseNote);
         String name = nameField.getText().toString();
         String date = dateField.getText().toString();
-        String amount = amountField.getValue().toString();
+        String amount = amountField.getText().toString();
         String notes = notesField.getText().toString();
 
         if(name.matches("") || date.matches("") || amount.matches("") ) {
