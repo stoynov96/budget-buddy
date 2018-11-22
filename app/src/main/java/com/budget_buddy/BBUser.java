@@ -43,17 +43,17 @@ class BBUser implements DataNode {
     // The user's name as entered in the database.
     private String userName;
     // Current level of the user (NYI)
-    private long budgetLevel = -1;
+    private long budgetLevel = 1;
     // Current score of the user (NYI)
-    private long budgetScore = -1;
+    private long budgetScore = 0;
     // Monthly Savings Goal (this is how much the user hopes to save throughout the month)
-    private long savingsGoal = -1;
+    private double savingsGoal = 0;
     // Rent (in dollars, should we worry about cents at all?)
-    private long rent = -1;
+    private double rent = 0;
     // other expenses (maybe we should store as an array but simpler as a lump sum)
-    private long otherExpenses = -1;
+    private double otherExpenses = 0;
     // Primary income
-    private long primaryIncome = -1;
+    private double primaryIncome = 0;
     // Other income
     // Suggested daily spending amount
     // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
@@ -112,16 +112,16 @@ class BBUser implements DataNode {
     public long getBudgetScore() {
         return this.budgetScore;
     }
-    public long getSavingsGoal() {
+    public double getSavingsGoal() {
         return savingsGoal;
     }
-    public long getRent() {
+    public double getRent() {
         return rent;
     }
-    public long getOtherExpenses() {
+    public double getOtherExpenses() {
         return otherExpenses;
     }
-    public long getPrimaryIncome() {
+    public double getPrimaryIncome() {
         return primaryIncome;
     }
 
@@ -140,17 +140,7 @@ class BBUser implements DataNode {
     public void WriteUserInfo() throws InvalidDataLabelException {
         // Todo: We really need to check if user already exists,
         // but I am not sure this should be done here
-        tableWriter.WriteData(userPath, this, userName);
-    }
-
-    public void WriteUserParameters(UserParameters parameters) throws InvalidDataLabelException {
-        user = authentication.getInstance().getCurrentUser();
-        try {
-            tableWriter.WriteData(userPath, parameters, "/"+user.getUid()+"/User Parameters/");
-        }
-        catch (Exception e) {
-
-        }
+        tableWriter.SetData(userPath, "/" + user.getUid() + "/User Parameters/", this);
     }
 
     /**
@@ -283,12 +273,13 @@ class BBUser implements DataNode {
     @Override
     public Map<String, Object> ToMap() {
         return new HashMap<String, Object>() {{
-            put("BudgetLevel", budgetLevel);
-            put("BudgetScore", budgetScore);
-            put("SavingsGoal", savingsGoal);
+            put("Budget Level", budgetLevel);
+            put("Budget Score", budgetScore);
+            put("Savings Goal", savingsGoal);
             put("Rent", rent);
-            put("OtherExpenses", otherExpenses);
-            put("PrimaryIncome", primaryIncome);
+            put("Other Expenses", otherExpenses);
+            put("Primary Income", primaryIncome);
+            put("User Name", GetUser().getDisplayName());
             // suggestedSpending should probably be calculated on the spot
         }};
     }
@@ -296,17 +287,17 @@ class BBUser implements DataNode {
     @Override
     public void GetFromMap(Map<String, Object> map) {
         Object temp = map.get("Budget Level");
-        budgetLevel = temp != null ? (long) temp : -1;
+        budgetLevel = temp != null ? (long) temp : budgetLevel;
         temp = map.get("Budget Score");
-        budgetScore = temp != null ? (long) temp : -1;
+        budgetScore = temp != null ? (long) temp : budgetScore;
         temp = map.get("Monthly Savings Goal");
-        savingsGoal = temp != null ? (long) temp : -1;
+        savingsGoal = temp != null ? (double) temp : savingsGoal;
         temp = map.get("Rent");
-        rent = temp != null ? (long) temp : -1;
+        rent = temp != null ? (double) temp : rent;
         temp = map.get("Other Monthly Expenses");
-        otherExpenses = temp != null ? (long) temp : -1;
+        otherExpenses = temp != null ? (double) temp : otherExpenses;
         temp = map.get("Monthly Income");
-        primaryIncome = temp != null ? (long) temp : -1;
+        primaryIncome = temp != null ? (double) temp : primaryIncome;
         //userInterfaceCallback.OnProfileSet();
         for(MyCallback callback: UICallbacks) {
             callback.OnProfileSet();
@@ -337,6 +328,7 @@ class BBUser implements DataNode {
         this.userName = userName;
         return this;
     }
+
     BBUser SetBudgetLevel(long budgetLevel) {
         this.budgetLevel = budgetLevel;
         return this;

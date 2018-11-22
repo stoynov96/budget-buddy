@@ -112,11 +112,11 @@ public class Dashboard extends AppCompatActivity {
         }
     }
 
-    private void SetExperience(long experience) {
+    private void SetExperience(double experience) {
 
     }
 
-    private void SetSavingsGoal(long goal) {
+    private void SetSavingsGoal(double goal) {
 
     }
 

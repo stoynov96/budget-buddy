@@ -198,10 +198,7 @@ public class TableReader {
                     Map<String, Object> newUser = new HashMap<>();
                     Map<String, Object> userData = new HashMap<>();
                     newUser.put(userID, userData);
-                    userData.put("User Name", name);
-                    userData.put("Budget Level", 1);
-                    userData.put("Budget Score", 0);
-                    userData.put("Suggested Spending Amount", 0);
+                    userData.put("Suggested Spending Amount", 0);   // this should be moved to user parameters at some point
 
                     mDatabase.child(path).child(userID).setValue(userData);
                     // if the user is not in the database, then jump to the UserProfileActivity so they can create their budget

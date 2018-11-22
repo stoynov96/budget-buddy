@@ -42,7 +42,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/total_monthy_income_field" />
 
-        <EditText
+        <com.budget_buddy.components.CurrencyEditTextFragment
             android:id="@+id/total_monthy_income_field"
             android:layout_width="140dp"
             android:layout_height="40dp"
@@ -66,7 +66,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/total_rent_field" />
 
-        <EditText
+        <com.budget_buddy.components.CurrencyEditTextFragment
             android:id="@+id/total_rent_field"
             android:layout_width="140dp"
             android:layout_height="40dp"
@@ -91,7 +91,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/total_other_expenses_field" />
 
-        <EditText
+        <com.budget_buddy.components.CurrencyEditTextFragment
             android:id="@+id/total_other_expenses_field"
             android:layout_width="140dp"
             android:layout_height="40dp"
@@ -116,7 +116,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/monthly_savings_goal_field" />
 
-        <EditText
+        <com.budget_buddy.components.CurrencyEditTextFragment
             android:id="@+id/monthly_savings_goal_field"
             android:layout_width="140dp"
             android:layout_height="40dp"
