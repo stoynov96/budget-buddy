@@ -280,7 +280,7 @@ class BBUser implements DataNode {
      */
     public void LatchToDatabase() throws InvalidDataLabelException {
         List<String> latchPath = new ArrayList<>(userPath);
-        latchPath.add(userName);
+        latchPath.add(user.getUid());
         tableReader.Latch(latchPath, this);
     }
 
@@ -300,6 +300,9 @@ class BBUser implements DataNode {
 
     @Override
     public void GetFromMap(Map<String, Object> map) {
+        if(map == null) {
+            return;
+        }
         Object temp = map.get(BUDGET_LEVEL_KEY);
         budgetLevel = temp != null ? (long) temp : budgetLevel;
         temp = map.get(BUDGET_SCORE_KEY);
