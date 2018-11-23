@@ -58,8 +58,7 @@ public class UserProfileActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.i("Error", "" + e);
         }
-        Intent dashboardIntent = new Intent(this, Dashboard.class);
-        startActivity(dashboardIntent);
+
         finish();
     }
 
