@@ -247,7 +247,7 @@ public class PhotoEntry extends AppCompatActivity {
             final int rotation = getRotationCompensation(cameraDevice.getId(), this, this);
             ImageReader.OnImageAvailableListener mImageAvailable = new ImageReader.OnImageAvailableListener() {
 
-                final int frameModulo = 5;
+                final int frameModulo = 10;
                 int frameCounter = 0;
                 @Override
                 public void onImageAvailable(ImageReader reader) {
@@ -383,11 +383,8 @@ public class PhotoEntry extends AppCompatActivity {
              */
             @Override
             public void onSuccess(FirebaseVisionText firebaseVisionText) {
-                String text = firebaseVisionText.getText();
-                Log.i("Image text", text);
                 // pattern used for finding a correct price. format is: any number of digits followed by . followed by exactly two digits.
-                // may need to handle cases where the price is preceded by $, although I have yet to find a receipt that still shows the $
-                Pattern validPrice = Pattern.compile("\\d+\\.\\d\\d");
+                Pattern validPrice = Pattern.compile("^$?\\d+\\.\\d\\d");
                 ArrayList<String> options = new ArrayList<>();
 
                 // synchronizing mGraphicOverlay ensures that this section cannot run concurrently, this prevents a race condition
@@ -412,26 +409,21 @@ public class PhotoEntry extends AppCompatActivity {
                             List<FirebaseVisionText.Element> elements = lines.get(j).getElements();
 
                             for (int k = 0; k < elements.size(); k++) {
-                                // draw box around the word
-                                //GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
-                                //mGraphicOverlay.add(textGraphic);
-
-                                    String word = elements.get(k).getText();
+                                String word = elements.get(k).getText();
+                                // the general process here should change, since these checks are really not necessary
+                                // just search for a box that contains a valid format for a price, then stop
+                                // then we don't need to worry about every possible option for how a receipt lists the total
                                 if (totalRect == null) {
                                     if (word.equalsIgnoreCase("TOTAL") || word.equalsIgnoreCase("DUE")
-                                            || word.equalsIgnoreCase("AMOUNT") || word.equalsIgnoreCase("SALE")) {
+                                            || word.equalsIgnoreCase("AMOUNT") || word.equalsIgnoreCase("SALE")
+                                            || word.equalsIgnoreCase("PAYMENT")) {
                                         totalRect = elements.get(k).getBoundingBox();
                                     }
                                 } else {
-
                                     Rect elBox = elements.get(k).getBoundingBox();
-                                    // check if this box is on the level as the total box, if so assume this box contains the price
-                                    // it also checks if the box contains a properly formatted price. if not the check enables the camera
-                                    // to keep running until it gets it right
-                                    // for now this works fairly well, but we should probably consider other boxes as well, such as immediately below
-                                    // again, though, I have yet to find an example receipt where this is the case
+                                    // as noted above, we should really just stop once we find a valid price
+                                    // the other checks aren't particularly useful/necessary
                                     if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom && validPrice.matcher(word).matches() && userIsReady) {
-
                                         try {
                                             // when the price is found, stop the camera
                                             price = Double.parseDouble(word);
@@ -445,7 +437,6 @@ public class PhotoEntry extends AppCompatActivity {
                                         } catch (Exception e) {
 
                                         }
-
                                     }
                                 }
                             }
@@ -569,5 +560,4 @@ public class PhotoEntry extends AppCompatActivity {
 
         }
     };
-
 }

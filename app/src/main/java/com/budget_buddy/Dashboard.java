@@ -75,6 +75,16 @@ public class Dashboard extends AppCompatActivity {
                 SetSavingsGoal(currentUser.getSavingsGoal());
             }
         }
+
+        @Override
+        public void CreateNewUser() {
+
+        }
+
+        @Override
+        public void UserExists() {
+
+        }
     };
 
     @Override
@@ -112,11 +122,11 @@ public class Dashboard extends AppCompatActivity {
         }
     }
 
-    private void SetExperience(long experience) {
+    private void SetExperience(double experience) {
 
     }
 
-    private void SetSavingsGoal(long goal) {
+    private void SetSavingsGoal(double goal) {
 
     }
 
