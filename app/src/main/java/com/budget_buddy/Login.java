@@ -1,15 +1,18 @@
 package com.budget_buddy;
 
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.budget_buddy.exception.InvalidDataLabelException;
 
+import com.budget_buddy.utils.Data.MyCallback;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -19,12 +22,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 
+import java.util.HashMap;
+
 public class Login extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 9001;
 
     private GoogleSignInClient mGoogleSignInClient;
-    private BBUser currentUser = BBUser.GetInstance();
+    private BBUser currentUser;
     private ProgressBar wheel;
 
     @Override
@@ -41,29 +46,32 @@ public class Login extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        onLaunchSignIn();
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        currentUser = BBUser.GetInstance();
+
+        fromDashboard();
+        checkLoggedIn();
+        onLaunchSignIn();
+
         // TODO: Check if user is signed in (non-null) and update UI accordingly. I.E. if they are no longer signed in, display the sign in page.
-        if(currentUser.GetUser() != null) {
+        if(currentUser.IsLoggedIn()) {
             //gotoDashboard(currentUser);
+
         }
         else {
             // TODO: If they are no longer signed in, go to the sign in page
+
         }
     }
+
 
     public void signIn(View view) {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    public void signOut(View view) {
-        currentUser.SignOut();
-        mGoogleSignInClient.signOut();
     }
 
     @Override
@@ -96,12 +104,37 @@ public class Login extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("Sign in message:", "signInWithCredential:success");
                     try {
-                        currentUser.Initialize();
+                        MyCallback newUserCallback = new MyCallback() {
+                            @Override
+                            public void OnCallback(float[] weeklySpending) {
+
+                            }
+
+                            @Override
+                            public void OnCallback(HashMap<String, Object> map) {
+
+                            }
+
+                            @Override
+                            public void OnProfileSet() {
+
+                            }
+
+                            @Override
+                            public void CreateNewUser() {
+                                gotoNewUser(currentUser);
+                            }
+
+                            @Override
+                            public void UserExists() {
+                                gotoDashboard(currentUser);
+                            }
+                        };
+                        currentUser.Initialize(newUserCallback);
                     }
                     catch (InvalidDataLabelException idle) {
                         // TODO: IMPORTANT: Handle this exception
                     }
-                    gotoDashboard(currentUser);
                 } else {
                     // TODO: If sign in fails, display a message to the user.
                     Log.w("Sign in message:", "signInWithCredential:failure", task.getException());
@@ -110,6 +143,14 @@ public class Login extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void gotoNewUser(BBUser user) {
+        if (user.GetUser() != null) {
+            Intent newUserIntent = new Intent(this, UserProfileActivity.class);
+            closeProgressWheel();
+            startActivity(newUserIntent);
+        }
     }
 
     private void gotoDashboard(BBUser user) {
@@ -127,7 +168,6 @@ public class Login extends AppCompatActivity {
             GoogleSignInAccount account = task.getResult();
             firebaseAuthWithGoogle(account);
         } else {
-
             task.addOnCompleteListener(this, new OnCompleteListener<GoogleSignInAccount>() {
                 @Override
                 public void onComplete(@NonNull Task<GoogleSignInAccount> task) {
@@ -150,4 +190,27 @@ public class Login extends AppCompatActivity {
     private void closeProgressWheel() {
         wheel.setVisibility(View.GONE);
     }
+
+    private void checkLoggedIn(){
+        if (!currentUser.IsLoggedIn()){
+            findViewById(R.id.button).setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void fromDashboard(){
+        // Check if we are coming from dashboard logout
+        Bundle extras = getIntent().getExtras();
+        if(extras != null && extras.getBoolean("dashboard", false)){
+            currentUser.SignOut();
+            mGoogleSignInClient.signOut();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // do nothing - prevent going back to dashboard if logged out
+        return;
+    }
+
+
 }
