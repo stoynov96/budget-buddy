@@ -47,13 +47,13 @@ class BBUser implements DataNode {
     // Current score of the user (NYI)
     private long budgetScore = 0;
     // Monthly Savings Goal (this is how much the user hopes to save throughout the month)
-    private double savingsGoal = 0;
+    private long savingsGoal = 0;
     // Rent (in dollars, should we worry about cents at all?)
-    private double rent = 0;
+    private long rent = 0;
     // other expenses (maybe we should store as an array but simpler as a lump sum)
-    private double otherExpenses = 0;
+    private long otherExpenses = 0;
     // Primary income
-    private double primaryIncome = 0;
+    private long primaryIncome = 0;
     // Other income
     // Suggested daily spending amount
     // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
@@ -120,24 +120,22 @@ class BBUser implements DataNode {
         return this.budgetScore;
     }
     public double getSavingsGoal() {
-        return savingsGoal;
+        return (new Long(savingsGoal).doubleValue() / 100.0);
     }
-    public double getRent() {
-        return rent;
-    }
+    public double getRent() { return (new Long(rent).doubleValue() / 100.0); }
     public double getOtherExpenses() {
-        return otherExpenses;
+        return (new Long(otherExpenses).doubleValue() / 100.0);
     }
     public double getPrimaryIncome() {
-        return primaryIncome;
+        return (new Long(primaryIncome).doubleValue()) / 100.0;
     }
 
     public void setBudgetLevel(long l) { budgetLevel = l; }
     public void setBudgetScore(long s) { budgetScore = s; }
-    public void setSavingsGoal(double g) { savingsGoal = g; }
-    public void setRent(double r) { rent = r; }
-    public void setOtherExpenses(double o) { otherExpenses = o; }
-    public void setPrimaryIncome(double p) { primaryIncome = p; }
+    public void setSavingsGoal(double g) { savingsGoal = (new Double(g * 100.0).longValue()); }
+    public void setRent(double r) { rent = (new Double(r * 100.0).longValue()); }
+    public void setOtherExpenses(double o) { otherExpenses = (new Double(o * 100.0).longValue()); }
+    public void setPrimaryIncome(double p) { primaryIncome = (new Double(p * 100.0).longValue()); }
 
 
     public long getSuggestedSpendingAmount() {
@@ -305,13 +303,13 @@ class BBUser implements DataNode {
         temp = map.get(BUDGET_SCORE_KEY);
         budgetScore = temp != null ? (long) temp : budgetScore;
         temp = map.get(SAVINGS_GOAL_KEY);
-        savingsGoal = temp != null ? (double) temp : savingsGoal;
+        savingsGoal = temp != null ? (long) temp : savingsGoal;
         temp = map.get(RENT_KEY);
-        rent = temp != null ? (double) temp : rent;
+        rent = temp != null ? (long) temp : rent;
         temp = map.get(OTHER_EXPENSES_KEY);
-        otherExpenses = temp != null ? (double) temp : otherExpenses;
+        otherExpenses = temp != null ? (long) temp : otherExpenses;
         temp = map.get(PRIMARY_INCOME_KEY);
-        primaryIncome = temp != null ? (double) temp : primaryIncome;
+        primaryIncome = temp != null ? (long) temp : primaryIncome;
         //userInterfaceCallback.OnProfileSet();
         for(MyCallback callback: UICallbacks) {
             callback.OnProfileSet();
