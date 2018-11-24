@@ -63,8 +63,6 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     public void cancelEntry(View view) {
-        Intent dashboardIntent = new Intent(this, Dashboard.class);
-        startActivity(dashboardIntent);
         finish();
     }
 
