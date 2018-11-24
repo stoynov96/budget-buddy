@@ -61,6 +61,13 @@ class BBUser implements DataNode {
     // holds callbacks relevant to the UI, triggered on data loads
     private MyCallback userInterfaceCallback;
     private List<MyCallback> UICallbacks = new ArrayList<>();
+    static private String BUDGET_LEVEL_KEY = "Budget Level";
+    static private String BUDGET_SCORE_KEY = "Budget Score";
+    static private String SAVINGS_GOAL_KEY = "Savings Goal";
+    static private String RENT_KEY = "Rent";
+    static private String OTHER_EXPENSES_KEY = "Other Expenses";
+    static private String PRIMARY_INCOME_KEY = "Primary Income";
+    static private String USERNAME_KEY = "User Name";
 
     static BBUser GetInstance() {
         return ourInstance;
@@ -124,6 +131,14 @@ class BBUser implements DataNode {
     public double getPrimaryIncome() {
         return primaryIncome;
     }
+
+    public void setBudgetLevel(long l) { budgetLevel = l; }
+    public void setBudgetScore(long s) { budgetScore = s; }
+    public void setSavingsGoal(double g) { savingsGoal = g; }
+    public void setRent(double r) { rent = r; }
+    public void setOtherExpenses(double o) { otherExpenses = o; }
+    public void setPrimaryIncome(double p) { primaryIncome = p; }
+
 
     public long getSuggestedSpendingAmount() {
         return suggestedSpendingAmount;
@@ -269,34 +284,33 @@ class BBUser implements DataNode {
         tableReader.Latch(latchPath, this);
     }
 
-
     @Override
     public Map<String, Object> ToMap() {
         return new HashMap<String, Object>() {{
-            put("Budget Level", budgetLevel);
-            put("Budget Score", budgetScore);
-            put("Savings Goal", savingsGoal);
-            put("Rent", rent);
-            put("Other Expenses", otherExpenses);
-            put("Primary Income", primaryIncome);
-            put("User Name", GetUser().getDisplayName());
+            put(BUDGET_LEVEL_KEY, budgetLevel);
+            put(BUDGET_SCORE_KEY, budgetScore);
+            put(SAVINGS_GOAL_KEY, savingsGoal);
+            put(RENT_KEY, rent);
+            put(OTHER_EXPENSES_KEY, otherExpenses);
+            put(PRIMARY_INCOME_KEY, primaryIncome);
+            put(USERNAME_KEY, GetUser().getDisplayName());
             // suggestedSpending should probably be calculated on the spot
         }};
     }
 
     @Override
     public void GetFromMap(Map<String, Object> map) {
-        Object temp = map.get("Budget Level");
+        Object temp = map.get(BUDGET_LEVEL_KEY);
         budgetLevel = temp != null ? (long) temp : budgetLevel;
-        temp = map.get("Budget Score");
+        temp = map.get(BUDGET_SCORE_KEY);
         budgetScore = temp != null ? (long) temp : budgetScore;
-        temp = map.get("Monthly Savings Goal");
+        temp = map.get(SAVINGS_GOAL_KEY);
         savingsGoal = temp != null ? (double) temp : savingsGoal;
-        temp = map.get("Rent");
+        temp = map.get(RENT_KEY);
         rent = temp != null ? (double) temp : rent;
-        temp = map.get("Other Monthly Expenses");
+        temp = map.get(OTHER_EXPENSES_KEY);
         otherExpenses = temp != null ? (double) temp : otherExpenses;
-        temp = map.get("Monthly Income");
+        temp = map.get(PRIMARY_INCOME_KEY);
         primaryIncome = temp != null ? (double) temp : primaryIncome;
         //userInterfaceCallback.OnProfileSet();
         for(MyCallback callback: UICallbacks) {

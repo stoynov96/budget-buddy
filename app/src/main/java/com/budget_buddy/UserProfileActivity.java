@@ -48,11 +48,11 @@ public class UserProfileActivity extends AppCompatActivity {
         rent = rentField.getValue();
         otherMonthlyExpenses = otherMonthlyExpensesField.getValue();
         monthlySavingsGoal = monthlySavingsGoalField.getValue();
-        profileMap.put("Monthly Income", monthlyIncome);
-        profileMap.put("Rent", rent);
-        profileMap.put("Other Monthly Expenses", otherMonthlyExpenses);
-        profileMap.put("Monthly Savings Goal", monthlySavingsGoal);
-        currentUser.GetFromMap(profileMap);
+
+        currentUser.setPrimaryIncome(monthlyIncome);
+        currentUser.setRent(rent);
+        currentUser.setOtherExpenses(otherMonthlyExpenses);
+        currentUser.setSavingsGoal(monthlySavingsGoal);
         try {
             currentUser.WriteUserInfo();
         } catch (Exception e) {
