@@ -2,14 +2,18 @@ package com.budget_buddy;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.budget_buddy.components.CurrencyEditTextFragment;
@@ -32,20 +36,18 @@ public class UserProfileActivity extends AppCompatActivity {
     double rent;
     double otherMonthlyExpenses;
     double monthlySavingsGoal;
-    ArrayList<String> spendingCategories;
+    HashMap<String, String> spendingCategories;
     ArrayAdapter<String> adapter;
+    ArrayList<String> names = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
-
-        spendingCategories = new ArrayList<>();
-        spendingCategories.add("Rent");
-        spendingCategories.add("Food");
-        spendingCategories.add("Entertainment");
         Spinner spinner = findViewById(R.id.categoriesSpinner);
-        adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_dropdown_item, spendingCategories);
+
+        spendingCategories = new HashMap<String, String>();
+        adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_dropdown_item, names);
         spinner.setAdapter(adapter);
 
         monthlyIncomeField = findViewById(R.id.total_monthy_income_field);
@@ -79,17 +81,18 @@ public class UserProfileActivity extends AppCompatActivity {
 
     public void AddCategory(View view) {
         AlertDialog.Builder newCategory = new AlertDialog.Builder(this);
-        newCategory.setMessage("Enter the new category name: ");
-        final EditText input = new EditText(this);
-        input.requestFocus();
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-        input.setId(View.generateViewId());
-        input.setTag("categoryInput");
-        newCategory.setView(input);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        ConstraintLayout layout = (ConstraintLayout)inflater.inflate(R.layout.create_spending_category, null);
+        final EditText name = layout.findViewById(R.id.categoryNameTag);
+        final CurrencyEditTextFragment value = layout.findViewById(R.id.categoryNameLimit);
+        name.requestFocus();
+        newCategory.setView(layout);
         newCategory.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                spendingCategories.add(input.getText().toString());
+                value.validate();
+                spendingCategories.put(name.getText().toString(), value.getText().toString());
+                names.add(name.getText().toString());
                 adapter.notifyDataSetChanged();
             }
         });

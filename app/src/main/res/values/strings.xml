@@ -35,4 +35,6 @@
     <string name="spendingCategories">Spending Categories:</string>
     <string name="newCategory">Add New Spending Category</string>
     <string name="purchaseType">Purchase Type</string>
+    <string name="categoryName">Category Name: </string>
+    <string name="categoryLimit">Monthly Spending Limit: </string>
 </resources>

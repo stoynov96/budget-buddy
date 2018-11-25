@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -31,6 +32,9 @@ import com.budget_buddy.components.DatePickerFragment;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,16 +48,25 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
     private Context context;
     private Toast toast;
     ArrayAdapter<String> adapter;
-    private ArrayList<String> spendingCategories;
+    private HashMap<String, String> spendingCategories;
+    ArrayList<String> names = new ArrayList<String>();
+    Spinner typeSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual_entry);
+        typeSpinner = findViewById(R.id.purchaseTypeSpinner);
 
         spendingCategories = user.GetSpendingCategories();
-        Spinner typeSpinner = findViewById(R.id.purchaseTypeSpinner);
-        adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_dropdown_item, spendingCategories);
+        // need to get hashmap keys and populate the names array for the spinner to work correctly
+        Set<String> keys = spendingCategories.keySet();
+        Iterator<String> keyIterator = keys.iterator();
+        while(keyIterator.hasNext()) {
+            names.add(keyIterator.next());
+        }
+
+        adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_dropdown_item, names);
         typeSpinner.setAdapter(adapter);
         purchaseDateField = findViewById(R.id.purchaseDate);
         final Calendar calendar = Calendar.getInstance();
@@ -193,23 +206,20 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
 
     public void AddCategory(View view) {
         AlertDialog.Builder newCategory = new AlertDialog.Builder(this);
-        newCategory.setMessage("Enter the new category name: ");
-        final EditText input = new EditText(this);
-        input.requestFocus();
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-        input.setId(View.generateViewId());
-        input.setTag("categoryInput");
-        newCategory.setView(input);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        ConstraintLayout layout = (ConstraintLayout)inflater.inflate(R.layout.create_spending_category, null);
+        final EditText name = layout.findViewById(R.id.categoryNameTag);
+        final CurrencyEditTextFragment value = layout.findViewById(R.id.categoryNameLimit);
+        name.requestFocus();
+        newCategory.setView(layout);
         newCategory.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                spendingCategories.add(input.getText().toString());
-                try {
-                    user.UpdateUserParameters();
-                } catch (InvalidDataLabelException e) {
-                    e.printStackTrace();
-                }
+                value.validate();
+                user.AddToSpendingCategories(name.getText().toString(), value.getText().toString());
+                names.add(name.getText().toString());
                 adapter.notifyDataSetChanged();
+                typeSpinner.setSelection(adapter.getCount());
             }
         });
         AlertDialog alert = newCategory.create();
