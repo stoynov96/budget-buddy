@@ -10,7 +10,7 @@
         android:id="@+id/purchaseDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
         android:focusable="false"
@@ -18,7 +18,7 @@
         android:inputType="date"
         android:onClick="displayDatepicker"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/purchaseName" />
+        app:layout_constraintTop_toBottomOf="@+id/button2" />
 
     <TextView
         android:id="@+id/purchaseDateTitle"
@@ -28,9 +28,10 @@
         android:layout_marginEnd="8dp"
         android:gravity="center"
         android:text="@string/purchase_date_title"
+        android:textAlignment="viewStart"
         app:layout_constraintBottom_toBottomOf="@+id/purchaseDate"
         app:layout_constraintEnd_toStartOf="@+id/purchaseDate"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/purchaseDate" />
 
@@ -56,6 +57,7 @@
         android:layout_marginEnd="8dp"
         android:gravity="center"
         android:text="@string/purchase_name_title"
+        android:textAlignment="viewStart"
         app:layout_constraintBottom_toBottomOf="@+id/purchaseName"
         app:layout_constraintEnd_toStartOf="@+id/purchaseName"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -70,6 +72,7 @@
         android:layout_marginEnd="8dp"
         android:gravity="center"
         android:text="@string/purchase_amount_title"
+        android:textAlignment="viewStart"
         app:layout_constraintBottom_toBottomOf="@+id/purchaseAmount"
         app:layout_constraintEnd_toStartOf="@+id/purchaseAmount"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +81,7 @@
     <EditText
         android:id="@+id/purchaseNote"
         android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_height="205dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -86,8 +89,10 @@
         android:inputType="textMultiLine"
         app:layout_constraintBottom_toTopOf="@+id/saveButton"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/purchaseDescriptionTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/purchaseDescriptionTitle"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/purchaseDescriptionTitle"
@@ -128,5 +133,41 @@
         android:text="@string/cancel_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="138dp"
+        android:layout_height="23dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/purchaseType"
+        app:layout_constraintBottom_toBottomOf="@+id/purchaseTypeSpinner"
+        app:layout_constraintEnd_toStartOf="@+id/purchaseTypeSpinner"
+        app:layout_constraintHorizontal_bias="0.38"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/purchaseTypeSpinner"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Spinner
+        android:id="@+id/purchaseTypeSpinner"
+        android:layout_width="209dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/purchaseName" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="357dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:onClick="AddCategory"
+        android:text="@string/newCategory"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/purchaseTypeSpinner" />
 
 </android.support.constraint.ConstraintLayout>

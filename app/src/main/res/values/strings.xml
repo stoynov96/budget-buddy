@@ -32,4 +32,7 @@
     <string name="profile_monthly_savings_goal_title">Monthly savings goal: </string>
     <string name="nav_header">Navigation</string>
     <string name="captureButton">Capture</string>
+    <string name="spendingCategories">Spending Categories:</string>
+    <string name="newCategory">Add New Spending Category</string>
+    <string name="purchaseType">Purchase Type</string>
 </resources>

@@ -1,14 +1,18 @@
 package com.budget_buddy;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -39,12 +43,18 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
     // For Toast
     private Context context;
     private Toast toast;
+    ArrayAdapter<String> adapter;
+    private ArrayList<String> spendingCategories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manual_entry);
 
+        spendingCategories = user.GetSpendingCategories();
+        Spinner typeSpinner = findViewById(R.id.purchaseTypeSpinner);
+        adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_dropdown_item, spendingCategories);
+        typeSpinner.setAdapter(adapter);
         purchaseDateField = findViewById(R.id.purchaseDate);
         final Calendar calendar = Calendar.getInstance();
         final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
@@ -181,6 +191,32 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
        }
     }
 
+    public void AddCategory(View view) {
+        AlertDialog.Builder newCategory = new AlertDialog.Builder(this);
+        newCategory.setMessage("Enter the new category name: ");
+        final EditText input = new EditText(this);
+        input.requestFocus();
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input.setId(View.generateViewId());
+        input.setTag("categoryInput");
+        newCategory.setView(input);
+        newCategory.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                spendingCategories.add(input.getText().toString());
+                try {
+                    user.UpdateUserParameters();
+                } catch (InvalidDataLabelException e) {
+                    e.printStackTrace();
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
+        AlertDialog alert = newCategory.create();
+        alert.show();
+        alert.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+    }
+
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
         final Calendar calendar = Calendar.getInstance();
@@ -202,10 +238,12 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         EditText dateField = findViewById(R.id.purchaseDate);
         CurrencyEditTextFragment amountField = findViewById(R.id.purchaseAmount);
         EditText notesField = findViewById(R.id.purchaseNote);
+        Spinner typeField = findViewById(R.id.purchaseTypeSpinner);
         String name = nameField.getText().toString();
         String date = dateField.getText().toString();
         String amount = amountField.getText().toString();
         String notes = notesField.getText().toString();
+        String type = typeField.getSelectedItem().toString();
 
         if(name.matches("") || date.matches("") || amount.matches("") ) {
             toast = Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT);
@@ -219,7 +257,7 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
 
         amountField.validate();
         amount = amountField.CleanString();
-        user.WriteNewExpenditure(name, date, amount, notes);
+        user.WriteNewExpenditure(name, date, amount, notes, type);
         toast = Toast.makeText(context, "Added!", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.BOTTOM, 0, 1);
         toast.show();
