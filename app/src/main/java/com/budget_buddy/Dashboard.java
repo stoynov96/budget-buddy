@@ -93,6 +93,7 @@ public class Dashboard extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         currentUser.setUserInterfaceCallback(callback);
+        currentUser.AcquireAllPurchases();
         setUpDrawer();
         setupExperienceBar();
         addChart();

@@ -54,6 +54,8 @@ class BBUser implements DataNode {
     private long primaryIncome = 0;
     // Array of categories for purchases
     private ArrayList<String> spendingCategories;
+    // HashMap of purchases
+    private HashMap<String, ArrayList<Expenditure>> purchases = new HashMap<>();
     // Other income
     // Suggested daily spending amount
     // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
@@ -200,6 +202,54 @@ class BBUser implements DataNode {
         catch (ParseException e1) {
             Log.d("Parse error", e1.toString());
         }
+    }
+
+    public void AcquireAllPurchases() {
+        user = authentication.getInstance().getCurrentUser();
+        String path = userPath.get(0) + "/" + user.getUid() + "/";
+
+        MyCallback purchaseCallback = new MyCallback() {
+            @Override
+            public void OnCallback(float[] weeklySpending) {
+
+            }
+
+            @Override
+            public void OnCallback(HashMap<String, Object> map) {
+                Iterator iterator = map.entrySet().iterator();
+                Expenditure expenditure = new Expenditure("","","","", "");
+
+                while (iterator.hasNext()) {
+                    Map.Entry pair = (Map.Entry)iterator.next();
+                    HashMap<String, Object> expenditureMap = (HashMap<String, Object>)pair.getValue();
+                    expenditure.GetFromMap(expenditureMap);
+                    ArrayList<Expenditure> purchaseList = purchases.get(expenditure.GetDate());
+                    if (purchaseList == null) {
+                        purchaseList = new ArrayList<>();
+                    }
+                    purchaseList.add(expenditure);
+                    purchases.put(expenditure.GetDate(), purchaseList);
+                }
+
+            }
+
+            @Override
+            public void OnProfileSet() {
+
+            }
+
+            @Override
+            public void CreateNewUser() {
+
+            }
+
+            @Override
+            public void UserExists() {
+
+            }
+        };
+
+        tableReader.WeeklyExpenditures(path, purchaseCallback);
     }
 
     /**
