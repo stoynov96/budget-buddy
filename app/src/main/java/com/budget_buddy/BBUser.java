@@ -215,6 +215,9 @@ class BBUser implements DataNode {
             }
 
             @Override
+            public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
+
+            @Override
             public void OnCallback(HashMap<String, Object> map) {
                 Iterator iterator = map.entrySet().iterator();
                 Expenditure expenditure = new Expenditure("","","","", "");
@@ -320,6 +323,9 @@ class BBUser implements DataNode {
                 callback.OnCallback(expenditures);
 
             }
+
+            @Override
+            public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
 
             @Override
             public void OnCallback(float [] expenditures) {

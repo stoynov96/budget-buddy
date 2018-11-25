@@ -61,6 +61,9 @@ public class Dashboard extends AppCompatActivity {
         }
 
         @Override
+        public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
+
+        @Override
         public void OnCallback(HashMap<String, Object> map) {
 
         }
