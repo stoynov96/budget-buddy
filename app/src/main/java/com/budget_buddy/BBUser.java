@@ -204,7 +204,7 @@ class BBUser implements DataNode {
         }
     }
 
-    public void AcquireAllPurchases() {
+    public void AcquireAllPurchases(final MyCallback userInterfaceCallback) {
         user = authentication.getInstance().getCurrentUser();
         String path = userPath.get(0) + "/" + user.getUid() + "/";
 
@@ -221,7 +221,7 @@ class BBUser implements DataNode {
             public void OnCallback(HashMap<String, Object> map) {
                 Iterator iterator = map.entrySet().iterator();
                 Expenditure expenditure = new Expenditure("","","","", "");
-
+                purchases.clear();
                 while (iterator.hasNext()) {
                     Map.Entry pair = (Map.Entry)iterator.next();
                     HashMap<String, Object> expenditureMap = (HashMap<String, Object>)pair.getValue();
@@ -233,6 +233,8 @@ class BBUser implements DataNode {
                     purchaseList.add(expenditure);
                     purchases.put(expenditure.GetDate(), purchaseList);
                 }
+
+                userInterfaceCallback.OnPurchases(purchases);
 
             }
 

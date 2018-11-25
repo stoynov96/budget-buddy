@@ -9,6 +9,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -29,7 +30,13 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.charts.BarChart;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -61,7 +68,27 @@ public class Dashboard extends AppCompatActivity {
         }
 
         @Override
-        public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
+        public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) {
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            spendingChart.clear();
+            entries.clear();
+            for (long i = 0; i < 7; i++) {
+                LocalDate date = LocalDate.now().minusDays(i);
+                String dateStr = date.format(dateFormat);
+
+                ArrayList<Expenditure> expenditures = purchases.get(dateStr);
+                float dayTotal = 0.0f;
+                if(expenditures != null) {
+                    for(Expenditure e: expenditures) {
+                        Log.i("meow", e.ToMap().toString());
+                        dayTotal += (new Float(e.amount).floatValue());
+                    }
+                }
+                BarEntry entry = new BarEntry(6 - i, dayTotal);
+                entries.add(entry);
+            }
+            spendingChart.setEntries(entries);
+        }
 
         @Override
         public void OnCallback(HashMap<String, Object> map) {
@@ -96,7 +123,6 @@ public class Dashboard extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         currentUser.setUserInterfaceCallback(callback);
-        currentUser.AcquireAllPurchases();
         setUpDrawer();
         setupExperienceBar();
         addChart();
@@ -212,7 +238,8 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.connect(spendingChart.getId(), ConstraintSet.TOP, cl.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
-        currentUser.GetWeeklySpending(callback);
+        //currentUser.GetWeeklySpending(callback);
+        currentUser.AcquireAllPurchases(callback);
     }
 
     @Override
