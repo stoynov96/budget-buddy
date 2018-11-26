@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Login extends AppCompatActivity {
@@ -112,6 +113,9 @@ public class Login extends AppCompatActivity {
                             public void OnCallback(float[] weeklySpending) {
 
                             }
+
+                            @Override
+                            public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
 
                             @Override
                             public void OnCallback(HashMap<String, Object> map) {
