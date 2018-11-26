@@ -107,6 +107,9 @@ public class UserProfileActivity extends AppCompatActivity {
         public void OnCallback(float[] weeklySpending) { }
 
         @Override
+        public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
+
+        @Override
         public void OnCallback(HashMap<String, Object> map) { }
 
         @Override

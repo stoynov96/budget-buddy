@@ -1,5 +1,8 @@
 package com.budget_buddy.utils.Data;
 
+import com.budget_buddy.Expenditure;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 // Primitive callback interface to help with reading from the database. Since Firebase is asynchronous
@@ -16,6 +19,8 @@ public interface MyCallback {
      *                       last 7 days.
      */
     void OnCallback(float [] weeklySpending);
+
+    void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases);
 
     /**
      * This function is called in TableReader after getting the requested data from Firebase. Returns
