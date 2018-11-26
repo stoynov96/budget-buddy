@@ -23,7 +23,8 @@
         </activity>
         <activity android:name=".Dashboard"/>
         <activity android:name=".PhotoEntry"/>
-        <activity android:name=".ManualEntry"/>
+        <activity android:name=".ManualEntry"
+                  android:theme="@style/Theme.AppCompat.Light.Dialog.MinWidth" />
 
         <activity android:name=".UserProfileActivity"/>
     </application>
