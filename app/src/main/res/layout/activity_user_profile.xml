@@ -42,10 +42,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/total_monthy_income_field" />
 
-        <EditText
+        <com.budget_buddy.components.CurrencyEditTextFragment
             android:id="@+id/total_monthy_income_field"
             android:layout_width="140dp"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
@@ -55,21 +55,21 @@
             app:layout_constraintTop_toBottomOf="@+id/user_profile_title" />
 
         <TextView
-            android:id="@+id/total_monthly_expense_title"
+            android:id="@+id/total_rent_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="8dp"
             android:text="@string/profile_rent_title"
-            app:layout_constraintEnd_toStartOf="@+id/total_monthly_expenses_field"
+            app:layout_constraintEnd_toStartOf="@+id/total_rent_field"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/total_monthly_expenses_field" />
+            app:layout_constraintTop_toTopOf="@+id/total_rent_field" />
 
-        <EditText
-            android:id="@+id/total_monthly_expenses_field"
+        <com.budget_buddy.components.CurrencyEditTextFragment
+            android:id="@+id/total_rent_field"
             android:layout_width="140dp"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
@@ -91,17 +91,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/total_other_expenses_field" />
 
-        <EditText
+        <com.budget_buddy.components.CurrencyEditTextFragment
             android:id="@+id/total_other_expenses_field"
             android:layout_width="140dp"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:importantForAutofill="no"
             android:inputType="numberDecimal"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/total_monthly_expenses_field" />
+            app:layout_constraintTop_toBottomOf="@+id/total_rent_field" />
 
         <TextView
             android:id="@+id/monthly_savings_goal_title"
@@ -116,10 +116,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/monthly_savings_goal_field" />
 
-        <EditText
+        <com.budget_buddy.components.CurrencyEditTextFragment
             android:id="@+id/monthly_savings_goal_field"
             android:layout_width="140dp"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
@@ -127,6 +127,41 @@
             android:inputType="numberDecimal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/total_other_expenses_field" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="186dp"
+            android:layout_height="31dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/spendingCategories"
+            app:layout_constraintEnd_toStartOf="@+id/categoriesSpinner"
+            app:layout_constraintHorizontal_bias="0.666"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/categoriesSpinner" />
+
+        <Spinner
+            android:id="@+id/categoriesSpinner"
+            android:layout_width="139dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/monthly_savings_goal_field" />
+
+        <Button
+            android:id="@+id/newCategory"
+            android:layout_width="338dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:onClick="AddCategory"
+            android:text="@string/newCategory"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 
     </android.support.constraint.ConstraintLayout>
@@ -149,6 +184,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
 
+            android:onClick="cancelEntry"
             android:text="@string/cancel_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/saveButton"
@@ -161,6 +197,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="32dp"
 
+            android:onClick="saveEntry"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/cancelButton"
             app:layout_constraintTop_toTopOf="@+id/cancelButton"

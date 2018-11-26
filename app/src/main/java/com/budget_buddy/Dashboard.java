@@ -4,36 +4,34 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
+
 import com.budget_buddy.animations.ExperienceBarAnimation;
 import com.budget_buddy.charts.GoalProgressBar;
 
+import com.budget_buddy.charts.SpendingChart;
 import com.budget_buddy.utils.Data.MyCallback;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.LimitLine;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IValueFormatter;
-import com.github.mikephil.charting.utils.ViewPortHandler;
-import com.google.firebase.database.DataSnapshot;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Dashboard extends AppCompatActivity {
 
@@ -45,23 +43,21 @@ public class Dashboard extends AppCompatActivity {
 
     HorizontalBarChart progressBar;
     BarChart chart;
+    SpendingChart spendingChart;
     final List<BarEntry> entries = new ArrayList<BarEntry>();
     TextView progressBarDescription;
+	DrawerLayout drawerLayout;
 
     // Here's a more permanent home for the callback
     MyCallback callback = new MyCallback() {
         @Override
         public void OnCallback(float [] weeklySpending) {
-            chart.clear();
+            spendingChart.clear();
+            entries.clear();
             for(int i = 0; i < 7; i++) {
                 entries.add(new BarEntry(i, weeklySpending[6-i]));
             }
-            BarDataSet dataSet = new BarDataSet(entries, "");
-            BarData barData = new BarData(dataSet);
-            barData.setBarWidth(0.85f);
-            chart.setData(barData);
-            chart.setFitBars(true);
-            chart.invalidate();
+            spendingChart.setEntries(entries);
         }
 
         @Override
@@ -79,6 +75,16 @@ public class Dashboard extends AppCompatActivity {
                 SetSavingsGoal(currentUser.getSavingsGoal());
             }
         }
+
+        @Override
+        public void CreateNewUser() {
+
+        }
+
+        @Override
+        public void UserExists() {
+
+        }
     };
 
     @Override
@@ -87,6 +93,7 @@ public class Dashboard extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         currentUser.setUserInterfaceCallback(callback);
+        setUpDrawer();
         setupExperienceBar();
         addChart();
         addProgressBar();
@@ -115,11 +122,11 @@ public class Dashboard extends AppCompatActivity {
         }
     }
 
-    private void SetExperience(long experience) {
+    private void SetExperience(double experience) {
 
     }
 
-    private void SetSavingsGoal(long goal) {
+    private void SetSavingsGoal(double goal) {
 
     }
 
@@ -185,92 +192,79 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void addChart() {
-        chart = new BarChart(this);
-        chart.setId(R.id.bar_graph_view);
+
+        spendingChart = new SpendingChart(this, getTheme());
+        spendingChart.setId(R.id.bar_graph_view);
 
         ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataGraphLayout);
-        cl.addView(chart,0,0);
+        cl.addView(spendingChart,0,0);
 
         ConstraintSet constraintSet = new ConstraintSet();
 
         constraintSet.clone(cl);
-        constraintSet.connect(chart.getId(), ConstraintSet.LEFT, cl.getId(),ConstraintSet.LEFT, 8);
-        constraintSet.connect(chart.getId(), ConstraintSet.RIGHT, cl.getId(),ConstraintSet.RIGHT, 8);
-        constraintSet.connect(chart.getId(),ConstraintSet.BOTTOM, cl.getId(),ConstraintSet.BOTTOM, 0);
-        constraintSet.connect(chart.getId(), ConstraintSet.TOP, cl.getId(), ConstraintSet.TOP, 0);
+        constraintSet.connect(spendingChart.getId(), ConstraintSet.LEFT, cl.getId(),ConstraintSet.LEFT, 8);
+        constraintSet.connect(spendingChart.getId(), ConstraintSet.RIGHT, cl.getId(),ConstraintSet.RIGHT, 8);
+        constraintSet.connect(spendingChart.getId(),ConstraintSet.BOTTOM, cl.getId(),ConstraintSet.BOTTOM, 0);
+        constraintSet.connect(spendingChart.getId(), ConstraintSet.TOP, cl.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
-        // This is initializing the bars to 0 since we do not have data from Firebase yet.
-        for(int i = 0; i < 7; i++) {
-            entries.add(new BarEntry(i, 0));
-        }
-
         currentUser.GetWeeklySpending(callback);
+    }
 
-        BarDataSet dataSet = new BarDataSet(entries, "");
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(Gravity.LEFT);
+        } else {
+            drawerLayout.openDrawer(Gravity.LEFT);
+        }
+        return;
+    }
 
-        // set colors
-        dataSet.setColor(getResources().getColor(R.color.colorPrimary, this.getTheme()));
-        dataSet.setBarBorderColor(getResources().getColor(R.color.colorPrimaryDark, this.getTheme()));
-        dataSet.setBarBorderWidth(2.5f);
+    private void setUpDrawer(){
+        drawerLayout = findViewById(R.id.drawer_layout);
 
-        BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.85f);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
-        chart.setData(barData);
-        chart.setFitBars(true);
-        IValueFormatter valueFormatter = new IValueFormatter() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // close drawer when item is tapped
+                        drawerLayout.closeDrawers();
 
-            private DecimalFormat mFormat = new DecimalFormat("###,###,##0.00");
+                        switch(menuItem.getItemId()) {
+                            case R.id.logoutButton:
+                                goToLogin();
+                                break;
+                            case R.id.testItem:
+                                // TODO: Other navigation items
+                                break;
+                        }
 
-            @Override
-            public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-                return "$" + mFormat.format(value);
-            }
-        };
+                        return true;
+                    }
+                });
+    }
 
-        barData.setValueFormatter(valueFormatter);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(Gravity.LEFT);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-        // disable touch gestures
-        chart.setDragEnabled(false);
-        chart.setScaleEnabled(false);
-        chart.setTouchEnabled(false);
-
-        // remove label
-        chart.getDescription().setEnabled(false);
-
-        // make the daily allowance line
-        LimitLine dailyAllowance = new LimitLine(4.0f, "Daily allowance");
-        dailyAllowance.setLineColor(getResources().getColor(R.color.colorAccent, this.getTheme()));
-        chart.getAxisLeft().addLimitLine(dailyAllowance);
-
-        // don't show the grid
-        chart.getXAxis().setDrawGridLines(false);
-        chart.getAxisLeft().setDrawGridLines(false);
-        chart.getAxisRight().setEnabled(false);
-
-        // draw labels on bottom
-        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        IAxisValueFormatter axisValueFormatter = new IAxisValueFormatter() {
-
-            private String[] days = getResources().getStringArray(R.array.day_abbreviations);
-
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                Calendar calendar = Calendar.getInstance();
-                // this graph will only show previous 7 days
-                int today = calendar.get(Calendar.DAY_OF_WEEK);
-                return days[((int) value + today) % 7];
-            }
-        };
-
-        chart.getXAxis().setValueFormatter(axisValueFormatter);
-        // set the bottom of the window to y=0
-        chart.getAxisLeft().setAxisMinimum(0);
-
-        chart.getLegend().setEnabled(false);
-
-        //chart.animateX(2000);
-        chart.animateY( 2000, Easing.EasingOption.EaseInOutExpo);
+    private void goToLogin(){
+        Intent loginIntent = new Intent(this, Login.class);
+        loginIntent.putExtra("dashboard", true);
+        startActivity(loginIntent);
     }
 }

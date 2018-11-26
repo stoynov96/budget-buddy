@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -42,14 +43,20 @@ import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 
 
 import android.util.SparseIntArray;
+import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.Surface;
+import android.view.View;
+import android.widget.Button;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // http://coderzpassion.com/android-working-camera2-api/
 
@@ -62,11 +69,14 @@ public class PhotoEntry extends AppCompatActivity {
     private CameraCaptureSession previewSession;
     private ImageReader mImageReader;
     private GraphicOverlay mGraphicOverlay;
+    private Button captureButton;
     // "This" makes it so we can access this activity across internal callbacks
     private AppCompatActivity This = this;
     private static final int CAMERAREQUEST = 1;
     private static final int MAX_PREVIEW_WIDTH = 480;
     private static final int MAX_PREVIEW_HEIGHT = 640;
+    // bool set when the user thinks it's a good time to capture the image
+    private boolean userIsReady = false;
 
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
@@ -86,6 +96,9 @@ public class PhotoEntry extends AppCompatActivity {
 
         cameraTextureView =(TextureView) findViewById(R.id.textureView);
         cameraTextureView.setSurfaceTextureListener(surfaceTextureListener);
+
+        captureButton = (Button) findViewById(R.id.captureButton);
+        setupCaptureButton();
     }
 
     /**
@@ -234,7 +247,7 @@ public class PhotoEntry extends AppCompatActivity {
             final int rotation = getRotationCompensation(cameraDevice.getId(), this, this);
             ImageReader.OnImageAvailableListener mImageAvailable = new ImageReader.OnImageAvailableListener() {
 
-                final int frameModulo = 5;
+                final int frameModulo = 10;
                 int frameCounter = 0;
                 @Override
                 public void onImageAvailable(ImageReader reader) {
@@ -370,8 +383,10 @@ public class PhotoEntry extends AppCompatActivity {
              */
             @Override
             public void onSuccess(FirebaseVisionText firebaseVisionText) {
-                String text = firebaseVisionText.getText();
-                Log.i("Image text", text);
+                // pattern used for finding a correct price. format is: optional $, any number of digits followed by . followed by exactly two digits.
+                // format was changed to check for if the above is included in a substring
+                Pattern validPrice = Pattern.compile(".*$?\\d+\\.\\d\\d.*");
+                ArrayList<String> options = new ArrayList<>();
 
                 // synchronizing mGraphicOverlay ensures that this section cannot run concurrently, this prevents a race condition
                 // where the boxes are cleared prematurely after the total is found because the next frame is also processed
@@ -388,36 +403,40 @@ public class PhotoEntry extends AppCompatActivity {
                     for (int i = 0; i < blocks.size(); i++) {
                         List<FirebaseVisionText.Line> lines = blocks.get(i).getLines();
                         for (int j = 0; j < lines.size(); j++) {
+                            // draw box around the line
+                            GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, lines.get(j));
+                            mGraphicOverlay.add(textGraphic);
+                            options.add(lines.get(j).getText());
                             List<FirebaseVisionText.Element> elements = lines.get(j).getElements();
 
                             for (int k = 0; k < elements.size(); k++) {
-                                // draw box around the word
-                                GraphicOverlay.Graphic textGraphic = new TextGraphic(mGraphicOverlay, elements.get(k));
-                                mGraphicOverlay.add(textGraphic);
-
+                                String word = elements.get(k).getText();
+                                // the general process here should change, since these checks are really not necessary
+                                // just search for a box that contains a valid format for a price, then stop
+                                // then we don't need to worry about every possible option for how a receipt lists the total
                                 if (totalRect == null) {
-                                    if (elements.get(k).getText().equals("TOTAL")) {
+                                    if (word.equalsIgnoreCase("TOTAL") || word.equalsIgnoreCase("DUE")
+                                            || word.equalsIgnoreCase("AMOUNT") || word.equalsIgnoreCase("SALE")
+                                            || word.equalsIgnoreCase("PAYMENT")) {
                                         totalRect = elements.get(k).getBoundingBox();
                                     }
                                 } else {
-
                                     Rect elBox = elements.get(k).getBoundingBox();
-                                    // check if this box is on the level as the total box, if so assume this box contains the price
-                                    if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom) {
-
+                                    // as noted above, we should really just stop once we find a valid price
+                                    // the other checks aren't particularly useful/necessary
+                                    if (elBox.top <= totalRect.bottom && totalRect.top <= elBox.bottom && validPrice.matcher(word).matches() && userIsReady) {
                                         try {
                                             // when the price is found, stop the camera
-                                            price = Double.parseDouble(elements.get(k).getText());
+                                            price = Double.parseDouble(word);
                                             previewSession.stopRepeating();
                                             mImageReader.close();
                                             Intent manualEntryIntent = new Intent(This, ManualEntry.class);
-                                            manualEntryIntent.putExtra("price", elements.get(k).getText());
+                                            manualEntryIntent.putStringArrayListExtra("options", options);
                                             startActivity(manualEntryIntent);
                                             return;
                                         } catch (Exception e) {
 
                                         }
-
                                     }
                                 }
                             }
@@ -430,6 +449,27 @@ public class PhotoEntry extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.i("Image text", "failure");
+            }
+        });
+    }
+
+    /**
+     * This function simply sets the onTouch listener for the button.
+     */
+    private void setupCaptureButton() {
+        captureButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    userIsReady = true;
+                    captureButton.getBackground().setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+                    captureButton.invalidate();
+                } else if(event.getAction() == MotionEvent.ACTION_UP) {
+                    userIsReady = false;
+                    captureButton.getBackground().clearColorFilter();
+                    captureButton.invalidate();
+                }
+                return true;
             }
         });
     }
@@ -520,5 +560,4 @@ public class PhotoEntry extends AppCompatActivity {
 
         }
     };
-
 }

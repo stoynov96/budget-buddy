@@ -41,24 +41,34 @@ class BBUser implements DataNode {
     // The user's name as entered in the database.
     private String userName;
     // Current level of the user (NYI)
-    private long budgetLevel = -1;
+    private long budgetLevel = 1;
     // Current score of the user (NYI)
-    private long budgetScore = -1;
+    private long budgetScore = 0;
     // Monthly Savings Goal (this is how much the user hopes to save throughout the month)
-    private long savingsGoal = -1;
+    private long savingsGoal = 0;
     // Rent (in dollars, should we worry about cents at all?)
-    private long rent = -1;
+    private long rent = 0;
     // other expenses (maybe we should store as an array but simpler as a lump sum)
-    private long otherExpenses = -1;
+    private long otherExpenses = 0;
     // Primary income
-    private long primaryIncome = -1;
+    private long primaryIncome = 0;
+    // Array of categories for purchases
+    private ArrayList<String> spendingCategories;
     // Other income
-    private long otherIncome = -1;
     // Suggested daily spending amount
     // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
     private long suggestedSpendingAmount = -1;
     // holds callbacks relevant to the UI, triggered on data loads
     private MyCallback userInterfaceCallback;
+    private List<MyCallback> UICallbacks = new ArrayList<>();
+    static private String BUDGET_LEVEL_KEY = "Budget Level";
+    static private String BUDGET_SCORE_KEY = "Budget Score";
+    static private String SAVINGS_GOAL_KEY = "Savings Goal";
+    static private String RENT_KEY = "Rent";
+    static private String OTHER_EXPENSES_KEY = "Other Expenses";
+    static private String PRIMARY_INCOME_KEY = "Primary Income";
+    static private String USERNAME_KEY = "User Name";
+    static private String SPENDING_CATEGORIES = "Spending Categories";
 
     static BBUser GetInstance() {
         return ourInstance;
@@ -75,12 +85,12 @@ class BBUser implements DataNode {
         authentication.signOut();
     }
 
-    public void Initialize() throws InvalidDataLabelException {
+    public void Initialize(final MyCallback newUserCallback) throws InvalidDataLabelException {
         user = authentication.getCurrentUser();
         if(user != null) {
             userName = user.getDisplayName();
-            tableReader.CheckForExistingUser(userPath.get(0), user.getUid(), userName);
-            // TODO: Add other initialization her as appropriate
+            tableReader.CheckForExistingUser(userPath.get(0), user.getUid(), userName, newUserCallback);
+            // TODO: Add other initialization here as appropriate
         } else {  // user does not exist, create new user
 
         }
@@ -110,21 +120,46 @@ class BBUser implements DataNode {
     public long getBudgetScore() {
         return this.budgetScore;
     }
-    public long getSavingsGoal() {
-        return savingsGoal;
+    public double getSavingsGoal() {
+        return (new Long(savingsGoal).doubleValue() / 100.0);
     }
-    public long getRent() {
-        return rent;
+    public double getRent() { return (new Long(rent).doubleValue() / 100.0); }
+    public double getOtherExpenses() {
+        return (new Long(otherExpenses).doubleValue() / 100.0);
     }
-    public long getOtherExpenses() {
-        return otherExpenses;
+    public double getPrimaryIncome() {
+        return (new Long(primaryIncome).doubleValue()) / 100.0;
     }
-    public long getPrimaryIncome() {
-        return primaryIncome;
+    public ArrayList<String> GetSpendingCategories() {
+        return this.spendingCategories;
     }
-    public long getOtherIncome() {
-        return otherIncome;
+
+    public void AddToSpendingCategories(String newItem) {
+        this.spendingCategories.add(newItem);
+        try {
+            UpdateUserParameters();
+        }
+        catch (InvalidDataLabelException e) {
+            e.printStackTrace();
+        }
     }
+
+    public void UpdateUserParameters() throws InvalidDataLabelException {
+        tableWriter.SetData(userPath, "/" + user.getUid() + "/User Parameters/", this);
+    }
+
+    public void SetSpendingCategories(ArrayList<String> newCategories) {
+        this.spendingCategories = newCategories;
+    }
+
+    public void setBudgetLevel(long l) { budgetLevel = l; }
+    public void setBudgetScore(long s) { budgetScore = s; }
+    public void setSavingsGoal(double g) { savingsGoal = (new Double(g * 100.0).longValue()); }
+    public void setRent(double r) { rent = (new Double(r * 100.0).longValue()); }
+    public void setOtherExpenses(double o) { otherExpenses = (new Double(o * 100.0).longValue()); }
+    public void setPrimaryIncome(double p) { primaryIncome = (new Double(p * 100.0).longValue()); }
+
+
     public long getSuggestedSpendingAmount() {
         return suggestedSpendingAmount;
     }
@@ -140,7 +175,7 @@ class BBUser implements DataNode {
     public void WriteUserInfo() throws InvalidDataLabelException {
         // Todo: We really need to check if user already exists,
         // but I am not sure this should be done here
-        tableWriter.WriteData(userPath, this, userName);
+        tableWriter.SetData(userPath, "/" + user.getUid() + "/User Parameters/", this);
     }
 
     /**
@@ -154,13 +189,13 @@ class BBUser implements DataNode {
      * @param note Any optional note the user enters for the purchase.
      * @throws InvalidDataLabelException thrown if userpath contains invalid label.
      */
-    public void WriteNewExpenditure(String name, String date, String amount, String note) throws InvalidDataLabelException {
+    public void WriteNewExpenditure(String name, String date, String amount, String note, String type) throws InvalidDataLabelException {
         DateFormat inputFormat = new SimpleDateFormat("MMM dd, yyyy");
         DateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Date oldDate = inputFormat.parse(date);
             String formattedDate = outputFormat.format(oldDate);
-            Expenditure expenditure = new Expenditure(name, formattedDate, amount, note);
+            Expenditure expenditure = new Expenditure(name, formattedDate, amount, note, type);
             tableWriter.WriteData(userPath, expenditure, "/"+user.getUid()+"/Purchases/"+formattedDate);}
         catch (ParseException e1) {
             Log.d("Parse error", e1.toString());
@@ -174,6 +209,7 @@ class BBUser implements DataNode {
      * @param callback The callback used to return the array of expenditures to the calling procedure.
      */
     public void GetWeeklySpending(final MyCallback callback) {
+        user = authentication.getInstance().getCurrentUser();
         String path = userPath.get(0) + "/" + user.getUid() + "/";
 
         MyCallback callbackInner = new MyCallback() {
@@ -218,7 +254,7 @@ class BBUser implements DataNode {
             public void OnCallback(HashMap<String, Object> map) {
                 Iterator iterator = map.entrySet().iterator();
                 float [] expenditures = {0, 0, 0, 0, 0, 0, 0};
-                Expenditure expenditure = new Expenditure("","","","");
+                Expenditure expenditure = new Expenditure("","","","", "");
 
                 while (iterator.hasNext()) {
                     Map.Entry pair = (Map.Entry)iterator.next();
@@ -242,6 +278,16 @@ class BBUser implements DataNode {
 
             @Override
             public void OnProfileSet() {}
+
+            @Override
+            public void CreateNewUser() {
+
+            }
+
+            @Override
+            public void UserExists() {
+
+            }
         };
 
         tableReader.WeeklyExpenditures(path, callbackInner);
@@ -254,40 +300,56 @@ class BBUser implements DataNode {
      */
     public void LatchToDatabase() throws InvalidDataLabelException {
         List<String> latchPath = new ArrayList<>(userPath);
-        latchPath.add(userName);
+        latchPath.add(user.getUid());
         tableReader.Latch(latchPath, this);
     }
-
 
     @Override
     public Map<String, Object> ToMap() {
         return new HashMap<String, Object>() {{
-            put("BudgetLevel", budgetLevel);
-            put("BudgetScore", budgetScore);
-            put("SavingsGoal", savingsGoal);
-            put("Rent", rent);
-            put("OtherExpenses", otherExpenses);
-            put("PrimaryIncome", primaryIncome);
-            put("OtherIncome", otherIncome);
+            put(BUDGET_LEVEL_KEY, budgetLevel);
+            put(BUDGET_SCORE_KEY, budgetScore);
+            put(SAVINGS_GOAL_KEY, savingsGoal);
+            put(RENT_KEY, rent);
+            put(OTHER_EXPENSES_KEY, otherExpenses);
+            put(PRIMARY_INCOME_KEY, primaryIncome);
+            put(USERNAME_KEY, GetUser().getDisplayName());
+            put(SPENDING_CATEGORIES, spendingCategories);
             // suggestedSpending should probably be calculated on the spot
         }};
     }
 
     @Override
     public void GetFromMap(Map<String, Object> map) {
-        Object temp = map.get("Budget Level");
-        budgetLevel = temp != null ? (long) temp : -1;
-        temp = map.get("Budget Score");
-        budgetScore = temp != null ? (long) temp : -1;
-        temp = map.get("Savings Goal");
-        savingsGoal = temp != null ? (long) temp : -1;
-        temp = map.get("Rent");
-        rent = temp != null ? (long) temp : -1;
-        temp = map.get("Other Expenses");
-        otherExpenses = temp != null ? (long) temp : -1;
-        temp = map.get("Other Income");
-        otherIncome = temp != null ? (long) temp : -1;
-        userInterfaceCallback.OnProfileSet();
+        if(map == null) {
+            return;
+        }
+        Object temp = map.get(BUDGET_LEVEL_KEY);
+        budgetLevel = temp != null ? (long) temp : budgetLevel;
+        temp = map.get(BUDGET_SCORE_KEY);
+        budgetScore = temp != null ? (long) temp : budgetScore;
+        temp = map.get(SAVINGS_GOAL_KEY);
+        savingsGoal = temp != null ? (long) temp : savingsGoal;
+        temp = map.get(RENT_KEY);
+        rent = temp != null ? (long) temp : rent;
+        temp = map.get(OTHER_EXPENSES_KEY);
+        otherExpenses = temp != null ? (long) temp : otherExpenses;
+        temp = map.get(PRIMARY_INCOME_KEY);
+        primaryIncome = temp != null ? (long) temp : primaryIncome;
+        temp = map.get(SPENDING_CATEGORIES);
+        spendingCategories = temp != null ? (ArrayList<String>) temp : spendingCategories;
+        //userInterfaceCallback.OnProfileSet();
+        for(MyCallback callback: UICallbacks) {
+            callback.OnProfileSet();
+        }
+    }
+
+    public void addUICallback(MyCallback callback) {
+        UICallbacks.add(callback);
+        user = authentication.getInstance().getCurrentUser();
+        String path = userPath.get(0) + "/" + user.getUid() + "/";
+
+        tableReader.addListener(path, callback);
     }
 
     public void setUserInterfaceCallback(MyCallback callback) {
@@ -306,6 +368,7 @@ class BBUser implements DataNode {
         this.userName = userName;
         return this;
     }
+
     BBUser SetBudgetLevel(long budgetLevel) {
         this.budgetLevel = budgetLevel;
         return this;

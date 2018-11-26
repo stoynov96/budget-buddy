@@ -1,8 +1,12 @@
 package com.budget_buddy.utils.Data;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.budget_buddy.UserProfileActivity;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.google.firebase.database.ChildEventListener;
@@ -47,6 +51,7 @@ public class TableReader {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Map<String, Object> map = (Map)dataSnapshot.getValue();
                 if (map != null) {
+                    map = (Map<String, Object>) map.get("User Parameters");
                     data.GetFromMap(map);
                     data.OnDataChange();
                 }
@@ -88,6 +93,37 @@ public class TableReader {
             lastLabel = label;
         }
         return labelsSb.toString();
+    }
+
+    public void addListener(String path, final MyCallback callback) {
+        Query mQueryReference = mDatabase.child(path);
+
+        mQueryReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                callback.OnProfileSet();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                callback.OnProfileSet();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     /**
@@ -154,7 +190,7 @@ public class TableReader {
      * @param path The pathname to Users in the database
      * @param name The username (this should be the key eventually) to check for.
      */
-    public void CheckForExistingUser(final String path, final String userID, final String name) {
+    public void CheckForExistingUser(final String path, final String userID, final String name, final MyCallback newUserCallback) {
         Query myQueryReference = mDatabase.child(path);
         myQueryReference.orderByKey().equalTo(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -163,17 +199,14 @@ public class TableReader {
                     Map<String, Object> newUser = new HashMap<>();
                     Map<String, Object> userData = new HashMap<>();
                     newUser.put(userID, userData);
-                    userData.put("User Name", name);
-                    userData.put("Budget Level", -1);
-                    userData.put("Budget Score", -1);
-                    userData.put("Savings Goal", -1);
-                    userData.put("Rent", -1);
-                    userData.put("Other Expenses", -1);
-                    userData.put("Primary Income", -1);
-                    userData.put("Other Income", -1);
-                    userData.put("Suggested Spending Amount", -1);
+                    userData.put("Suggested Spending Amount", 0);   // this should be moved to user parameters at some point
 
                     mDatabase.child(path).child(userID).setValue(userData);
+                    // if the user is not in the database, then jump to the UserProfileActivity so they can create their budget
+                    newUserCallback.CreateNewUser();
+                }
+                else {
+                    newUserCallback.UserExists();
                 }
             }
 
