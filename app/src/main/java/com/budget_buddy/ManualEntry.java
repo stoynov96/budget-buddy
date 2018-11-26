@@ -8,17 +8,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 
+import com.budget_buddy.components.BBToast;
 import com.budget_buddy.components.CurrencyEditTextFragment;
 import com.budget_buddy.exception.InvalidDataLabelException;
-import android.util.Log;
+
 import android.widget.DatePicker;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +25,6 @@ import com.budget_buddy.components.DatePickerFragment;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.logging.Level;
 
 public class ManualEntry extends AppCompatActivity implements DatePickerFragment.OnDateSetListener {
 
@@ -140,9 +137,10 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         String notes = notesField.getText().toString();
 
         if(name.matches("") || date.matches("") || amount.matches("") ) {
-            toast = Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.BOTTOM, 0, 1);
-            toast.show();
+            new BBToast(context, "Invalid Input");
+//            toast = Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT);
+//            toast.setGravity(Gravity.BOTTOM, 0, 1);
+//            toast.show();
             nameField.getText().clear();
             amountField.getText().clear();
             notesField.getText().clear();
@@ -152,9 +150,10 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         amountField.validate();
         amount = amountField.CleanString();
         user.WriteNewExpenditure(name, date, amount, notes);
-        toast = Toast.makeText(context, "Added!", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.BOTTOM, 0, 1);
-        toast.show();
+        new BBToast(context, "Added!");
+//        toast = Toast.makeText(context, "Added!", Toast.LENGTH_SHORT);
+//        toast.setGravity(Gravity.BOTTOM, 0, 1);
+//        toast.show();
         nameField.getText().clear();
         amountField.getText().clear();
         notesField.getText().clear();

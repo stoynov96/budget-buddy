@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:id="@+id/menuNavGrp">
         <item
-            android:id="@+id/testItem"
-            android:title="test" />
+            android:id="@+id/achievementItem"
+            android:title="Achievements" />
         <item
             android:id="@+id/testItem2"
             android:title="test" />

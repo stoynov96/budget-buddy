@@ -242,7 +242,8 @@ public class Dashboard extends AppCompatActivity {
                             case R.id.logoutButton:
                                 goToLogin();
                                 break;
-                            case R.id.testItem:
+                            case R.id.achievementItem:
+                                goToAchievements();
                                 // TODO: Other navigation items
                                 break;
                         }
@@ -266,5 +267,10 @@ public class Dashboard extends AppCompatActivity {
         Intent loginIntent = new Intent(this, Login.class);
         loginIntent.putExtra("dashboard", true);
         startActivity(loginIntent);
+    }
+
+    private void goToAchievements() {
+        Intent achievementIntent = new Intent(this, AchievementActivity.class);
+        startActivity(achievementIntent);
     }
 }

@@ -86,6 +86,11 @@ public class UserProfileActivity extends AppCompatActivity {
             rentField.setText("$" + (rent == -1 ? "0.00" : rent));
             otherMonthlyExpensesField.setText("$" + (otherMonthlyExpenses == -1 ? "0.00" : otherMonthlyExpenses));
             monthlySavingsGoalField.setText("$" + (monthlySavingsGoal == -1 ? "0.00" : monthlySavingsGoal));
+
+            monthlyIncomeField.validate();
+            rentField.validate();
+            otherMonthlyExpensesField.validate();
+            monthlySavingsGoalField.validate();
         }
 
         @Override
