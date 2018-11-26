@@ -8,14 +8,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 public class AchievementActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
-    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +25,7 @@ public class AchievementActivity extends AppCompatActivity {
 
         setUpDrawer();
     }
+
     /*
     AchievementActivity - Nice way to handle collections besides shoving it in a class?
      - set the thing to the alpha channel to insure stuff
@@ -31,32 +33,39 @@ public class AchievementActivity extends AppCompatActivity {
         - has a property: public boolean GET ~ if already gotten
      - a function to check the collection
         - has a property of when to check it based on what activity we are in
-
      */
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        super.onCreateOptionsMenu(menu);
-        this.menu = menu;
-        return true;
-    }
+    public void checkAchievements(){
+        /*
+            - get collection of achievements that haven't been gotten
+            - check each achievement
+            -
 
+            FIREBASE implementation
+            - set listeners for some stats
+                - number of logins
+                - number of goals reached
+                - etc.
+            - callback mumbo jumbo?
+         */
+    }
 
     private void setUpDrawer(){
         drawerLayout = findViewById(R.id.drawer_layout);
 
+        // Set up Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
-//        MenuItem achievementItem = menu.getItem(0); // item 0 = achievement item ~ TODO make work haha
-//        achievementItem.setVisible(false);
-        //MenuItem item = menu.findItem(R.id.achievementItem);
-        //item.setVisible(false);
-
+        // Remove AchievementItem
         NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu menuNav = navigationView.getMenu();
+        menuNav.findItem(R.id.achievementItem).setEnabled(false);
+        menuNav.removeItem(R.id.achievementItem);
+
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
