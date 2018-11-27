@@ -63,6 +63,8 @@ public class SpendingChart extends BarChart {
 
         //chart.animateX(2000);
         animateY( 2000, Easing.EasingOption.EaseInOutExpo);
+
+        setTouchEnabled(false);
     }
 
     public void setEntries(List<BarEntry> entries) {

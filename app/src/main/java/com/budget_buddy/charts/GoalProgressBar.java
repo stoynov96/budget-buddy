@@ -27,6 +27,8 @@ public class GoalProgressBar extends HorizontalBarChart {
 
         // take care of top and bottom labels
         topAxis.setDrawLabels(false);
+
+        setTouchEnabled(false);
     }
 
     public void setGoal(int max) {
