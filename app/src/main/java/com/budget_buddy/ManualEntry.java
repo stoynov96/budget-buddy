@@ -6,6 +6,7 @@ import android.support.constraint.ConstraintSet;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -157,6 +158,7 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         nameField.getText().clear();
         amountField.getText().clear();
         notesField.getText().clear();
+        Log.i("FUCK", "OnDataChange: OVER HERE");
     }
 
     /**

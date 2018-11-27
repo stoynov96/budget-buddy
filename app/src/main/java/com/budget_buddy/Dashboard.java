@@ -86,20 +86,26 @@ public class Dashboard extends AppCompatActivity {
         public void UserExists() {
 
         }
+
+        @Override
+        public void StatsChanged() {
+            currentUser.loginCount++;
+            new BBToast(getApplicationContext(), "FUCK");
+        }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
+        currentUser.currentContext = getApplicationContext();
 
+        setContentView(R.layout.activity_dashboard);
         currentUser.setUserInterfaceCallback(callback);
+        currentUser.setStatsChangedCallback(callback);
         setUpDrawer();
         setupExperienceBar();
         addChart();
         addProgressBar();
-
-        checkLoginAchievement();
     }
 
     private void setupExperienceBar() {
@@ -277,19 +283,5 @@ public class Dashboard extends AppCompatActivity {
         startActivity(achievementIntent);
     }
 
-    // TODO For demo purposes - do this Kevin
-    private void checkLoginAchievement(){
-        switch (currentUser.loginCount) {
-            case 1:
-                new BBToast(getApplicationContext(), "WOW YOU LOGGED IN!", Gravity.TOP);
-                //display junk
-                break;
-            case 5:
-                //display junk
-                break;
 
-                default:
-                    break;
-        }
-    }
 }

@@ -39,4 +39,6 @@ public interface MyCallback {
      * dashboard instead of account creation.
      */
     void UserExists();
+
+    void StatsChanged();
 }

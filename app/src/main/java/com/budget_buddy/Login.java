@@ -54,6 +54,7 @@ public class Login extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         currentUser = BBUser.GetInstance();
+        currentUser.currentContext = getApplicationContext();
 
         fromDashboard();
         checkLoggedIn();
@@ -130,6 +131,11 @@ public class Login extends AppCompatActivity {
                             @Override
                             public void UserExists() {
                                 gotoDashboard(currentUser);
+                            }
+
+                            @Override
+                            public void StatsChanged() {
+
                             }
                         };
                         currentUser.Initialize(newUserCallback);

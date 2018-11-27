@@ -102,5 +102,10 @@ public class UserProfileActivity extends AppCompatActivity {
         public void UserExists() {
 
         }
+
+        @Override
+        public void StatsChanged() {
+
+        }
     };
 }

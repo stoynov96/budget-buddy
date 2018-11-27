@@ -1,7 +1,11 @@
 package com.budget_buddy;
 
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.Gravity;
+
+import com.budget_buddy.components.BBToast;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.budget_buddy.utils.Data.DataNode;
@@ -60,10 +64,12 @@ class BBUser implements DataNode {
     private long suggestedSpendingAmount = -1;
     // holds callbacks relevant to the UI, triggered on data loads
     private MyCallback userInterfaceCallback;
+    private MyCallback statsChangedCallback;
     private List<MyCallback> UICallbacks = new ArrayList<>();
 
     // Stats TODO Actually make achievement system - do this Kevin
     public int loginCount = 0;
+    public Context currentContext;
 
     static BBUser GetInstance() {
         return ourInstance;
@@ -256,6 +262,11 @@ class BBUser implements DataNode {
             public void UserExists() {
 
             }
+
+            @Override
+            public void StatsChanged() {
+
+            }
         };
 
         tableReader.WeeklyExpenditures(path, callbackInner);
@@ -268,7 +279,7 @@ class BBUser implements DataNode {
      */
     public void LatchToDatabase() throws InvalidDataLabelException {
         List<String> latchPath = new ArrayList<>(userPath);
-        latchPath.add(userName);
+        latchPath.add(user.getUid());
         tableReader.Latch(latchPath, this);
     }
 
@@ -326,15 +337,16 @@ class BBUser implements DataNode {
         userInterfaceCallback = callback;
     }
 
+    public void setStatsChangedCallback(MyCallback callback) { statsChangedCallback = callback; }
+
     @Override
     public void OnDataChange() {
         // Add custom logic here to be executed when user data changes
         // as a result of a database read
         // Do not add anything if this is expected to be overridden
 
-        // TEST - do achievement checks
-        //if ()
-        Log.i("OVER HERE!!!", "it changed\n");
+        checkLoginAchievements();
+
     }
 
     // Only for testing purposes
@@ -379,4 +391,20 @@ class BBUser implements DataNode {
         tableWriter.IncLoginCount(statPath);
     }
 
+    private void checkLoginAchievements(){
+        new BBToast(currentContext, "WOW YOU LOGGED IN!", Gravity.TOP);
+        Log.i("FUCK", "OnDataChange: OVER HERE");
+        switch (this.loginCount) {
+            case 1:
+
+                //display junk
+                break;
+            case 5:
+                //display junk
+                break;
+
+            default:
+                break;
+        }
+    }
 }
