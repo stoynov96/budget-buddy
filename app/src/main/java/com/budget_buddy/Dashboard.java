@@ -1,6 +1,7 @@
 package com.budget_buddy;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -25,6 +26,7 @@ import com.budget_buddy.charts.SpendingChart;
 import com.budget_buddy.utils.Data.MyCallback;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -48,12 +50,11 @@ public class Dashboard extends AppCompatActivity {
     TextView experienceProgressText;
     ExperienceBarAnimation experienceBarAnimation;
 
-    HorizontalBarChart progressBar;
-    BarChart chart;
     SpendingChart spendingChart;
     final List<BarEntry> entries = new ArrayList<BarEntry>();
     TextView progressBarDescription;
 	DrawerLayout drawerLayout;
+	Dashboard This = this; // a hack to reference this in the callback class, java's the best
 
     // Here's a more permanent home for the callback
     MyCallback callback = new MyCallback() {
@@ -80,14 +81,23 @@ public class Dashboard extends AppCompatActivity {
                 float dayTotal = 0.0f;
                 if(expenditures != null) {
                     for(Expenditure e: expenditures) {
-                        Log.i("meow", e.ToMap().toString());
                         dayTotal += (new Float(e.amount).floatValue());
                     }
                 }
                 BarEntry entry = new BarEntry(6 - i, dayTotal);
+
                 entries.add(entry);
             }
             spendingChart.setEntries(entries);
+
+            LimitLine aveLine = new LimitLine(currentUser.GetAveMonthSpent());
+            aveLine.setLineColor(getResources().getColor(R.color.colorAccent, This.getTheme()));
+            aveLine.setLineWidth(1f);
+            aveLine.setTextSize(12f);
+            aveLine.setTextColor(Color.BLACK);
+
+            spendingChart.getAxisLeft().removeAllLimitLines();
+            spendingChart.getAxisLeft().addLimitLine(aveLine);
         }
 
         @Override
@@ -240,6 +250,7 @@ public class Dashboard extends AppCompatActivity {
 
         //currentUser.GetWeeklySpending(callback);
         currentUser.AcquireAllPurchases(callback);
+
     }
 
     @Override
