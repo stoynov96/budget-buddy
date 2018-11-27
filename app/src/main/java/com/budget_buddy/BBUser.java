@@ -16,6 +16,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -52,6 +54,10 @@ class BBUser implements DataNode {
     private long otherExpenses = 0;
     // Primary income
     private long primaryIncome = 0;
+    // Total spent in past month
+    private long totalSpentPastMonth = 0;
+    // int used to keep of how many days the user has been entering purchases, max 30
+    private long totalDaysBudgeted = 1; // sort of a hack to get meaningful averages
     // Array of categories for purchases
     private HashMap<String, String> spendingCategories;
     // HashMap of purchases
@@ -204,6 +210,39 @@ class BBUser implements DataNode {
         }
     }
 
+    /**
+     * This function computes the average for the past month or the earliest day the user started budgeting.
+     * @return
+     */
+    public float GetAveMonthSpent() {
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        long runningTotal = 0L;
+        for (long i = 0; i < 30; i++) {
+            LocalDate date = LocalDate.now().minusDays(i);
+            String dateStr = date.format(dateFormat);
+
+            ArrayList<Expenditure> expenditures = purchases.get(dateStr);
+            float dayTotal = 0.0f;
+            if(expenditures != null) {
+                for(Expenditure e: expenditures) {
+                    dayTotal += (new Float(e.amount).floatValue());
+                }
+                runningTotal += new Float(dayTotal*100).longValue();
+                if(i + 1 > totalDaysBudgeted) {
+                    totalDaysBudgeted = i + 1;
+                }
+            }
+        }
+
+        totalSpentPastMonth = runningTotal;
+        return new Float(runningTotal).floatValue() / 100 / totalDaysBudgeted;
+    }
+
+    /**
+     * This function populates the purchases hash table with lists of purchases for each day.
+     * The purchases has table is indexed with date strings with format "yyyy-MM-dd"
+     * @param userInterfaceCallback
+     */
     public void AcquireAllPurchases(final MyCallback userInterfaceCallback) {
         user = authentication.getInstance().getCurrentUser();
         String path = userPath.get(0) + "/" + user.getUid() + "/";
@@ -220,11 +259,12 @@ class BBUser implements DataNode {
             @Override
             public void OnCallback(HashMap<String, Object> map) {
                 Iterator iterator = map.entrySet().iterator();
-                Expenditure expenditure = new Expenditure("","","","", "");
+
                 purchases.clear();
                 while (iterator.hasNext()) {
                     Map.Entry pair = (Map.Entry)iterator.next();
                     HashMap<String, Object> expenditureMap = (HashMap<String, Object>)pair.getValue();
+                    Expenditure expenditure = new Expenditure("","","","", "");
                     expenditure.GetFromMap(expenditureMap);
                     ArrayList<Expenditure> purchaseList = purchases.get(expenditure.GetDate());
                     if (purchaseList == null) {
