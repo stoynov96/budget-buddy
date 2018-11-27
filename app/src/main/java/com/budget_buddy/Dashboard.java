@@ -21,6 +21,7 @@ import com.budget_buddy.animations.ExperienceBarAnimation;
 import com.budget_buddy.charts.GoalProgressBar;
 
 import com.budget_buddy.charts.SpendingChart;
+import com.budget_buddy.components.BBToast;
 import com.budget_buddy.utils.Data.MyCallback;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
@@ -97,6 +98,8 @@ public class Dashboard extends AppCompatActivity {
         setupExperienceBar();
         addChart();
         addProgressBar();
+
+        checkLoginAchievement();
     }
 
     private void setupExperienceBar() {
@@ -272,5 +275,21 @@ public class Dashboard extends AppCompatActivity {
     private void goToAchievements() {
         Intent achievementIntent = new Intent(this, AchievementActivity.class);
         startActivity(achievementIntent);
+    }
+
+    // TODO For demo purposes - do this Kevin
+    private void checkLoginAchievement(){
+        switch (currentUser.loginCount) {
+            case 1:
+                new BBToast(getApplicationContext(), "WOW YOU LOGGED IN!", 30, Gravity.TOP);
+                //display junk
+                break;
+            case 5:
+                //display junk
+                break;
+
+                default:
+                    break;
+        }
     }
 }

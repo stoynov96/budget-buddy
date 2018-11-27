@@ -155,6 +155,16 @@ public class Login extends AppCompatActivity {
 
     private void gotoDashboard(BBUser user) {
         if (user.GetUser() != null) {
+
+            // TODO do this Kevin
+            currentUser.loginCount += 1;
+            try {
+                currentUser.WriteUserInfo();
+            } catch (InvalidDataLabelException e) {
+                Log.i("Error", "" + e);
+            }
+
+
             Intent dashboardIntent = new Intent(this, Dashboard.class);
             closeProgressWheel();
             startActivity(dashboardIntent);
@@ -211,6 +221,5 @@ public class Login extends AppCompatActivity {
         // do nothing - prevent going back to dashboard if logged out
         return;
     }
-
 
 }

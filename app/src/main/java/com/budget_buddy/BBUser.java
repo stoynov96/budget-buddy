@@ -62,6 +62,9 @@ class BBUser implements DataNode {
     private MyCallback userInterfaceCallback;
     private List<MyCallback> UICallbacks = new ArrayList<>();
 
+    // Stats TODO Actually make achievement system - do this Kevin
+    public int loginCount = 0;
+
     static BBUser GetInstance() {
         return ourInstance;
     }
@@ -280,6 +283,9 @@ class BBUser implements DataNode {
             put("Other Expenses", otherExpenses);
             put("Primary Income", primaryIncome);
             put("User Name", GetUser().getDisplayName());
+
+            put("Login Count", loginCount);
+
             // suggestedSpending should probably be calculated on the spot
         }};
     }
@@ -298,6 +304,10 @@ class BBUser implements DataNode {
         otherExpenses = temp != null ? (double) temp : otherExpenses;
         temp = map.get("Monthly Income");
         primaryIncome = temp != null ? (double) temp : primaryIncome;
+
+        temp = map.get("Login Count");
+        loginCount = temp != null ? (int) temp : loginCount;
+
         //userInterfaceCallback.OnProfileSet();
         for(MyCallback callback: UICallbacks) {
             callback.OnProfileSet();
@@ -343,4 +353,5 @@ class BBUser implements DataNode {
             add(DataConfig.DataLabels.USERS);
         }};
     }
+
 }

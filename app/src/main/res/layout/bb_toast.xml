@@ -20,4 +20,11 @@
         android:text="Fully custom toast."
         android:textSize="20dp"/>
 
+    <TextView
+        android:id="@+id/expToastText"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:textColor="@color/colorPrimary"
+        android:textSize="15dp" />
+
 </LinearLayout>

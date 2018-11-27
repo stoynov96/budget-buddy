@@ -6,13 +6,13 @@
             android:title="Achievements" />
         <item
             android:id="@+id/testItem2"
-            android:title="test" />
+            android:title="Set Goals" />
         <item
             android:id="@+id/testItem3"
-            android:title="test" />
+            android:title="Quick Input" />
         <item
             android:id="@+id/testItem4"
-            android:title="test" />
+            android:title="Manual Input" />
     </group>
 
     <group android:id="@+id/logoutGrp">
