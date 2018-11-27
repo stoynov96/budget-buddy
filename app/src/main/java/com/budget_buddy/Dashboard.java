@@ -152,6 +152,10 @@ public class Dashboard extends AppCompatActivity {
         setupExperienceBar();
         addChart();
         addProgressBar();
+        TextView suggestedSpendingText = findViewById(R.id.suggested_spending_text);
+        TextView averageSpendingText = findViewById(R.id.average_spending_text);
+        suggestedSpendingText.setText("");
+        averageSpendingText.setText("");
     }
 
     private void setupExperienceBar() {
