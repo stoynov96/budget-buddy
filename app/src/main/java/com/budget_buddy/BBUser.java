@@ -53,7 +53,7 @@ class BBUser implements DataNode {
     // Primary income
     private long primaryIncome = 0;
     // Array of categories for purchases
-    private ArrayList<String> spendingCategories;
+    private HashMap<String, String> spendingCategories;
     // HashMap of purchases
     private HashMap<String, ArrayList<Expenditure>> purchases = new HashMap<>();
     // Other income
@@ -132,12 +132,12 @@ class BBUser implements DataNode {
     public double getPrimaryIncome() {
         return (new Long(primaryIncome).doubleValue()) / 100.0;
     }
-    public ArrayList<String> GetSpendingCategories() {
+    public HashMap<String, String> GetSpendingCategories() {
         return this.spendingCategories;
     }
 
-    public void AddToSpendingCategories(String newItem) {
-        this.spendingCategories.add(newItem);
+    public void AddToSpendingCategories(String key, String value) {
+        this.spendingCategories.put(key, value);
         try {
             UpdateUserParameters();
         }
@@ -150,7 +150,7 @@ class BBUser implements DataNode {
         tableWriter.SetData(userPath, "/" + user.getUid() + "/User Parameters/", this);
     }
 
-    public void SetSpendingCategories(ArrayList<String> newCategories) {
+    public void SetSpendingCategories(HashMap<String, String> newCategories) {
         this.spendingCategories = newCategories;
     }
 
@@ -395,7 +395,7 @@ class BBUser implements DataNode {
         temp = map.get(PRIMARY_INCOME_KEY);
         primaryIncome = temp != null ? (long) temp : primaryIncome;
         temp = map.get(SPENDING_CATEGORIES);
-        spendingCategories = temp != null ? (ArrayList<String>) temp : spendingCategories;
+        spendingCategories = temp != null ? (HashMap<String, String>) temp : spendingCategories;
         //userInterfaceCallback.OnProfileSet();
         for(MyCallback callback: UICallbacks) {
             callback.OnProfileSet();
