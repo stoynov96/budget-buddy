@@ -104,6 +104,8 @@ public class Dashboard extends AppCompatActivity {
             int progress = (int)currentUser.GetGoalProgress();
             if (progress > 0)
                 progressBar.setProgress(progress,  This);
+            else
+                progressBar.setProgress(0, This);
             if((int) currentUser.getSavingsGoal() - progress > 0)
                 progressBarDescription.setText(This.getString(R.string.goal, (int)currentUser.getSavingsGoal() - progress));
 
