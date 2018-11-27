@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.ArraySet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,10 +61,12 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
 
         spendingCategories = user.GetSpendingCategories();
         // need to get hashmap keys and populate the names array for the spinner to work correctly
-        Set<String> keys = spendingCategories.keySet();
-        Iterator<String> keyIterator = keys.iterator();
-        while(keyIterator.hasNext()) {
-            names.add(keyIterator.next());
+        if(spendingCategories != null) {
+            Set<String> keys = spendingCategories.keySet();
+            Iterator<String> keyIterator = keys.iterator();
+            while(keyIterator.hasNext()) {
+                names.add(keyIterator.next());
+            }
         }
 
         adapter = new ArrayAdapter<String> (this, android.R.layout.simple_spinner_dropdown_item, names);
@@ -253,7 +256,10 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         String date = dateField.getText().toString();
         String amount = amountField.getText().toString();
         String notes = notesField.getText().toString();
-        String type = typeField.getSelectedItem().toString();
+        String type = "";
+        if(typeField.getSelectedItem() != null) {
+            type = typeField.getSelectedItem().toString();
+        }
 
         if(name.matches("") || date.matches("") || amount.matches("") ) {
             toast = Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT);

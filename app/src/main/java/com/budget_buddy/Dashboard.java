@@ -50,6 +50,7 @@ public class Dashboard extends AppCompatActivity {
     TextView experienceProgressText;
     ExperienceBarAnimation experienceBarAnimation;
 
+    GoalProgressBar progressBar;
     SpendingChart spendingChart;
     final List<BarEntry> entries = new ArrayList<BarEntry>();
     TextView progressBarDescription;
@@ -98,6 +99,20 @@ public class Dashboard extends AppCompatActivity {
 
             spendingChart.getAxisLeft().removeAllLimitLines();
             spendingChart.getAxisLeft().addLimitLine(aveLine);
+
+            progressBar.setGoal((int)currentUser.getSavingsGoal());
+            int progress = (int)currentUser.GetGoalProgress();
+            if (progress > 0)
+                progressBar.setProgress(progress,  This);
+            else
+                progressBar.setProgress(0, This);
+            if((int) currentUser.getSavingsGoal() - progress > 0)
+                progressBarDescription.setText(This.getString(R.string.goal, (int)currentUser.getSavingsGoal() - progress));
+
+            TextView suggestedSpendingText = findViewById(R.id.suggested_spending_text);
+            TextView averageSpendingText = findViewById(R.id.average_spending_text);
+            suggestedSpendingText.setText(This.getString(R.string.suggested_spending,(int) currentUser.GetSuggestedDailySpendingAmount()));
+            averageSpendingText.setText(This.getString(R.string.average,(int) currentUser.GetAveMonthSpent()));
         }
 
         @Override
@@ -137,6 +152,10 @@ public class Dashboard extends AppCompatActivity {
         setupExperienceBar();
         addChart();
         addProgressBar();
+        TextView suggestedSpendingText = findViewById(R.id.suggested_spending_text);
+        TextView averageSpendingText = findViewById(R.id.average_spending_text);
+        suggestedSpendingText.setText("");
+        averageSpendingText.setText("");
     }
 
     private void setupExperienceBar() {
@@ -184,9 +203,9 @@ public class Dashboard extends AppCompatActivity {
         // create description view
         progressBarDescription = new TextView(this);
         progressBarDescription.setId(R.id.progress_bar_description);
-        progressBarDescription.setText(this.getString(R.string.goal, 300 - 235));
+        progressBarDescription.setText(this.getString(R.string.goal, 0));
 
-        GoalProgressBar progressBar = new GoalProgressBar(this);
+        progressBar = new GoalProgressBar(this);
         progressBar.setId(R.id.progress_bar_view);
 
         ConstraintLayout cl = findViewById(R.id.dataBreakdownLayout);
@@ -206,20 +225,7 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.connect(progressBarDescription.getId(), ConstraintSet.BOTTOM, progressBar.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
-        List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, 235));
-        BarDataSet barDataSet = new BarDataSet(entries, "");
-
-        // set colors
-        barDataSet.setColor(getResources().getColor(R.color.colorPrimary, this.getTheme()));
-        barDataSet.setBarBorderColor(getResources().getColor(R.color.colorPrimaryDark, this.getTheme()));
-        barDataSet.setBarBorderWidth(2.5f);
-
-        BarData barData = new BarData(barDataSet);
-        barData.setDrawValues(false);
-
-        progressBar.setData(barData);
-        progressBar.setFitBars(true);
+        progressBar.setProgress(200, this);
 
         progressBar.setGoal(300);
 

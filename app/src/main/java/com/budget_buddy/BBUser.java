@@ -56,8 +56,10 @@ class BBUser implements DataNode {
     private long primaryIncome = 0;
     // Total spent in past month
     private long totalSpentPastMonth = 0;
-    // int used to keep of how many days the user has been entering purchases, max 30
+    // used to keep of how many days the user has been entering purchases, max 30
     private long totalDaysBudgeted = 1; // sort of a hack to get meaningful averages
+    // progress towards savings goal
+    private long savingsGoalProgress = 0;
     // Array of categories for purchases
     private HashMap<String, String> spendingCategories;
     // HashMap of purchases
@@ -168,8 +170,15 @@ class BBUser implements DataNode {
     public void setPrimaryIncome(double p) { primaryIncome = (new Double(p * 100.0).longValue()); }
 
 
-    public long getSuggestedSpendingAmount() {
-        return suggestedSpendingAmount;
+    /**
+     * This function computes the suggestedSpendingAmount and then returns the result divided by 30,
+     * the number of days in a month. I don't know how else to calculate this.
+     * @return
+     */
+    public float GetSuggestedDailySpendingAmount() {
+        suggestedSpendingAmount = (primaryIncome - rent - otherExpenses - savingsGoal);
+        // converted between floats and longs is becoming a hacky mess :(
+        return new Long(suggestedSpendingAmount).floatValue() / 100 / 30;
     }
 
     public boolean updateSavingsGoal(int newGoal) {
@@ -236,6 +245,38 @@ class BBUser implements DataNode {
 
         totalSpentPastMonth = runningTotal;
         return new Float(runningTotal).floatValue() / 100 / totalDaysBudgeted;
+    }
+
+    /**
+     * Computes the goal progress by taking the suggested spending allowance and subtracting the amount spent in a day.
+     * Going over the spending allowance reduces the progress, while going under increases the progress.
+     * Starts calculating from the first day the user started budgeting, but at most 30 days back.
+     * @return
+     */
+    public float GetGoalProgress() {
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        float progress = 0f;
+
+        for(long i = 0;i<totalDaysBudgeted;i++) {
+            LocalDate date = LocalDate.now().minusDays(i);
+            String dateStr = date.format(dateFormat);
+
+            ArrayList<Expenditure> expenditures = purchases.get(dateStr);
+            if(expenditures != null) {
+                float totalForDay = 0f;
+                for(Expenditure e: expenditures) {
+                    totalForDay += (new Float(e.amount).floatValue());
+                }
+                // if the user goes above the average, increase the progress
+                // if user goes below, decrease the progress
+                progress += GetSuggestedDailySpendingAmount() - totalForDay;
+            } else {
+                progress += GetSuggestedDailySpendingAmount();
+            }
+        }
+
+        savingsGoalProgress = new Float(progress * 100).longValue();
+        return progress;
     }
 
     /**
