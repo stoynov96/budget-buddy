@@ -8,7 +8,7 @@
     <string name="under_budget">You\'ve gone under budget %1$i days this past week.</string>
     <string name="goal">With your leftover savings, you\'re $%1$d away from your goal!</string>
     <string name="suggested_spending">If you keep your average daily spending at or below $%1$d, you\'ll be on track to meet your savings goal.</string>
-    <string name="average">You\'re current average spending is $%1$d.</string>
+    <string name="average">Your current average spending is $%1$d.</string>
     <string name="goal_product">That %1$s almost yours!</string>
     <string-array name="day_abbreviations">
         <item>Sun</item>
