@@ -1,30 +1,63 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="10dp"
-    android:background="@drawable/bb_toast_background"
-    >
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/customToastImage"
+    <!-- default toast box -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bb_toast_background"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/customToastImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
         <!-- android:src="@drawable/message_block" -->
 
 
-    <TextView
-        android:id="@+id/customToastText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fully custom toast."
-        android:textSize="20dp"/>
+        <TextView
+            android:id="@+id/customToastText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fully custom toast."
+            android:textSize="20dp" />
 
-    <TextView
-        android:id="@+id/expToastText"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:textColor="@color/colorPrimary"
-        android:textSize="15dp" />
+    </LinearLayout>
 
-</LinearLayout>
+
+    <!-- exp toast box -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="75dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bb_toast_background"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/linearLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/expToastBox">
+
+        <TextView
+            android:id="@+id/expToastText"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="15dp" />
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

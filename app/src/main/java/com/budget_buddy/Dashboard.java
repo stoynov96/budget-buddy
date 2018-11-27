@@ -281,7 +281,7 @@ public class Dashboard extends AppCompatActivity {
     private void checkLoginAchievement(){
         switch (currentUser.loginCount) {
             case 1:
-                new BBToast(getApplicationContext(), "WOW YOU LOGGED IN!", 30, Gravity.TOP);
+                new BBToast(getApplicationContext(), "WOW YOU LOGGED IN!", Gravity.TOP);
                 //display junk
                 break;
             case 5:

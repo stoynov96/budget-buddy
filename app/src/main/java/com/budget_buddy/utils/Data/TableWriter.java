@@ -1,13 +1,18 @@
 package com.budget_buddy.utils.Data;
 
 import android.support.annotation.NonNull;
-import com.budget_buddy.Expenditure;
+import android.util.Log;
+
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,5 +91,23 @@ public class TableWriter {
             labelsSb.append(label);
         }
         return labelsSb.toString();
+    }
+
+    public void IncLoginCount(final String path) throws InvalidDataLabelException{
+        //final String fullPath = joinLabels(path);
+
+        final DatabaseReference ref = mDatabase.child(path);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int count = dataSnapshot.child("/User Stats/login count").getValue(Integer.class);
+                ref.child("/User Stats/login count").setValue(++count);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

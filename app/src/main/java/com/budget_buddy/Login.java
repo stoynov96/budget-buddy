@@ -13,6 +13,8 @@ import android.widget.ProgressBar;
 import com.budget_buddy.exception.InvalidDataLabelException;
 
 import com.budget_buddy.utils.Data.MyCallback;
+import com.budget_buddy.utils.Data.TableReader;
+import com.budget_buddy.utils.Data.TableWriter;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -157,12 +159,17 @@ public class Login extends AppCompatActivity {
         if (user.GetUser() != null) {
 
             // TODO do this Kevin
-            currentUser.loginCount += 1;
+            //currentUser.loginCount += 1;
             try {
-                currentUser.WriteUserInfo();
+                currentUser.IncLogin();
             } catch (InvalidDataLabelException e) {
                 Log.i("Error", "" + e);
             }
+//            try {
+//                currentUser.WriteStats("99");
+//            } catch (InvalidDataLabelException e) {
+//                Log.i("Error", "" + e);
+//            }
 
 
             Intent dashboardIntent = new Intent(this, Dashboard.class);
@@ -220,6 +227,10 @@ public class Login extends AppCompatActivity {
     public void onBackPressed() {
         // do nothing - prevent going back to dashboard if logged out
         return;
+    }
+
+    public void incStats(){
+
     }
 
 }

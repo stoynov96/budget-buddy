@@ -18,8 +18,11 @@ public class BBToast {
     public BBToast(Context context, String message) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View customToast = inflater.inflate(R.layout.bb_toast, null);
+
+        hideExpToast(customToast);
+
         // Set message in toast
-        TextView textView = (TextView)((LinearLayout)customToast).getChildAt(1);
+        TextView textView = customToast.findViewById(R.id.customToastText);
         textView.setText(message);
 
         // Set current context for new Toast
@@ -36,8 +39,10 @@ public class BBToast {
     public BBToast(Context context, String message, int gravityLocation) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View customToast = inflater.inflate(R.layout.bb_toast, null);
+        hideExpToast(customToast);
+
         // Set message in toast
-        TextView textView = (TextView)((LinearLayout)customToast).getChildAt(1);
+        TextView textView = customToast.findViewById(R.id.customToastText);
         textView.setText(message);
 
         // Set current context for new Toast
@@ -48,15 +53,15 @@ public class BBToast {
         bbToast.setDuration(Toast.LENGTH_SHORT); // to appear
         bbToast.setGravity(gravityLocation, 0, 1);
         bbToast.show();
-        //Toast toast = new Toast(getApplicationContext());
     }
 
     public BBToast(Context context, String message, int exp, int gravityLocation) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View customToast = inflater.inflate(R.layout.bb_toast, null);
+
         // Set message in toast
-        TextView textView = (TextView)((LinearLayout)customToast).getChildAt(1);
-        TextView textView2 = (TextView)((LinearLayout)customToast).getChildAt(2);
+        TextView textView = customToast.findViewById(R.id.customToastText);
+        TextView textView2 = customToast.findViewById(R.id.expToastText);
         textView.setText(message);
         textView2.setText("+" + exp);
 
@@ -68,12 +73,11 @@ public class BBToast {
         bbToast.setDuration(Toast.LENGTH_SHORT); // to appear
         bbToast.setGravity(gravityLocation, 0, 1);
         bbToast.show();
-        //Toast toast = new Toast(getApplicationContext());
     }
-    private void setMessage(String message){
-        //BBToast.
-    }
-    private void setStyle(){
-        //BBToast.setView()
+
+    private void hideExpToast(View customToast){
+        // Hide exp toast box
+        LinearLayout expToastBox = customToast.findViewById(R.id.expToastBox);
+        expToastBox.setVisibility(View.GONE);
     }
 }

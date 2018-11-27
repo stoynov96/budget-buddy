@@ -331,6 +331,10 @@ class BBUser implements DataNode {
         // Add custom logic here to be executed when user data changes
         // as a result of a database read
         // Do not add anything if this is expected to be overridden
+
+        // TEST - do achievement checks
+        //if ()
+        Log.i("OVER HERE!!!", "it changed\n");
     }
 
     // Only for testing purposes
@@ -352,6 +356,27 @@ class BBUser implements DataNode {
         userPath = new ArrayList<String>() {{
             add(DataConfig.DataLabels.USERS);
         }};
+    }
+
+    /**
+     * This function writes a new user stat to the database. The current structure is to write
+     * to the Users/'username'/User Stats section
+     * @param loginCount The name of the item purchased.
+     * @throws InvalidDataLabelException thrown if userpath contains invalid label.
+     */
+    public void WriteStats(String loginCount) throws InvalidDataLabelException {
+        try {
+            tableWriter.SetData(userPath, "/"+user.getUid()+"/User Stats/", new UserStats(loginCount));
+        }
+        catch (InvalidDataLabelException e) {
+            Log.i("Error", "" + e);
+        }
+    }
+
+    public void IncLogin() throws  InvalidDataLabelException {
+        String statPath = userPath.get(0) + "/" + user.getUid() + "/";
+        //String statPath = userPath + "/" + user.getUid();
+        tableWriter.IncLoginCount(statPath);
     }
 
 }
