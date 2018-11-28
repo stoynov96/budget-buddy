@@ -225,9 +225,9 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.connect(progressBarDescription.getId(), ConstraintSet.BOTTOM, progressBar.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
-        progressBar.setProgress(200, this);
+        //progressBar.setProgress(200, this);
 
-        progressBar.setGoal(300);
+        //progressBar.setGoal(300);
 
         // remove legend
         progressBar.getLegend().setEnabled(false);
@@ -235,12 +235,14 @@ public class Dashboard extends AppCompatActivity {
         progressBar.getDescription().setEnabled(false);
 
         progressBar.animateY(getResources().getInteger(R.integer.dashboard_animation_time), Easing.EasingOption.EaseInOutExpo);
+        progressBar.setNoDataText("");
     }
 
     private void addChart() {
 
         spendingChart = new SpendingChart(this, getTheme());
         spendingChart.setId(R.id.bar_graph_view);
+        spendingChart.setNoDataText("");
 
         ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataGraphLayout);
         cl.addView(spendingChart,0,0);
