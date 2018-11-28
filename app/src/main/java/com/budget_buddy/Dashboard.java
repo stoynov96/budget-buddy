@@ -88,9 +88,8 @@ public class Dashboard extends AppCompatActivity {
         }
 
         @Override
-        public void StatsChanged() {
-            currentUser.loginCount++;
-            new BBToast(getApplicationContext(), "FUCK");
+        public void StatsChanged(int loginDebug) {
+
         }
     };
 

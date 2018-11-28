@@ -104,7 +104,7 @@ public class UserProfileActivity extends AppCompatActivity {
         }
 
         @Override
-        public void StatsChanged() {
+        public void StatsChanged(int loginDebug) {
 
         }
     };

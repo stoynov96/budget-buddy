@@ -93,15 +93,18 @@ public class TableWriter {
         return labelsSb.toString();
     }
 
-    public void IncLoginCount(final String path) throws InvalidDataLabelException{
+    public void IncLoginCount(final String path, final MyCallback callback) throws InvalidDataLabelException{
         //final String fullPath = joinLabels(path);
 
         final DatabaseReference ref = mDatabase.child(path);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int count = dataSnapshot.child("/User Stats/login count").getValue(Integer.class);
                 ref.child("/User Stats/login count").setValue(++count);
+
+                callback.StatsChanged(count);
             }
 
             @Override

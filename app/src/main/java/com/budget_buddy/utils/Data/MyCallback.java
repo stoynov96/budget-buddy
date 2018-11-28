@@ -40,5 +40,5 @@ public interface MyCallback {
      */
     void UserExists();
 
-    void StatsChanged();
+    void StatsChanged(int loginDebug);
 }

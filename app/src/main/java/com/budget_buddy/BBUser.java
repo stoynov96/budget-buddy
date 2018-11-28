@@ -264,8 +264,7 @@ class BBUser implements DataNode {
             }
 
             @Override
-            public void StatsChanged() {
-
+            public void StatsChanged(int loginDebug) {
             }
         };
 
@@ -344,9 +343,6 @@ class BBUser implements DataNode {
         // Add custom logic here to be executed when user data changes
         // as a result of a database read
         // Do not add anything if this is expected to be overridden
-
-        checkLoginAchievements();
-
     }
 
     // Only for testing purposes
@@ -388,23 +384,9 @@ class BBUser implements DataNode {
     public void IncLogin() throws  InvalidDataLabelException {
         String statPath = userPath.get(0) + "/" + user.getUid() + "/";
         //String statPath = userPath + "/" + user.getUid();
-        tableWriter.IncLoginCount(statPath);
+
+
+        tableWriter.IncLoginCount(statPath, statsChangedCallback);
     }
 
-    private void checkLoginAchievements(){
-        new BBToast(currentContext, "WOW YOU LOGGED IN!", Gravity.TOP);
-        Log.i("FUCK", "OnDataChange: OVER HERE");
-        switch (this.loginCount) {
-            case 1:
-
-                //display junk
-                break;
-            case 5:
-                //display junk
-                break;
-
-            default:
-                break;
-        }
-    }
 }

@@ -6,15 +6,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import com.budget_buddy.components.BBToast;
 import com.budget_buddy.exception.InvalidDataLabelException;
 
 import com.budget_buddy.utils.Data.MyCallback;
 import com.budget_buddy.utils.Data.TableReader;
 import com.budget_buddy.utils.Data.TableWriter;
+import com.github.mikephil.charting.data.BarEntry;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -33,6 +36,51 @@ public class Login extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private BBUser currentUser;
     private ProgressBar wheel;
+
+    // Here's a more permanent home for the callback
+    MyCallback statsChanged = new MyCallback() {
+        @Override
+        public void OnCallback(float [] weeklySpending) {
+        }
+
+        @Override
+        public void OnCallback(HashMap<String, Object> map) {
+
+        }
+
+        @Override
+        public void OnProfileSet() {
+        }
+
+        @Override
+        public void CreateNewUser() {
+
+        }
+
+        @Override
+        public void UserExists() {
+
+        }
+
+        @Override
+        public void StatsChanged(int count) {
+            currentUser.loginCount = count;
+            Log.i("FUCK", "OnDataChange: OVER HERE");
+            switch (currentUser.loginCount) {
+                case 1:
+                    new BBToast(getApplicationContext(), "First Login!", 100,Gravity.TOP);
+                    //display junk
+                    break;
+                case 5:
+                    //display junk
+                    break;
+
+                default:
+                    break;
+            }
+            //new BBToast(getApplicationContext(), "FUCK");
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +103,8 @@ public class Login extends AppCompatActivity {
         super.onStart();
         currentUser = BBUser.GetInstance();
         currentUser.currentContext = getApplicationContext();
+
+        currentUser.setStatsChangedCallback(statsChanged);
 
         fromDashboard();
         checkLoggedIn();
@@ -134,7 +184,7 @@ public class Login extends AppCompatActivity {
                             }
 
                             @Override
-                            public void StatsChanged() {
+                            public void StatsChanged(int loginDebug) {
 
                             }
                         };
