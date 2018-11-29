@@ -1,6 +1,7 @@
 package com.budget_buddy;
 
 import android.content.Context;
+import android.icu.text.DateTimePatternGenerator;
 import android.util.Log;
 
 import com.budget_buddy.config.DataConfig;
@@ -18,6 +19,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -306,14 +308,16 @@ class BBUser implements DataNode {
         temp = map.get("Monthly Savings Goal");
         savingsGoal = temp != null ? (double) temp : savingsGoal;
         temp = map.get("Rent");
+
+        // Workaround for odd bug where rent from DB is of type Long?
+        temp = temp instanceof Long ? ((Long)temp).doubleValue() : temp;
+
         rent = temp != null ? (double) temp : rent;
         temp = map.get("Other Monthly Expenses");
         otherExpenses = temp != null ? (double) temp : otherExpenses;
         temp = map.get("Monthly Income");
         primaryIncome = temp != null ? (double) temp : primaryIncome;
 
-        //temp = map.get("Login Count");
-        //loginCount = temp != null ? (int) temp : loginCount;
 
         //userInterfaceCallback.OnProfileSet();
         for(MyCallback callback: UICallbacks) {
@@ -370,18 +374,16 @@ class BBUser implements DataNode {
         switch (statToInc) {
             case LOGIN_COUNT:
                 path = "login count";
-                userStats.statCallBack = userStats.loginCountCallBack(this);
+                userStats.loginCountCallBack(this);
                 break;
             case PURCHASE_COUNT:
                 path = "purchase count";
-                userStats.statCallBack = userStats.purchaseCountCallBack(this);
+                userStats.purchaseCountCallBack(this);
+                break;
             default:
                 Log.e("UserStats", "Increment: invalid stat to increase!");
 
         }
-        // Users/94kdLk4OETTpJdsoVWhwLBuPLB52/User Stats/login count
-        // Users/94kdLk4OETTpJdsoVWhwLBuPLB52/User Stats/login count
-        // Log.i("FUCK", "Increment: " + userPath + path);
 
         tableWriter.Increment(userPath, "/" + user.getUid() + "/User Stats/" + path, userStats.statCallBack);
     }
@@ -416,7 +418,7 @@ class BBUser implements DataNode {
 
                 @Override
                 public void OnIncrement(int value) {
-                    Log.i("FUCK", "OnCallback: " + value);
+                    //Log.i("FUCK", "OnCallback: " + value);
                     setBudgetScore((long) value);
                 }
             });
@@ -427,7 +429,29 @@ class BBUser implements DataNode {
 
     private void setBudgetScore(long score){
         this.budgetScore = score;
-        Log.i("FUCK", "setBudgetScore: IN");
+        //Log.i("FUCK", "setBudgetScore: IN");
     }
 
+    public void CheckDailies(UserStats.Dailies dailyToCheck){
+        String path = "";
+        switch (dailyToCheck) {
+            case FIRST_PURCHASE:
+                path = "login count";
+                // TODO OVER HERE DOOD
+                //DateTimePatternGenerator dtf = DateTimePatternGenerator.g
+                //java.time.LocalDate.
+                userStats.purchaseCountCallBack(this);
+                break;
+            default:
+                Log.e("UserStats", "Increment: invalid stat to increase!");
+
+        }
+
+        try {
+            tableReader.singleRead(userPath, "/" + user.getUid() + "/" + path, userStats.statCallBack);
+        } catch (InvalidDataLabelException e1) {
+            Log.d("Parse error", e1.toString());
+        }
+        //tableWriter.Increment(userPath, "/" + user.getUid() + "/User Stats/" + path, userStats.statCallBack);
+    }
 }

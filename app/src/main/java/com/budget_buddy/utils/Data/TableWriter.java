@@ -100,8 +100,9 @@ public class TableWriter {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int count = dataSnapshot.getValue(Integer.class);
+                count++;
                 callback.OnIncrement(count); // increment before write to db
-                ref.setValue(++count);
+                ref.setValue(count);
             }
 
             @Override

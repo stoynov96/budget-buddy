@@ -115,7 +115,10 @@ public class Login extends AppCompatActivity {
 
                             @Override
                             public void OnCallback(HashMap<String, Object> map) {
-
+                                // Pull data from db and set to existing user
+                                currentUser.GetFromMap(map);
+                                //Log.i("FUCK", "UserExists: " + currentUser.getBudgetScore());
+                                gotoDashboard(currentUser);
                             }
 
                             @Override
@@ -130,7 +133,7 @@ public class Login extends AppCompatActivity {
 
                             @Override
                             public void UserExists() {
-                                gotoDashboard(currentUser);
+
                             }
 
                             @Override

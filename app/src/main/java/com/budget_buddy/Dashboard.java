@@ -72,7 +72,7 @@ public class Dashboard extends AppCompatActivity {
                 // display profile setup dialog
                 Log.i("Profile", "needs set up");
             } else {
-                Log.i("FUCK", "OnProfileSet: EXP GETTING CHANGED HOPEFULLY PLS THANKS");
+                //Log.i("FUCK", "OnProfileSet: EXP FROM USER = " + currentUser.getBudgetScore());
                 experienceBarAnimation.setProgress((int)currentUser.getBudgetScore());
 
                 SetExperience(currentUser.getBudgetScore());

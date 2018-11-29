@@ -155,6 +155,7 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         // AchievementCheck - Purchase
         try {
             user.IncStat(UserStats.Counters.PURCHASE_COUNT);
+            user.CheckDailies(UserStats.Dailies.FIRST_PURCHASE);
         } catch (InvalidDataLabelException e) {
             Log.i("Error", "" + e);
         }

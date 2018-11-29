@@ -213,8 +213,43 @@ public class TableReader {
                     newUserCallback.CreateNewUser();
                 }
                 else {
-                    newUserCallback.UserExists();
+                    //Log.i("FUCK", "THE PATH: " + dataSnapshot.getKey());
+                    HashMap<String, Object> userParameters = new HashMap<>();
+                    // Pull data from DB to set to our BBUser singleton on start up
+
+                    for(DataSnapshot snapshot : dataSnapshot.child(userID).child("User Parameters").getChildren()) {
+                        userParameters.put(snapshot.getKey(), snapshot.getValue());
+                    }
+
+                    newUserCallback.OnCallback(userParameters);
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+
+    public void singleRead(final List<String> path, final String path2, final MyCallback callback) throws InvalidDataLabelException {
+        String fullPath = joinLabels(path) + path2;
+
+        final DatabaseReference ref = mDatabase.child(fullPath);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HashMap<String, Object> map = new HashMap<>();
+
+                // Get snapshot needed
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    map.put(snapshot.getKey(), snapshot.getValue());
+                }
+
+                callback.OnCallback(map);
             }
 
             @Override
