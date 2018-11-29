@@ -134,7 +134,7 @@ public class Login extends AppCompatActivity {
                             }
 
                             @Override
-                            public void StatsChanged(int loginDebug) {
+                            public void OnIncrement(int value) {
 
                             }
                         };
@@ -167,7 +167,7 @@ public class Login extends AppCompatActivity {
 
             // AchievementCheck - Login
             try {
-                currentUser.IncStat(UserStats.Counters.LOGINCOUNT);
+                currentUser.IncStat(UserStats.Counters.LOGIN_COUNT);
             } catch (InvalidDataLabelException e) {
                 Log.i("Error", "" + e);
             }

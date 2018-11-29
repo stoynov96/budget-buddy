@@ -22,12 +22,12 @@ public class UserStats implements DataNode {
 
     // Counters
     public int loginCount;
+    public int purchaseCount;
 
-    // Achievements
-    boolean FirstLogin = false;
+
 
     enum Counters {
-        LOGINCOUNT;
+        LOGIN_COUNT, PURCHASE_COUNT;
     }
 
     // Constructor
@@ -55,31 +55,40 @@ public class UserStats implements DataNode {
 
     }
 
-    public void LatchToDatabase(List<String> latchPath) throws InvalidDataLabelException {
-        new TableReader().Latch(latchPath, this);
-    }
-
     public void checkAchievements(BBUser currentUser){
-        new BBToast(currentUser.currentContext, "First Login!", 100,Gravity.TOP);
-        currentUser.IncBudgetScore(100);
-        // TODO EXPERIENCE SET UP
+
+        //currentUser.IncBudgetScore(100);
         //currentUser.ex
         switch (loginCount) {
             case 1:
+                new BBToast(currentUser.currentContext, "First Login!", 100,Gravity.TOP);
+                //Log.i("FUCK", "checkAchievements: IT WORKED");
                 currentUser.IncBudgetScore(100);
-                //display junk
+                // TODO set up link between AchievementActivity
+                //currentUser.
                 break;
             case 5:
-                //display junk
                 break;
 
             default:
                 break;
         }
+
+        // TODO move FINISH
+        switch (purchaseCount) {
+            case 1:
+                currentUser.IncBudgetScore(100);
+                new BBToast(currentUser.currentContext, "Very First Purchase!", 100,Gravity.TOP);
+                break;
+            case 2:
+                break;
+                default:
+                    break;
+
+        }
     }
 
-    public MyCallback loginCallBack(final BBUser user){
-        // Here's a more permanent home for the callback
+    public MyCallback loginCountCallBack(final BBUser user){
         MyCallback statsChanged = new MyCallback() {
             @Override
             public void OnCallback(float [] weeklySpending) {
@@ -105,14 +114,50 @@ public class UserStats implements DataNode {
             }
 
             @Override
-            public void StatsChanged(int count) {
-                    loginCount = count;
+            public void OnIncrement(int value) {
+                    loginCount = value;
                     checkAchievements(user);
+                    // TODO move display achievement and exp allocation here
                 }
             };
 
         return statsChanged;
     }
 
+    public MyCallback purchaseCountCallBack(final BBUser user){
+        MyCallback statsChanged = new MyCallback() {
+            @Override
+            public void OnCallback(float [] weeklySpending) {
+            }
+
+            @Override
+            public void OnCallback(HashMap<String, Object> map) {
+
+            }
+
+            @Override
+            public void OnProfileSet() {
+            }
+
+            @Override
+            public void CreateNewUser() {
+
+            }
+
+            @Override
+            public void UserExists() {
+
+            }
+
+            @Override
+            public void OnIncrement(int value) {
+                purchaseCount = value;
+                checkAchievements(user);
+                // TODO move display achievement and exp allocation here
+            }
+        };
+
+        return statsChanged;
+    }
 
 }

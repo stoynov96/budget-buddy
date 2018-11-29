@@ -1,7 +1,6 @@
 package com.budget_buddy.utils.Data;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
@@ -15,7 +14,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TableWriter {
 
@@ -80,33 +78,6 @@ public class TableWriter {
             mDatabase.child(fullPath).child(label).push().setValue(data.ToMap());
     }
 
-    /**
-     * Write a single data value under a number of labels
-     * @param path Path of labels to nest data
-     * @param label Label to write data under
-     *              (leave null if one should be generated automatically)
-     * @throws InvalidDataLabelException Thrown if an invalid label is used
-     */
-    public void WriteSingleData(List<String> path, Object ob, String label)
-            throws InvalidDataLabelException {
-        String fullPath = joinLabels(path);
-
-        OnCompleteListener<Void> listener = new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isCanceled()) {
-                    // Todo: add logic here to handle cancelled writes
-                }
-            }
-        };
-
-        // Write the data
-        if (label == null)
-            mDatabase.child(fullPath).push().setValue(ob);
-        else
-            mDatabase.child(fullPath).child(label).push().setValue(ob);
-    }
-
     private String joinLabels(List<String> labels) throws InvalidDataLabelException {
         StringBuilder labelsSb = new StringBuilder();
         String deliminator = "";
@@ -123,17 +94,36 @@ public class TableWriter {
     public void Increment(final List<String> path, final String path2, final MyCallback callback) throws InvalidDataLabelException{
         String fullPath = joinLabels(path) + path2;
 
-        Log.i("FUCKO", "Increment: " + fullPath);
-
         final DatabaseReference ref = mDatabase.child(fullPath);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int count = dataSnapshot.getValue(Integer.class);
+                callback.OnIncrement(count); // increment before write to db
                 ref.setValue(++count);
+            }
 
-                callback.StatsChanged(count);
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void IncrementBy(final int amount, final List<String> path, final String path2, final MyCallback callback) throws InvalidDataLabelException {
+        String fullPath = joinLabels(path) + path2;
+
+        final DatabaseReference ref = mDatabase.child(fullPath);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //HashMap<String, Object>  map = new HashMap<>();
+                int count = dataSnapshot.getValue(Integer.class);
+                count += amount;
+                callback.OnIncrement(count); // increment before write to db
+                ref.setValue(count);
             }
 
             @Override

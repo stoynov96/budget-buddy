@@ -46,6 +46,7 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
         purchaseDateField.setText(dateFormat.format(calendar.getTime()));
         context = getApplicationContext();
+        user.currentContext = context;
 
         Bundle extras = getIntent().getExtras();
         if(extras != null) {
@@ -151,6 +152,12 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         amountField.validate();
         amount = amountField.CleanString();
         user.WriteNewExpenditure(name, date, amount, notes);
+        // AchievementCheck - Purchase
+        try {
+            user.IncStat(UserStats.Counters.PURCHASE_COUNT);
+        } catch (InvalidDataLabelException e) {
+            Log.i("Error", "" + e);
+        }
         new BBToast(context, "Added!");
 //        toast = Toast.makeText(context, "Added!", Toast.LENGTH_SHORT);
 //        toast.setGravity(Gravity.BOTTOM, 0, 1);
@@ -158,7 +165,6 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         nameField.getText().clear();
         amountField.getText().clear();
         notesField.getText().clear();
-        Log.i("FUCK", "OnDataChange: OVER HERE");
     }
 
     /**

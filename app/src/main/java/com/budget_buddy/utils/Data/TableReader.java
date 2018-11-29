@@ -201,6 +201,7 @@ public class TableReader {
 
                     // Temp location for user stats
                     userStats.put("login count", 0);
+                    userStats.put("purchase count", 0);
 
                     newUser.put(userID, userData);
                     userData.put("Suggested Spending Amount", 0);   // this should be moved to user parameters at some point

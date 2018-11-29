@@ -72,6 +72,9 @@ public class Dashboard extends AppCompatActivity {
                 // display profile setup dialog
                 Log.i("Profile", "needs set up");
             } else {
+                Log.i("FUCK", "OnProfileSet: EXP GETTING CHANGED HOPEFULLY PLS THANKS");
+                experienceBarAnimation.setProgress((int)currentUser.getBudgetScore());
+
                 SetExperience(currentUser.getBudgetScore());
                 SetSavingsGoal(currentUser.getSavingsGoal());
             }
@@ -88,7 +91,7 @@ public class Dashboard extends AppCompatActivity {
         }
 
         @Override
-        public void StatsChanged(int loginDebug) {
+        public void OnIncrement(int value) {
 
         }
     };
@@ -100,7 +103,6 @@ public class Dashboard extends AppCompatActivity {
 
         setContentView(R.layout.activity_dashboard);
         currentUser.setUserInterfaceCallback(callback);
-        currentUser.setStatsChangedCallback(callback);
         setUpDrawer();
         setupExperienceBar();
         addChart();

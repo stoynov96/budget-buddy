@@ -1,18 +1,14 @@
 package com.budget_buddy;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
-import android.view.Gravity;
 
-import com.budget_buddy.components.BBToast;
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.budget_buddy.utils.Data.DataNode;
 import com.budget_buddy.utils.Data.MyCallback;
 import com.budget_buddy.utils.Data.TableReader;
 import com.budget_buddy.utils.Data.TableWriter;
-import com.budget_buddy.utils.Data.UserParameters;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -64,7 +60,6 @@ class BBUser implements DataNode {
     private long suggestedSpendingAmount = -1;
     // holds callbacks relevant to the UI, triggered on data loads
     private MyCallback userInterfaceCallback;
-    private MyCallback statsChangedCallback;
     private List<MyCallback> UICallbacks = new ArrayList<>();
 
     // Stats TODO Actually make achievement system - do this Kevin
@@ -266,7 +261,7 @@ class BBUser implements DataNode {
             }
 
             @Override
-            public void StatsChanged(int loginDebug) {
+            public void OnIncrement(int value) {
             }
         };
 
@@ -338,13 +333,14 @@ class BBUser implements DataNode {
         userInterfaceCallback = callback;
     }
 
-    public void setStatsChangedCallback(MyCallback callback) { statsChangedCallback = callback; }
-
     @Override
     public void OnDataChange() {
         // Add custom logic here to be executed when user data changes
         // as a result of a database read
         // Do not add anything if this is expected to be overridden
+        if (userInterfaceCallback != null) {
+            userInterfaceCallback.OnProfileSet();
+        }
     }
 
     // Only for testing purposes
@@ -366,17 +362,19 @@ class BBUser implements DataNode {
         userPath = new ArrayList<String>() {{
             add(DataConfig.DataLabels.USERS);
         }};
-
-        //userStats = new UserStats(user.getUid());
     }
 
+    // Increments stats
     public void IncStat(UserStats.Counters statToInc) throws  InvalidDataLabelException {
         String path = "";
         switch (statToInc) {
-            case LOGINCOUNT:
+            case LOGIN_COUNT:
                 path = "login count";
-                userStats.statCallBack = userStats.loginCallBack(this);
+                userStats.statCallBack = userStats.loginCountCallBack(this);
                 break;
+            case PURCHASE_COUNT:
+                path = "purchase count";
+                userStats.statCallBack = userStats.purchaseCountCallBack(this);
             default:
                 Log.e("UserStats", "Increment: invalid stat to increase!");
 
@@ -390,9 +388,46 @@ class BBUser implements DataNode {
 
     public void IncBudgetScore(long exp){
         try {
-            tableWriter.WriteSingleData(userPath, exp, "/" + user.getUid() + "/User Parameters/Budget Score");
+            tableWriter.IncrementBy( (int)exp, userPath, "/" + user.getUid() + "/User Parameters/Budget Score", new MyCallback() {
+                @Override
+                public void OnCallback(float[] weeklySpending) {
+
+                }
+
+                @Override
+                public void OnCallback(HashMap<String, Object> map) {
+
+                }
+
+                @Override
+                public void OnProfileSet() {
+
+                }
+
+                @Override
+                public void CreateNewUser() {
+
+                }
+
+                @Override
+                public void UserExists() {
+
+                }
+
+                @Override
+                public void OnIncrement(int value) {
+                    Log.i("FUCK", "OnCallback: " + value);
+                    setBudgetScore((long) value);
+                }
+            });
         } catch (InvalidDataLabelException e1) {
             Log.d("Parse error", e1.toString());
         }
     }
+
+    private void setBudgetScore(long score){
+        this.budgetScore = score;
+        Log.i("FUCK", "setBudgetScore: IN");
+    }
+
 }

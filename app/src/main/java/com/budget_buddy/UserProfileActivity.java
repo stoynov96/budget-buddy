@@ -3,15 +3,13 @@ package com.budget_buddy;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.budget_buddy.components.CurrencyEditTextFragment;
 import com.budget_buddy.utils.Data.MyCallback;
-import com.budget_buddy.utils.Data.UserParameters;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -106,7 +104,7 @@ public class UserProfileActivity extends AppCompatActivity {
         }
 
         @Override
-        public void StatsChanged(int loginDebug) {
+        public void OnIncrement(int value) {
 
         }
     };
@@ -116,7 +114,7 @@ public class UserProfileActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if(extras != null && extras.getBoolean("login", false)){
             try {
-                currentUser.IncStat(UserStats.Counters.LOGINCOUNT);
+                currentUser.IncStat(UserStats.Counters.LOGIN_COUNT);
             } catch (InvalidDataLabelException e) {
                 Log.i("Error", "" + e);
             }

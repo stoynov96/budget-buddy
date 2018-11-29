@@ -17,6 +17,15 @@ import android.view.MenuItem;
 public class AchievementActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
+    BBUser currentUser = BBUser.GetInstance();
+
+
+    // Dailies
+
+    // Milestone Achievements
+    boolean FirstLogin = false;
+    boolean FifthLogin = false;
+    boolean TenthLogin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +33,7 @@ public class AchievementActivity extends AppCompatActivity {
         setContentView(R.layout.activity_achievements);
 
         setUpDrawer();
+
     }
 
     /*
@@ -36,19 +46,22 @@ public class AchievementActivity extends AppCompatActivity {
      */
 
     public void checkAchievements(){
-        /*
-            - get collection of achievements that haven't been gotten
-            - check each achievement
-            -
+        int loginCount = currentUser.userStats.loginCount;
+        switch (loginCount) {
+            case 10:
+                TenthLogin = true;
+                // TODO stuff to display achievement
+            case 5:
+                FifthLogin = true;
+            case 1:
+                FirstLogin = true;
+                break;
+        }
 
-            FIREBASE implementation
-            - set listeners for some stats
-                - number of logins
-                - number of goals reached
-                - etc.
-            - callback mumbo jumbo?
-         */
+        //int purchaseCount = currentUser.userStats.purchaseCount
     }
+
+
 
     private void setUpDrawer(){
         drawerLayout = findViewById(R.id.drawer_layout);

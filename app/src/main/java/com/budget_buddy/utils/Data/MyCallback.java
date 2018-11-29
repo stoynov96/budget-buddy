@@ -40,5 +40,9 @@ public interface MyCallback {
      */
     void UserExists();
 
-    void StatsChanged(int loginDebug);
+    /** This function is called in TableWriter after incrementing a single data piece from Firebase.
+     * Returns a int of the newly incremented data piece.
+     * @param value The incremented value from Firebase.
+     */
+    void OnIncrement(int value);
 }
