@@ -58,6 +58,8 @@ public class UserProfileActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.i("Error", "" + e);
         }
+
+        fromLogin();
         Intent dashboardIntent = new Intent(this, Dashboard.class);
         startActivity(dashboardIntent);
         finish();
@@ -108,4 +110,16 @@ public class UserProfileActivity extends AppCompatActivity {
 
         }
     };
+
+    private void fromLogin(){
+        // Check if we are coming from login activity
+        Bundle extras = getIntent().getExtras();
+        if(extras != null && extras.getBoolean("login", false)){
+            try {
+                currentUser.IncStat(UserStats.Counters.LOGINCOUNT);
+            } catch (InvalidDataLabelException e) {
+                Log.i("Error", "" + e);
+            }
+        }
+    }
 }

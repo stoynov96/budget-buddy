@@ -1,23 +1,16 @@
 package com.budget_buddy;
 
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 
-import com.budget_buddy.components.BBToast;
 import com.budget_buddy.exception.InvalidDataLabelException;
 
 import com.budget_buddy.utils.Data.MyCallback;
-import com.budget_buddy.utils.Data.TableReader;
-import com.budget_buddy.utils.Data.TableWriter;
-import com.github.mikephil.charting.data.BarEntry;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -37,50 +30,7 @@ public class Login extends AppCompatActivity {
     private BBUser currentUser;
     private ProgressBar wheel;
 
-    // Here's a more permanent home for the callback
-    MyCallback statsChanged = new MyCallback() {
-        @Override
-        public void OnCallback(float [] weeklySpending) {
-        }
 
-        @Override
-        public void OnCallback(HashMap<String, Object> map) {
-
-        }
-
-        @Override
-        public void OnProfileSet() {
-        }
-
-        @Override
-        public void CreateNewUser() {
-
-        }
-
-        @Override
-        public void UserExists() {
-
-        }
-
-        @Override
-        public void StatsChanged(int count) {
-            currentUser.loginCount = count;
-            Log.i("FUCK", "OnDataChange: OVER HERE");
-            switch (currentUser.loginCount) {
-                case 1:
-                    new BBToast(getApplicationContext(), "First Login!", 100,Gravity.TOP);
-                    //display junk
-                    break;
-                case 5:
-                    //display junk
-                    break;
-
-                default:
-                    break;
-            }
-            //new BBToast(getApplicationContext(), "FUCK");
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +54,7 @@ public class Login extends AppCompatActivity {
         currentUser = BBUser.GetInstance();
         currentUser.currentContext = getApplicationContext();
 
-        currentUser.setStatsChangedCallback(statsChanged);
+        //currentUser.setStatsChangedCallback(new UserStats().loginCount(currentUser));
 
         fromDashboard();
         checkLoggedIn();
@@ -206,6 +156,7 @@ public class Login extends AppCompatActivity {
     private void gotoNewUser(BBUser user) {
         if (user.GetUser() != null) {
             Intent newUserIntent = new Intent(this, UserProfileActivity.class);
+            newUserIntent.putExtra("login", true);
             closeProgressWheel();
             startActivity(newUserIntent);
         }
@@ -214,19 +165,12 @@ public class Login extends AppCompatActivity {
     private void gotoDashboard(BBUser user) {
         if (user.GetUser() != null) {
 
-            // TODO do this Kevin
-            //currentUser.loginCount += 1;
+            // AchievementCheck - Login
             try {
-                currentUser.IncLogin();
+                currentUser.IncStat(UserStats.Counters.LOGINCOUNT);
             } catch (InvalidDataLabelException e) {
                 Log.i("Error", "" + e);
             }
-//            try {
-//                currentUser.WriteStats("99");
-//            } catch (InvalidDataLabelException e) {
-//                Log.i("Error", "" + e);
-//            }
-
 
             Intent dashboardIntent = new Intent(this, Dashboard.class);
             closeProgressWheel();
@@ -284,9 +228,4 @@ public class Login extends AppCompatActivity {
         // do nothing - prevent going back to dashboard if logged out
         return;
     }
-
-    public void incStats(){
-
-    }
-
 }

@@ -112,7 +112,7 @@ public class Dashboard extends AppCompatActivity {
         experienceBar.setMax(2500);
         experienceProgressText = findViewById(R.id.experienceProgessFraction);
         experienceBarAnimation = new ExperienceBarAnimation(experienceBar, experienceProgressText);
-        experienceBarAnimation.setProgress(1675);
+        experienceBarAnimation.setProgress((int)currentUser.getBudgetScore());
     }
 
     public void gotoEntryMethodFor(View view) {

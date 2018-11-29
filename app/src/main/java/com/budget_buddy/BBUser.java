@@ -68,7 +68,8 @@ class BBUser implements DataNode {
     private List<MyCallback> UICallbacks = new ArrayList<>();
 
     // Stats TODO Actually make achievement system - do this Kevin
-    public int loginCount = 0;
+    public UserStats userStats;
+    //public int loginCount = 0;
     public Context currentContext;
 
     static BBUser GetInstance() {
@@ -89,6 +90,7 @@ class BBUser implements DataNode {
     public void Initialize(final MyCallback newUserCallback) throws InvalidDataLabelException {
         user = authentication.getCurrentUser();
         if(user != null) {
+            userStats = new UserStats(user.getUid());
             userName = user.getDisplayName();
             tableReader.CheckForExistingUser(userPath.get(0), user.getUid(), userName, newUserCallback);
             // TODO: Add other initialization here as appropriate
@@ -294,7 +296,7 @@ class BBUser implements DataNode {
             put("Primary Income", primaryIncome);
             put("User Name", GetUser().getDisplayName());
 
-            put("Login Count", loginCount);
+            //put("Login Count", loginCount);
 
             // suggestedSpending should probably be calculated on the spot
         }};
@@ -315,8 +317,8 @@ class BBUser implements DataNode {
         temp = map.get("Monthly Income");
         primaryIncome = temp != null ? (double) temp : primaryIncome;
 
-        temp = map.get("Login Count");
-        loginCount = temp != null ? (int) temp : loginCount;
+        //temp = map.get("Login Count");
+        //loginCount = temp != null ? (int) temp : loginCount;
 
         //userInterfaceCallback.OnProfileSet();
         for(MyCallback callback: UICallbacks) {
@@ -364,29 +366,33 @@ class BBUser implements DataNode {
         userPath = new ArrayList<String>() {{
             add(DataConfig.DataLabels.USERS);
         }};
+
+        //userStats = new UserStats(user.getUid());
     }
 
-    /**
-     * This function writes a new user stat to the database. The current structure is to write
-     * to the Users/'username'/User Stats section
-     * @param loginCount The name of the item purchased.
-     * @throws InvalidDataLabelException thrown if userpath contains invalid label.
-     */
-    public void WriteStats(String loginCount) throws InvalidDataLabelException {
+    public void IncStat(UserStats.Counters statToInc) throws  InvalidDataLabelException {
+        String path = "";
+        switch (statToInc) {
+            case LOGINCOUNT:
+                path = "login count";
+                userStats.statCallBack = userStats.loginCallBack(this);
+                break;
+            default:
+                Log.e("UserStats", "Increment: invalid stat to increase!");
+
+        }
+        // Users/94kdLk4OETTpJdsoVWhwLBuPLB52/User Stats/login count
+        // Users/94kdLk4OETTpJdsoVWhwLBuPLB52/User Stats/login count
+        // Log.i("FUCK", "Increment: " + userPath + path);
+
+        tableWriter.Increment(userPath, "/" + user.getUid() + "/User Stats/" + path, userStats.statCallBack);
+    }
+
+    public void IncBudgetScore(long exp){
         try {
-            tableWriter.SetData(userPath, "/"+user.getUid()+"/User Stats/", new UserStats(loginCount));
-        }
-        catch (InvalidDataLabelException e) {
-            Log.i("Error", "" + e);
+            tableWriter.WriteSingleData(userPath, exp, "/" + user.getUid() + "/User Parameters/Budget Score");
+        } catch (InvalidDataLabelException e1) {
+            Log.d("Parse error", e1.toString());
         }
     }
-
-    public void IncLogin() throws  InvalidDataLabelException {
-        String statPath = userPath.get(0) + "/" + user.getUid() + "/";
-        //String statPath = userPath + "/" + user.getUid();
-
-
-        tableWriter.IncLoginCount(statPath, statsChangedCallback);
-    }
-
 }

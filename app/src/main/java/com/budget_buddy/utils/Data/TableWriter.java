@@ -80,6 +80,33 @@ public class TableWriter {
             mDatabase.child(fullPath).child(label).push().setValue(data.ToMap());
     }
 
+    /**
+     * Write a single data value under a number of labels
+     * @param path Path of labels to nest data
+     * @param label Label to write data under
+     *              (leave null if one should be generated automatically)
+     * @throws InvalidDataLabelException Thrown if an invalid label is used
+     */
+    public void WriteSingleData(List<String> path, Object ob, String label)
+            throws InvalidDataLabelException {
+        String fullPath = joinLabels(path);
+
+        OnCompleteListener<Void> listener = new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isCanceled()) {
+                    // Todo: add logic here to handle cancelled writes
+                }
+            }
+        };
+
+        // Write the data
+        if (label == null)
+            mDatabase.child(fullPath).push().setValue(ob);
+        else
+            mDatabase.child(fullPath).child(label).push().setValue(ob);
+    }
+
     private String joinLabels(List<String> labels) throws InvalidDataLabelException {
         StringBuilder labelsSb = new StringBuilder();
         String deliminator = "";
@@ -93,16 +120,18 @@ public class TableWriter {
         return labelsSb.toString();
     }
 
-    public void IncLoginCount(final String path, final MyCallback callback) throws InvalidDataLabelException{
-        //final String fullPath = joinLabels(path);
+    public void Increment(final List<String> path, final String path2, final MyCallback callback) throws InvalidDataLabelException{
+        String fullPath = joinLabels(path) + path2;
 
-        final DatabaseReference ref = mDatabase.child(path);
+        Log.i("FUCKO", "Increment: " + fullPath);
+
+        final DatabaseReference ref = mDatabase.child(fullPath);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                int count = dataSnapshot.child("/User Stats/login count").getValue(Integer.class);
-                ref.child("/User Stats/login count").setValue(++count);
+                int count = dataSnapshot.getValue(Integer.class);
+                ref.setValue(++count);
 
                 callback.StatsChanged(count);
             }

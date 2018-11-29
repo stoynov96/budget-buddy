@@ -197,8 +197,15 @@ public class TableReader {
                 if (!dataSnapshot.exists()) { // user not in the DB, create a new one
                     Map<String, Object> newUser = new HashMap<>();
                     Map<String, Object> userData = new HashMap<>();
+                    Map<String, Object> userStats = new HashMap<>();
+
+                    // Temp location for user stats
+                    userStats.put("login count", 0);
+
                     newUser.put(userID, userData);
                     userData.put("Suggested Spending Amount", 0);   // this should be moved to user parameters at some point
+
+                    userData.put("User Stats", userStats); // should be moved as well
 
                     mDatabase.child(path).child(userID).setValue(userData);
                     // if the user is not in the database, then jump to the UserProfileActivity so they can create their budget
