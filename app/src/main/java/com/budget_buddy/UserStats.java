@@ -13,16 +13,13 @@ import java.util.Map;
 
 public class UserStats implements DataNode {
 
-    private final String userPath;
-    private final TableWriter tableWriter;
     public MyCallback statCallBack;
 
     // Counters
     public int loginCount;
     public int purchaseCount;
 
-
-
+    // Tags to set path
     enum Counters {
         LOGIN_COUNT, PURCHASE_COUNT
     }
@@ -32,10 +29,9 @@ public class UserStats implements DataNode {
     }
 
     // Constructor
-    UserStats(final String uid) {
-        tableWriter = new TableWriter();
+    UserStats() {
         loginCount = 0;
-        userPath = "Users/" + uid + "/User Stats/";
+        purchaseCount = 0;
     }
 
     @Override
@@ -57,8 +53,7 @@ public class UserStats implements DataNode {
     }
 
     private void checkProgressEXP(BBUser currentUser) {
-        Log.i("FUCK", "checkProgressEXP: IT WORKED");
-        // TODO move FINISH
+        //Log.i("FUCK", "checkProgressEXP: IT WORKED");
         switch (purchaseCount) {
             case 1:
                 currentUser.IncBudgetScore(100);
@@ -74,14 +69,10 @@ public class UserStats implements DataNode {
 
     private void checkLoginEXP(BBUser currentUser){
         //Log.i("FUCK", "checkLoginEXP: IT WORKED");
-        // Daily exp check
-
-
         // Lifetime exp check
         switch (loginCount) {
             case 1:
                 new BBToast(currentUser.currentContext, "First Login!", 100,Gravity.TOP);
-
                 currentUser.IncBudgetScore(100);
                 break;
             case 5:
@@ -90,10 +81,12 @@ public class UserStats implements DataNode {
             default:
                 break;
         }
-
-
     }
 
+    /***
+     * Creates and sets a callback in regards to keeping track of logins
+     * @param user holds reference for callback
+     ***/
     public void loginCountCallBack(final BBUser user){
         MyCallback statsChanged = new MyCallback() {
             @Override
@@ -130,6 +123,10 @@ public class UserStats implements DataNode {
         statCallBack =  statsChanged;
     }
 
+    /***
+     * Creates and sets a callback in regards to keeping track of purchases
+     * @param user holds reference for callback
+     ***/
     public void purchaseCountCallBack(final BBUser user){
         MyCallback statsChanged = new MyCallback() {
             @Override
@@ -138,8 +135,7 @@ public class UserStats implements DataNode {
 
             @Override
             public void OnCallback(HashMap<String, Object> map) {
-                // do first purchase check here?
-
+                checkFirstPurchaseDaily(map, user);
             }
 
             @Override
@@ -168,9 +164,11 @@ public class UserStats implements DataNode {
         statCallBack =  statsChanged;
     }
 
-    private void checkFirstPurchaseDaily(HashMap<String, Object> map) {
-        if (map.isEmpty()) {
-
+    private void checkFirstPurchaseDaily(HashMap<String, Object> map, BBUser currentUser) {
+        //Log.i("FUCK", "checkFirstPurchaseDaily: " + map.size());
+        if (map.size() == 1) {
+            new BBToast(currentUser.currentContext, "First Purchase of the Day!", 100,Gravity.TOP);
+            currentUser.IncBudgetScore(100);
         }
     }
 

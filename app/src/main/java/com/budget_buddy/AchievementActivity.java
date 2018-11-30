@@ -20,9 +20,10 @@ public class AchievementActivity extends AppCompatActivity {
     BBUser currentUser = BBUser.GetInstance();
 
 
-    // Dailies
+    // Dailies ??? probs dont really need?
+    boolean FirstDailyPurchase = false;
 
-    // Milestone Achievements
+    // Milestone Achievements ???
     boolean FirstLogin = false;
     boolean FifthLogin = false;
     boolean TenthLogin = false;
@@ -31,26 +32,19 @@ public class AchievementActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_achievements);
-
         setUpDrawer();
+        checkAchievements();
 
     }
 
-    /*
-    AchievementActivity - Nice way to handle collections besides shoving it in a class?
-     - set the thing to the alpha channel to insure stuff
-     - a collection of private achievements
-        - has a property: public boolean GET ~ if already gotten
-     - a function to check the collection
-        - has a property of when to check it based on what activity we are in
-     */
 
     public void checkAchievements(){
         int loginCount = currentUser.userStats.loginCount;
         switch (loginCount) {
             case 10:
                 TenthLogin = true;
-                // TODO stuff to display achievement
+                // TODO stuff to display achievement ~ set button image spot not greyed out?
+                // TODO also make pretty achievement icons
             case 5:
                 FifthLogin = true;
             case 1:
@@ -94,7 +88,6 @@ public class AchievementActivity extends AppCompatActivity {
                                 // TODO: Other navigation items
                                 break;
                         }
-
                         return true;
                     }
                 });

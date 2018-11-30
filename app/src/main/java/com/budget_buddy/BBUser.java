@@ -87,7 +87,7 @@ class BBUser implements DataNode {
     public void Initialize(final MyCallback newUserCallback) throws InvalidDataLabelException {
         user = authentication.getCurrentUser();
         if(user != null) {
-            userStats = new UserStats(user.getUid());
+            userStats = new UserStats();
             userName = user.getDisplayName();
             tableReader.CheckForExistingUser(userPath.get(0), user.getUid(), userName, newUserCallback);
             // TODO: Add other initialization here as appropriate
@@ -342,6 +342,7 @@ class BBUser implements DataNode {
         // Add custom logic here to be executed when user data changes
         // as a result of a database read
         // Do not add anything if this is expected to be overridden
+
         if (userInterfaceCallback != null) {
             userInterfaceCallback.OnProfileSet();
         }
@@ -368,8 +369,12 @@ class BBUser implements DataNode {
         }};
     }
 
-    // Increments stats
+    /***
+     * Increments User Stat that corresponds to statToInc and handles callback
+     * @param statToInc tag that corresponds to stat needed to be incremented
+     ***/
     public void IncStat(UserStats.Counters statToInc) throws  InvalidDataLabelException {
+        // Set path to stat
         String path = "";
         switch (statToInc) {
             case LOGIN_COUNT:
@@ -382,12 +387,14 @@ class BBUser implements DataNode {
                 break;
             default:
                 Log.e("UserStats", "Increment: invalid stat to increase!");
-
         }
-
         tableWriter.Increment(userPath, "/" + user.getUid() + "/User Stats/" + path, userStats.statCallBack);
     }
 
+    /***
+     * Increments BBUser's Score based on exp amount
+     * @param exp amount of experience to increase by
+     ***/
     public void IncBudgetScore(long exp){
         try {
             tableWriter.IncrementBy( (int)exp, userPath, "/" + user.getUid() + "/User Parameters/Budget Score", new MyCallback() {
@@ -429,29 +436,24 @@ class BBUser implements DataNode {
 
     private void setBudgetScore(long score){
         this.budgetScore = score;
-        //Log.i("FUCK", "setBudgetScore: IN");
     }
 
     public void CheckDailies(UserStats.Dailies dailyToCheck){
         String path = "";
         switch (dailyToCheck) {
             case FIRST_PURCHASE:
-                path = "login count";
-                // TODO OVER HERE DOOD
-                //DateTimePatternGenerator dtf = DateTimePatternGenerator.g
-                //java.time.LocalDate.
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                path = sdf.format(new Date());
+                //Log.i("FUCK", "CheckDailies: " + path + "/");
                 userStats.purchaseCountCallBack(this);
                 break;
             default:
                 Log.e("UserStats", "Increment: invalid stat to increase!");
-
         }
-
         try {
-            tableReader.singleRead(userPath, "/" + user.getUid() + "/" + path, userStats.statCallBack);
+            tableReader.singleRead(userPath, "/" + user.getUid() + "/Purchases/" + path, userStats.statCallBack);
         } catch (InvalidDataLabelException e1) {
             Log.d("Parse error", e1.toString());
         }
-        //tableWriter.Increment(userPath, "/" + user.getUid() + "/User Stats/" + path, userStats.statCallBack);
     }
 }

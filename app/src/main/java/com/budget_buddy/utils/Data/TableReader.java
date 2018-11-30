@@ -233,9 +233,17 @@ public class TableReader {
     }
 
 
-
+    /**
+     * This function checks if the user is already in the database or not. If not, it creates a new
+     * user and gives it some data points with initial values of -1.
+     * @param path The pathname to Users in the database
+     * @param path2 The path to lead to the specified path in the database
+     * @param  callback A callback object to return the retrieved data
+     */
     public void singleRead(final List<String> path, final String path2, final MyCallback callback) throws InvalidDataLabelException {
         String fullPath = joinLabels(path) + path2;
+
+        //Log.i("FUCK", "singleRead: " + fullPath);
 
         final DatabaseReference ref = mDatabase.child(fullPath);
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -247,14 +255,13 @@ public class TableReader {
                 // Get snapshot needed
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     map.put(snapshot.getKey(), snapshot.getValue());
+                    //Log.i("FUCK", "String: " + snapshot.getKey());
+                    //Log.i("FUCK", "Val: " + snapshot.getValue());
                 }
-
                 callback.OnCallback(map);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }
