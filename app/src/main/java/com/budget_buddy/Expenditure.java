@@ -18,13 +18,16 @@ public class Expenditure implements DataNode {
     String amount;
     // Purchase note
     String note;
+    // Purchase type
+    String type;
 
     // Constructor
-    Expenditure(String newName, String newDate, String newAmount, String newNote) {
-        name=newName;
-        date=newDate;
-        amount=newAmount;
-        note=newNote;
+    Expenditure(String newName, String newDate, String newAmount, String newNote, String newType) {
+        name = newName;
+        date = newDate;
+        amount = newAmount;
+        note = newNote;
+        type = newType;
     }
 
     // Currently unused since I can't return an Expenditure from Firebase. Self-explanatory.
@@ -32,6 +35,7 @@ public class Expenditure implements DataNode {
     public String GetDate() {return date;}
     public String GetAmount() {return amount;}
     public String GetNote() {return note;}
+    public String GetType() {return type;}
 
     @Override
     public Map<String, Object> ToMap() {
@@ -40,7 +44,7 @@ public class Expenditure implements DataNode {
         map.put("date", date);
         map.put("name", name);
         map.put("note", note);
-
+        map.put("type", type);
         return map;
     }
 
@@ -50,6 +54,7 @@ public class Expenditure implements DataNode {
         date = (String)map.get("date");
         amount = (String)map.get("amount");
         note = (String)map.get("note");
+        type = (String)map.get("type");
     }
 
     @Override

@@ -19,6 +19,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,13 +50,23 @@ class BBUser implements DataNode {
     // Current score of the user (NYI)
     private long budgetScore = 0;
     // Monthly Savings Goal (this is how much the user hopes to save throughout the month)
-    private double savingsGoal = 0;
+    private long savingsGoal = 0;
     // Rent (in dollars, should we worry about cents at all?)
-    private double rent = 0;
+    private long rent = 0;
     // other expenses (maybe we should store as an array but simpler as a lump sum)
-    private double otherExpenses = 0;
+    private long otherExpenses = 0;
     // Primary income
-    private double primaryIncome = 0;
+    private long primaryIncome = 0;
+    // Total spent in past month
+    private long totalSpentPastMonth = 0;
+    // used to keep of how many days the user has been entering purchases, max 30
+    private long totalDaysBudgeted = 1; // sort of a hack to get meaningful averages
+    // progress towards savings goal
+    private long savingsGoalProgress = 0;
+    // Array of categories for purchases
+    private HashMap<String, String> spendingCategories;
+    // HashMap of purchases
+    private HashMap<String, ArrayList<Expenditure>> purchases = new HashMap<>();
     // Other income
     // Suggested daily spending amount
     // ( primaryIncome + otherIncome - rent - otherExpenses) / daysInMonthOfSavingsGoal
@@ -63,6 +74,14 @@ class BBUser implements DataNode {
     // holds callbacks relevant to the UI, triggered on data loads
     private MyCallback userInterfaceCallback;
     private List<MyCallback> UICallbacks = new ArrayList<>();
+    static private String BUDGET_LEVEL_KEY = "Budget Level";
+    static private String BUDGET_SCORE_KEY = "Budget Score";
+    static private String SAVINGS_GOAL_KEY = "Savings Goal";
+    static private String RENT_KEY = "Rent";
+    static private String OTHER_EXPENSES_KEY = "Other Expenses";
+    static private String PRIMARY_INCOME_KEY = "Primary Income";
+    static private String USERNAME_KEY = "User Name";
+    static private String SPENDING_CATEGORIES = "Spending Categories";
 
     // Stats TODO Actually make achievement system - do this Kevin
     public UserStats userStats;
@@ -121,20 +140,54 @@ class BBUser implements DataNode {
         return this.budgetScore;
     }
     public double getSavingsGoal() {
-        return savingsGoal;
+        return (new Long(savingsGoal).doubleValue() / 100.0);
     }
-    public double getRent() {
-        return rent;
-    }
+    public double getRent() { return (new Long(rent).doubleValue() / 100.0); }
     public double getOtherExpenses() {
-        return otherExpenses;
+        return (new Long(otherExpenses).doubleValue() / 100.0);
     }
     public double getPrimaryIncome() {
-        return primaryIncome;
+        return (new Long(primaryIncome).doubleValue()) / 100.0;
+    }
+    public HashMap<String, String> GetSpendingCategories() {
+        return this.spendingCategories;
     }
 
-    public long getSuggestedSpendingAmount() {
-        return suggestedSpendingAmount;
+    public void AddToSpendingCategories(String key, String value) {
+        this.spendingCategories.put(key, value);
+        try {
+            UpdateUserParameters();
+        }
+        catch (InvalidDataLabelException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void UpdateUserParameters() throws InvalidDataLabelException {
+        tableWriter.SetData(userPath, "/" + user.getUid() + "/User Parameters/", this);
+    }
+
+    public void SetSpendingCategories(HashMap<String, String> newCategories) {
+        this.spendingCategories = newCategories;
+    }
+
+    public void setBudgetLevel(long l) { budgetLevel = l; }
+    public void setBudgetScore(long s) { budgetScore = s; }
+    public void setSavingsGoal(double g) { savingsGoal = (new Double(g * 100.0).longValue()); }
+    public void setRent(double r) { rent = (new Double(r * 100.0).longValue()); }
+    public void setOtherExpenses(double o) { otherExpenses = (new Double(o * 100.0).longValue()); }
+    public void setPrimaryIncome(double p) { primaryIncome = (new Double(p * 100.0).longValue()); }
+
+
+    /**
+     * This function computes the suggestedSpendingAmount and then returns the result divided by 30,
+     * the number of days in a month. I don't know how else to calculate this.
+     * @return
+     */
+    public float GetSuggestedDailySpendingAmount() {
+        suggestedSpendingAmount = (primaryIncome - rent - otherExpenses - savingsGoal);
+        // converted between floats and longs is becoming a hacky mess :(
+        return new Long(suggestedSpendingAmount).floatValue() / 100 / 30;
     }
 
     public boolean updateSavingsGoal(int newGoal) {
@@ -162,17 +215,136 @@ class BBUser implements DataNode {
      * @param note Any optional note the user enters for the purchase.
      * @throws InvalidDataLabelException thrown if userpath contains invalid label.
      */
-    public void WriteNewExpenditure(String name, String date, String amount, String note) throws InvalidDataLabelException {
+    public void WriteNewExpenditure(String name, String date, String amount, String note, String type) throws InvalidDataLabelException {
         DateFormat inputFormat = new SimpleDateFormat("MMM dd, yyyy");
         DateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Date oldDate = inputFormat.parse(date);
             String formattedDate = outputFormat.format(oldDate);
-            Expenditure expenditure = new Expenditure(name, formattedDate, amount, note);
+            Expenditure expenditure = new Expenditure(name, formattedDate, amount, note, type);
             tableWriter.WriteData(userPath, expenditure, "/"+user.getUid()+"/Purchases/"+formattedDate);}
         catch (ParseException e1) {
             Log.d("Parse error", e1.toString());
         }
+    }
+
+    /**
+     * This function computes the average for the past month or the earliest day the user started budgeting.
+     * @return
+     */
+    public float GetAveMonthSpent() {
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        long runningTotal = 0L;
+        for (long i = 0; i < 30; i++) {
+            LocalDate date = LocalDate.now().minusDays(i);
+            String dateStr = date.format(dateFormat);
+
+            ArrayList<Expenditure> expenditures = purchases.get(dateStr);
+            float dayTotal = 0.0f;
+            if(expenditures != null) {
+                for(Expenditure e: expenditures) {
+                    dayTotal += (new Float(e.amount).floatValue());
+                }
+                runningTotal += new Float(dayTotal*100).longValue();
+                if(i + 1 > totalDaysBudgeted) {
+                    totalDaysBudgeted = i + 1;
+                }
+            }
+        }
+
+        totalSpentPastMonth = runningTotal;
+        return new Float(runningTotal).floatValue() / 100 / totalDaysBudgeted;
+    }
+
+    /**
+     * Computes the goal progress by taking the suggested spending allowance and subtracting the amount spent in a day.
+     * Going over the spending allowance reduces the progress, while going under increases the progress.
+     * Starts calculating from the first day the user started budgeting, but at most 30 days back.
+     * @return
+     */
+    public float GetGoalProgress() {
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        float progress = 0f;
+
+        for(long i = 0;i<totalDaysBudgeted;i++) {
+            LocalDate date = LocalDate.now().minusDays(i);
+            String dateStr = date.format(dateFormat);
+
+            ArrayList<Expenditure> expenditures = purchases.get(dateStr);
+            if(expenditures != null) {
+                float totalForDay = 0f;
+                for(Expenditure e: expenditures) {
+                    totalForDay += (new Float(e.amount).floatValue());
+                }
+                // if the user goes above the average, increase the progress
+                // if user goes below, decrease the progress
+                progress += GetSuggestedDailySpendingAmount() - totalForDay;
+            } else {
+                progress += GetSuggestedDailySpendingAmount();
+            }
+        }
+
+        savingsGoalProgress = new Float(progress * 100).longValue();
+        return progress;
+    }
+
+    /**
+     * This function populates the purchases hash table with lists of purchases for each day.
+     * The purchases has table is indexed with date strings with format "yyyy-MM-dd"
+     * @param userInterfaceCallback
+     */
+    public void AcquireAllPurchases(final MyCallback userInterfaceCallback) {
+        user = authentication.getInstance().getCurrentUser();
+        String path = userPath.get(0) + "/" + user.getUid() + "/";
+
+        MyCallback purchaseCallback = new MyCallback() {
+            @Override
+            public void OnCallback(float[] weeklySpending) {
+
+            }
+
+            @Override
+            public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
+
+            @Override
+            public void OnCallback(HashMap<String, Object> map) {
+                Iterator iterator = map.entrySet().iterator();
+
+                purchases.clear();
+                while (iterator.hasNext()) {
+                    Map.Entry pair = (Map.Entry)iterator.next();
+                    HashMap<String, Object> expenditureMap = (HashMap<String, Object>)pair.getValue();
+                    Expenditure expenditure = new Expenditure("","","","", "");
+                    expenditure.GetFromMap(expenditureMap);
+                    ArrayList<Expenditure> purchaseList = purchases.get(expenditure.GetDate());
+                    if (purchaseList == null) {
+                        purchaseList = new ArrayList<>();
+                    }
+                    purchaseList.add(expenditure);
+                    purchases.put(expenditure.GetDate(), purchaseList);
+                }
+
+                userInterfaceCallback.OnPurchases(purchases);
+
+            }
+
+            @Override
+            public void OnProfileSet() {
+
+            }
+
+            @Override
+            public void CreateNewUser() {
+
+            }
+
+            @Override
+            public void UserExists() {
+
+            }
+        };
+
+        tableReader.WeeklyExpenditures(path, purchaseCallback);
     }
 
     /**
@@ -227,7 +399,7 @@ class BBUser implements DataNode {
             public void OnCallback(HashMap<String, Object> map) {
                 Iterator iterator = map.entrySet().iterator();
                 float [] expenditures = {0, 0, 0, 0, 0, 0, 0};
-                Expenditure expenditure = new Expenditure("","","","");
+                Expenditure expenditure = new Expenditure("","","","", "");
 
                 while (iterator.hasNext()) {
                     Map.Entry pair = (Map.Entry)iterator.next();
@@ -243,6 +415,9 @@ class BBUser implements DataNode {
                 callback.OnCallback(expenditures);
 
             }
+
+            @Override
+            public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
 
             @Override
             public void OnCallback(float [] expenditures) {
@@ -281,44 +456,44 @@ class BBUser implements DataNode {
         tableReader.Latch(latchPath, this);
     }
 
-
     @Override
     public Map<String, Object> ToMap() {
         return new HashMap<String, Object>() {{
-            put("Budget Level", budgetLevel);
-            put("Budget Score", budgetScore);
-            put("Savings Goal", savingsGoal);
-            put("Rent", rent);
-            put("Other Expenses", otherExpenses);
-            put("Primary Income", primaryIncome);
-            put("User Name", GetUser().getDisplayName());
-
-            //put("Login Count", loginCount);
-
+            put(BUDGET_LEVEL_KEY, budgetLevel);
+            put(BUDGET_SCORE_KEY, budgetScore);
+            put(SAVINGS_GOAL_KEY, savingsGoal);
+            put(RENT_KEY, rent);
+            put(OTHER_EXPENSES_KEY, otherExpenses);
+            put(PRIMARY_INCOME_KEY, primaryIncome);
+            put(USERNAME_KEY, GetUser().getDisplayName());
+            put(SPENDING_CATEGORIES, spendingCategories);
             // suggestedSpending should probably be calculated on the spot
         }};
     }
 
     @Override
     public void GetFromMap(Map<String, Object> map) {
-        Object temp = map.get("Budget Level");
+        if(map == null) {
+            return;
+        }
+        Object temp = map.get(BUDGET_LEVEL_KEY);
         budgetLevel = temp != null ? (long) temp : budgetLevel;
-        temp = map.get("Budget Score");
+        temp = map.get(BUDGET_SCORE_KEY);
         budgetScore = temp != null ? (long) temp : budgetScore;
-        temp = map.get("Monthly Savings Goal");
-        savingsGoal = temp != null ? (double) temp : savingsGoal;
-        temp = map.get("Rent");
+        temp = map.get(SAVINGS_GOAL_KEY);
+        savingsGoal = temp != null ? (long) temp : savingsGoal;
 
         // Workaround for odd bug where rent from DB is of type Long?
-        temp = temp instanceof Long ? ((Long)temp).doubleValue() : temp;
+        //temp = temp instanceof Long ? ((Long)temp).doubleValue() : temp;
 
-        rent = temp != null ? (double) temp : rent;
-        temp = map.get("Other Monthly Expenses");
-        otherExpenses = temp != null ? (double) temp : otherExpenses;
-        temp = map.get("Monthly Income");
-        primaryIncome = temp != null ? (double) temp : primaryIncome;
-
-
+        temp = map.get(RENT_KEY);
+        rent = temp != null ? (long) temp : rent;
+        temp = map.get(OTHER_EXPENSES_KEY);
+        otherExpenses = temp != null ? (long) temp : otherExpenses;
+        temp = map.get(PRIMARY_INCOME_KEY);
+        primaryIncome = temp != null ? (long) temp : primaryIncome;
+        temp = map.get(SPENDING_CATEGORIES);
+        spendingCategories = temp != null ? (HashMap<String, String>) temp : spendingCategories;
         //userInterfaceCallback.OnProfileSet();
         for(MyCallback callback: UICallbacks) {
             callback.OnProfileSet();
