@@ -1,13 +1,11 @@
 package com.budget_buddy;
 
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.budget_buddy.exception.InvalidDataLabelException;
@@ -34,6 +32,8 @@ public class Login extends AppCompatActivity {
     private BBUser currentUser;
     private ProgressBar wheel;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +54,9 @@ public class Login extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         currentUser = BBUser.GetInstance();
+        currentUser.currentContext = getApplicationContext();
+
+        //currentUser.setStatsChangedCallback(new UserStats().loginCount(currentUser));
 
         fromDashboard();
         checkLoggedIn();
@@ -119,7 +122,10 @@ public class Login extends AppCompatActivity {
 
                             @Override
                             public void OnCallback(HashMap<String, Object> map) {
-
+                                // Pull data from db and set to existing user
+                                currentUser.GetFromMap(map);
+                                //Log.i("FUCK", "UserExists: " + currentUser.getBudgetScore());
+                                gotoDashboard(currentUser);
                             }
 
                             @Override
@@ -134,7 +140,12 @@ public class Login extends AppCompatActivity {
 
                             @Override
                             public void UserExists() {
-                                gotoDashboard(currentUser);
+
+                            }
+
+                            @Override
+                            public void OnIncrement(int value) {
+
                             }
                         };
                         currentUser.Initialize(newUserCallback);
@@ -155,6 +166,7 @@ public class Login extends AppCompatActivity {
     private void gotoNewUser(BBUser user) {
         if (user.GetUser() != null) {
             Intent newUserIntent = new Intent(this, UserProfileActivity.class);
+            newUserIntent.putExtra("login", true);
             closeProgressWheel();
             startActivityForResult(newUserIntent, PROFILE_CREATION);
         }
@@ -162,6 +174,14 @@ public class Login extends AppCompatActivity {
 
     private void gotoDashboard(BBUser user) {
         if (user.GetUser() != null) {
+
+            // AchievementCheck - Login
+            try {
+                currentUser.IncStat(UserStats.Counters.LOGIN_COUNT);
+            } catch (InvalidDataLabelException e) {
+                Log.i("Error", "" + e);
+            }
+
             Intent dashboardIntent = new Intent(this, Dashboard.class);
             closeProgressWheel();
             startActivity(dashboardIntent);
@@ -218,6 +238,4 @@ public class Login extends AppCompatActivity {
         // do nothing - prevent going back to dashboard if logged out
         return;
     }
-
-
 }

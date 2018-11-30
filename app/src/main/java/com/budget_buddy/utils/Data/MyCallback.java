@@ -44,4 +44,10 @@ public interface MyCallback {
      * dashboard instead of account creation.
      */
     void UserExists();
+
+    /** This function is called in TableWriter after incrementing a single data piece from Firebase.
+     * Returns a int of the newly incremented data piece.
+     * @param value The incremented value from Firebase.
+     */
+    void OnIncrement(int value);
 }

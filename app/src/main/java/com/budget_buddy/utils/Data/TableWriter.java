@@ -1,16 +1,19 @@
 package com.budget_buddy.utils.Data;
 
 import android.support.annotation.NonNull;
-import com.budget_buddy.Expenditure;
+
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TableWriter {
 
@@ -86,5 +89,48 @@ public class TableWriter {
             labelsSb.append(label);
         }
         return labelsSb.toString();
+    }
+
+    public void Increment(final List<String> path, final String path2, final MyCallback callback) throws InvalidDataLabelException{
+        String fullPath = joinLabels(path) + path2;
+
+        final DatabaseReference ref = mDatabase.child(fullPath);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int count = dataSnapshot.getValue(Integer.class);
+                count++;
+                callback.OnIncrement(count); // increment before write to db
+                ref.setValue(count);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void IncrementBy(final int amount, final List<String> path, final String path2, final MyCallback callback) throws InvalidDataLabelException {
+        String fullPath = joinLabels(path) + path2;
+
+        final DatabaseReference ref = mDatabase.child(fullPath);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //HashMap<String, Object>  map = new HashMap<>();
+                int count = dataSnapshot.getValue(Integer.class);
+                count += amount;
+                callback.OnIncrement(count); // increment before write to db
+                ref.setValue(count);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

@@ -9,17 +9,20 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import com.budget_buddy.exception.InvalidDataLabelException;
+import com.budget_buddy.components.CurrencyEditTextFragment;
+import com.budget_buddy.utils.Data.MyCallback;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-
 import com.budget_buddy.components.CurrencyEditTextFragment;
 import com.budget_buddy.utils.Data.MyCallback;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,6 +79,9 @@ public class UserProfileActivity extends AppCompatActivity {
             Log.i("Error", "" + e);
         }
 
+        fromLogin();
+        //Intent dashboardIntent = new Intent(this, Dashboard.class);
+        //startActivity(dashboardIntent);
         finish();
     }
 
@@ -125,6 +131,11 @@ public class UserProfileActivity extends AppCompatActivity {
             rentField.setText("$" + (rent == -1 ? "0.00" : rent));
             otherMonthlyExpensesField.setText("$" + (otherMonthlyExpenses == -1 ? "0.00" : otherMonthlyExpenses));
             monthlySavingsGoalField.setText("$" + (monthlySavingsGoal == -1 ? "0.00" : monthlySavingsGoal));
+
+            monthlyIncomeField.validate();
+            rentField.validate();
+            otherMonthlyExpensesField.validate();
+            monthlySavingsGoalField.validate();
         }
 
         @Override
@@ -136,5 +147,22 @@ public class UserProfileActivity extends AppCompatActivity {
         public void UserExists() {
 
         }
+
+        @Override
+        public void OnIncrement(int value) {
+
+        }
     };
+
+    private void fromLogin(){
+        // Check if we are coming from login activity
+        Bundle extras = getIntent().getExtras();
+        if(extras != null && extras.getBoolean("login", false)){
+            try {
+                currentUser.IncStat(UserStats.Counters.LOGIN_COUNT);
+            } catch (InvalidDataLabelException e) {
+                Log.i("Error", "" + e);
+            }
+        }
+    }
 }

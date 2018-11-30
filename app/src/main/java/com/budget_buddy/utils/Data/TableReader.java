@@ -198,21 +198,71 @@ public class TableReader {
                 if (!dataSnapshot.exists()) { // user not in the DB, create a new one
                     Map<String, Object> newUser = new HashMap<>();
                     Map<String, Object> userData = new HashMap<>();
+                    Map<String, Object> userStats = new HashMap<>();
+
+                    // Temp location for user stats
+                    userStats.put("login count", 0);
+                    userStats.put("purchase count", 0);
+
                     newUser.put(userID, userData);
                     userData.put("Suggested Spending Amount", 0);   // this should be moved to user parameters at some point
+
+                    userData.put("User Stats", userStats); // should be moved as well
 
                     mDatabase.child(path).child(userID).setValue(userData);
                     // if the user is not in the database, then jump to the UserProfileActivity so they can create their budget
                     newUserCallback.CreateNewUser();
                 }
                 else {
-                    newUserCallback.UserExists();
+                    //Log.i("FUCK", "THE PATH: " + dataSnapshot.getKey());
+                    HashMap<String, Object> userParameters = new HashMap<>();
+                    // Pull data from DB to set to our BBUser singleton on start up
+
+                    for(DataSnapshot snapshot : dataSnapshot.child(userID).child("User Parameters").getChildren()) {
+                        userParameters.put(snapshot.getKey(), snapshot.getValue());
+                    }
+
+                    newUserCallback.OnCallback(userParameters);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+    }
+
+
+    /**
+     * This function checks if the user is already in the database or not. If not, it creates a new
+     * user and gives it some data points with initial values of -1.
+     * @param path The pathname to Users in the database
+     * @param path2 The path to lead to the specified path in the database
+     * @param  callback A callback object to return the retrieved data
+     */
+    public void singleRead(final List<String> path, final String path2, final MyCallback callback) throws InvalidDataLabelException {
+        String fullPath = joinLabels(path) + path2;
+
+        //Log.i("FUCK", "singleRead: " + fullPath);
+
+        final DatabaseReference ref = mDatabase.child(fullPath);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HashMap<String, Object> map = new HashMap<>();
+
+                // Get snapshot needed
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    map.put(snapshot.getKey(), snapshot.getValue());
+                    //Log.i("FUCK", "String: " + snapshot.getKey());
+                    //Log.i("FUCK", "Val: " + snapshot.getValue());
+                }
+                callback.OnCallback(map);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
     }
