@@ -383,8 +383,9 @@ public class PhotoEntry extends AppCompatActivity {
              */
             @Override
             public void onSuccess(FirebaseVisionText firebaseVisionText) {
-                // pattern used for finding a correct price. format is: any number of digits followed by . followed by exactly two digits.
-                Pattern validPrice = Pattern.compile("^$?\\d+\\.\\d\\d");
+                // pattern used for finding a correct price. format is: optional $, any number of digits followed by . followed by exactly two digits.
+                // format was changed to check for if the above is included in a substring
+                Pattern validPrice = Pattern.compile(".*$?\\d+\\.\\d\\d.*");
                 ArrayList<String> options = new ArrayList<>();
 
                 // synchronizing mGraphicOverlay ensures that this section cannot run concurrently, this prevents a race condition
@@ -430,7 +431,6 @@ public class PhotoEntry extends AppCompatActivity {
                                             previewSession.stopRepeating();
                                             mImageReader.close();
                                             Intent manualEntryIntent = new Intent(This, ManualEntry.class);
-                                            manualEntryIntent.putExtra("price", word);
                                             manualEntryIntent.putStringArrayListExtra("options", options);
                                             startActivity(manualEntryIntent);
                                             return;

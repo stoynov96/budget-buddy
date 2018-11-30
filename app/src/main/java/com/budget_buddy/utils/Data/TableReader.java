@@ -51,6 +51,7 @@ public class TableReader {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Map<String, Object> map = (Map)dataSnapshot.getValue();
                 if (map != null) {
+                    map = (Map<String, Object>) map.get("User Parameters");
                     data.GetFromMap(map);
                     data.OnDataChange();
                 }

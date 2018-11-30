@@ -1,6 +1,7 @@
 package com.budget_buddy;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -9,6 +10,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -24,12 +26,19 @@ import com.budget_buddy.charts.SpendingChart;
 import com.budget_buddy.utils.Data.MyCallback;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.charts.BarChart;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,12 +50,12 @@ public class Dashboard extends AppCompatActivity {
     TextView experienceProgressText;
     ExperienceBarAnimation experienceBarAnimation;
 
-    HorizontalBarChart progressBar;
-    BarChart chart;
+    GoalProgressBar progressBar;
     SpendingChart spendingChart;
     final List<BarEntry> entries = new ArrayList<BarEntry>();
     TextView progressBarDescription;
 	DrawerLayout drawerLayout;
+	Dashboard This = this; // a hack to reference this in the callback class, java's the best
 
     // Here's a more permanent home for the callback
     MyCallback callback = new MyCallback() {
@@ -58,6 +67,52 @@ public class Dashboard extends AppCompatActivity {
                 entries.add(new BarEntry(i, weeklySpending[6-i]));
             }
             spendingChart.setEntries(entries);
+        }
+
+        @Override
+        public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) {
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            spendingChart.clear();
+            entries.clear();
+            for (long i = 0; i < 7; i++) {
+                LocalDate date = LocalDate.now().minusDays(i);
+                String dateStr = date.format(dateFormat);
+
+                ArrayList<Expenditure> expenditures = purchases.get(dateStr);
+                float dayTotal = 0.0f;
+                if(expenditures != null) {
+                    for(Expenditure e: expenditures) {
+                        dayTotal += (new Float(e.amount).floatValue());
+                    }
+                }
+                BarEntry entry = new BarEntry(6 - i, dayTotal);
+
+                entries.add(entry);
+            }
+            spendingChart.setEntries(entries);
+
+            LimitLine aveLine = new LimitLine(currentUser.GetAveMonthSpent());
+            aveLine.setLineColor(getResources().getColor(R.color.colorAccent, This.getTheme()));
+            aveLine.setLineWidth(1f);
+            aveLine.setTextSize(12f);
+            aveLine.setTextColor(Color.BLACK);
+
+            spendingChart.getAxisLeft().removeAllLimitLines();
+            spendingChart.getAxisLeft().addLimitLine(aveLine);
+
+            progressBar.setGoal((int)currentUser.getSavingsGoal());
+            int progress = (int)currentUser.GetGoalProgress();
+            if (progress > 0)
+                progressBar.setProgress(progress,  This);
+            else
+                progressBar.setProgress(0, This);
+            if((int) currentUser.getSavingsGoal() - progress > 0)
+                progressBarDescription.setText(This.getString(R.string.goal, (int)currentUser.getSavingsGoal() - progress));
+
+            TextView suggestedSpendingText = findViewById(R.id.suggested_spending_text);
+            TextView averageSpendingText = findViewById(R.id.average_spending_text);
+            suggestedSpendingText.setText(This.getString(R.string.suggested_spending,(int) currentUser.GetSuggestedDailySpendingAmount()));
+            averageSpendingText.setText(This.getString(R.string.average,(int) currentUser.GetAveMonthSpent()));
         }
 
         @Override
@@ -97,6 +152,10 @@ public class Dashboard extends AppCompatActivity {
         setupExperienceBar();
         addChart();
         addProgressBar();
+        TextView suggestedSpendingText = findViewById(R.id.suggested_spending_text);
+        TextView averageSpendingText = findViewById(R.id.average_spending_text);
+        suggestedSpendingText.setText("");
+        averageSpendingText.setText("");
     }
 
     private void setupExperienceBar() {
@@ -144,9 +203,9 @@ public class Dashboard extends AppCompatActivity {
         // create description view
         progressBarDescription = new TextView(this);
         progressBarDescription.setId(R.id.progress_bar_description);
-        progressBarDescription.setText(this.getString(R.string.goal, 300 - 235));
+        progressBarDescription.setText(this.getString(R.string.goal, 0));
 
-        GoalProgressBar progressBar = new GoalProgressBar(this);
+        progressBar = new GoalProgressBar(this);
         progressBar.setId(R.id.progress_bar_view);
 
         ConstraintLayout cl = findViewById(R.id.dataBreakdownLayout);
@@ -166,22 +225,9 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.connect(progressBarDescription.getId(), ConstraintSet.BOTTOM, progressBar.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
-        List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, 235));
-        BarDataSet barDataSet = new BarDataSet(entries, "");
+        //progressBar.setProgress(200, this);
 
-        // set colors
-        barDataSet.setColor(getResources().getColor(R.color.colorPrimary, this.getTheme()));
-        barDataSet.setBarBorderColor(getResources().getColor(R.color.colorPrimaryDark, this.getTheme()));
-        barDataSet.setBarBorderWidth(2.5f);
-
-        BarData barData = new BarData(barDataSet);
-        barData.setDrawValues(false);
-
-        progressBar.setData(barData);
-        progressBar.setFitBars(true);
-
-        progressBar.setGoal(300);
+        //progressBar.setGoal(300);
 
         // remove legend
         progressBar.getLegend().setEnabled(false);
@@ -189,12 +235,14 @@ public class Dashboard extends AppCompatActivity {
         progressBar.getDescription().setEnabled(false);
 
         progressBar.animateY(getResources().getInteger(R.integer.dashboard_animation_time), Easing.EasingOption.EaseInOutExpo);
+        progressBar.setNoDataText("");
     }
 
     private void addChart() {
 
         spendingChart = new SpendingChart(this, getTheme());
         spendingChart.setId(R.id.bar_graph_view);
+        spendingChart.setNoDataText("");
 
         ConstraintLayout cl = (ConstraintLayout) findViewById(R.id.dataGraphLayout);
         cl.addView(spendingChart,0,0);
@@ -208,7 +256,9 @@ public class Dashboard extends AppCompatActivity {
         constraintSet.connect(spendingChart.getId(), ConstraintSet.TOP, cl.getId(), ConstraintSet.TOP, 0);
         constraintSet.applyTo(cl);
 
-        currentUser.GetWeeklySpending(callback);
+        //currentUser.GetWeeklySpending(callback);
+        currentUser.AcquireAllPurchases(callback);
+
     }
 
     @Override

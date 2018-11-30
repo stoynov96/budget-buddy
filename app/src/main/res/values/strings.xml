@@ -1,12 +1,15 @@
 <resources>
     <string name="app_name">budget-buddy</string>
-    <string name="manual_reciept_entry">manual reciept entry</string>
+    <string name="google_sign_in">Sign-In</string>
+    <string name="manual_reciept_entry">manual receipt entry</string>
     <string name="budget_peasant">Budget Peasant</string>
     <string name="profile_image_string_common_google_play_services_enable_button">profile image @string/common_google_play_services_enable_button</string>
     <string name="camera_entry">camera entry</string>
     <string name="default_welcome_message">Here\'s a breakdown of your budgeting this month.</string>
     <string name="under_budget">You\'ve gone under budget %1$i days this past week.</string>
     <string name="goal">With your leftover savings, you\'re $%1$d away from your goal!</string>
+    <string name="suggested_spending">If you keep your average daily spending at or below $%1$d, you\'ll be on track to meet your savings goal.</string>
+    <string name="average">Your current average spending is $%1$d.</string>
     <string name="goal_product">That %1$s almost yours!</string>
     <string-array name="day_abbreviations">
         <item>Sun</item>
@@ -32,4 +35,9 @@
     <string name="profile_monthly_savings_goal_title">Monthly savings goal: </string>
     <string name="nav_header">Navigation</string>
     <string name="captureButton">Capture</string>
+    <string name="spendingCategories">Spending Categories:</string>
+    <string name="newCategory">Add New Spending Category</string>
+    <string name="purchaseType">Purchase Type</string>
+    <string name="categoryName">Category Name: </string>
+    <string name="categoryLimit">Monthly Spending Limit: </string>
 </resources>

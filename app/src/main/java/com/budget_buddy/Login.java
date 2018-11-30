@@ -22,11 +22,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Login extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 9001;
+    private static final int PROFILE_CREATION = 9002;
 
     private GoogleSignInClient mGoogleSignInClient;
     private BBUser currentUser;
@@ -90,6 +92,8 @@ public class Login extends AppCompatActivity {
                 Log.w("Sign in message:", "Google sign in failed: " + e.getMessage(), e);
                 // ...
             }
+        } else if (requestCode == PROFILE_CREATION) {
+            gotoDashboard(currentUser);
         }
     }
 
@@ -109,6 +113,9 @@ public class Login extends AppCompatActivity {
                             public void OnCallback(float[] weeklySpending) {
 
                             }
+
+                            @Override
+                            public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
 
                             @Override
                             public void OnCallback(HashMap<String, Object> map) {
@@ -149,7 +156,7 @@ public class Login extends AppCompatActivity {
         if (user.GetUser() != null) {
             Intent newUserIntent = new Intent(this, UserProfileActivity.class);
             closeProgressWheel();
-            startActivity(newUserIntent);
+            startActivityForResult(newUserIntent, PROFILE_CREATION);
         }
     }
 

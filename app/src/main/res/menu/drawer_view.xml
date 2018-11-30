@@ -3,16 +3,16 @@
     <group android:id="@+id/menuNavGrp">
         <item
             android:id="@+id/testItem"
-            android:title="test" />
+            android:title="Manual Entry" />
         <item
             android:id="@+id/testItem2"
-            android:title="test" />
+            android:title="Quick Entry" />
         <item
             android:id="@+id/testItem3"
-            android:title="test" />
+            android:title="Profile" />
         <item
             android:id="@+id/testItem4"
-            android:title="test" />
+            android:title="Find a goal" />
     </group>
 
     <group android:id="@+id/logoutGrp">
