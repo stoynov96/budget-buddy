@@ -342,6 +342,11 @@ class BBUser implements DataNode {
             public void UserExists() {
 
             }
+
+            @Override
+            public void OnIncrement(int value) {
+
+            }
         };
 
         tableReader.WeeklyExpenditures(path, purchaseCallback);
@@ -579,6 +584,11 @@ class BBUser implements DataNode {
                 }
 
                 @Override
+                public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) {
+
+                }
+
+                @Override
                 public void OnCallback(HashMap<String, Object> map) {
 
                 }
@@ -607,10 +617,6 @@ class BBUser implements DataNode {
         } catch (InvalidDataLabelException e1) {
             Log.d("Parse error", e1.toString());
         }
-    }
-
-    private void setBudgetScore(long score){
-        this.budgetScore = score;
     }
 
     public void CheckDailies(UserStats.Dailies dailyToCheck){

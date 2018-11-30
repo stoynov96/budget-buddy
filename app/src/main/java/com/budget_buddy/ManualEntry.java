@@ -264,9 +264,6 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
 
         if(name.matches("") || date.matches("") || amount.matches("") ) {
             new BBToast(context, "Invalid Input");
-//            toast = Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT);
-//            toast.setGravity(Gravity.BOTTOM, 0, 1);
-//            toast.show();
             nameField.getText().clear();
             amountField.getText().clear();
             notesField.getText().clear();
@@ -275,14 +272,8 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
 
         amountField.validate();
         amount = amountField.CleanString();
-        user.WriteNewExpenditure(name, date, amount, notes);
-        // AchievementCheck - Purchase
-        try {
-            user.IncStat(UserStats.Counters.PURCHASE_COUNT);
-            user.CheckDailies(UserStats.Dailies.FIRST_PURCHASE);
-        } catch (InvalidDataLabelException e) {
-            Log.i("Error", "" + e);
-        }
+        user.WriteNewExpenditure(name, date, amount, notes, type);
+        achievementCheckPurchase();
         new BBToast(context, "Added!");
 
         nameField.getText().clear();
@@ -308,5 +299,14 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
     public void displayDatepicker(View view) {
         DialogFragment datePickerFragment = new DatePickerFragment();
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
+    private void achievementCheckPurchase(){
+        try {
+            user.IncStat(UserStats.Counters.PURCHASE_COUNT);
+            user.CheckDailies(UserStats.Dailies.FIRST_PURCHASE);
+        } catch (InvalidDataLabelException e) {
+            Log.i("Error", "" + e);
+        }
     }
 }

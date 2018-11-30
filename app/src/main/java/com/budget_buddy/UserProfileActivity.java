@@ -80,8 +80,8 @@ public class UserProfileActivity extends AppCompatActivity {
         }
 
         fromLogin();
-        Intent dashboardIntent = new Intent(this, Dashboard.class);
-        startActivity(dashboardIntent);
+        //Intent dashboardIntent = new Intent(this, Dashboard.class);
+        //startActivity(dashboardIntent);
         finish();
     }
 

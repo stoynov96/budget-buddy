@@ -8,6 +8,7 @@ import com.budget_buddy.utils.Data.DataNode;
 import com.budget_buddy.utils.Data.MyCallback;
 import com.budget_buddy.utils.Data.TableWriter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,27 +91,22 @@ public class UserStats implements DataNode {
     public void loginCountCallBack(final BBUser user){
         MyCallback statsChanged = new MyCallback() {
             @Override
-            public void OnCallback(float [] weeklySpending) {
-            }
+            public void OnCallback(float [] weeklySpending) { }
 
             @Override
-            public void OnCallback(HashMap<String, Object> map) {
-
-            }
+            public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
 
             @Override
-            public void OnProfileSet() {
-            }
+            public void OnCallback(HashMap<String, Object> map) { }
 
             @Override
-            public void CreateNewUser() {
-
-            }
+            public void OnProfileSet() { }
 
             @Override
-            public void UserExists() {
+            public void CreateNewUser() { }
 
-            }
+            @Override
+            public void UserExists() { }
 
             @Override
             public void OnIncrement(int value) {
@@ -130,34 +126,30 @@ public class UserStats implements DataNode {
     public void purchaseCountCallBack(final BBUser user){
         MyCallback statsChanged = new MyCallback() {
             @Override
-            public void OnCallback(float [] weeklySpending) {
-            }
+            public void OnCallback(float [] weeklySpending) { }
 
             @Override
+            public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
+            @Override
+
             public void OnCallback(HashMap<String, Object> map) {
                 checkFirstPurchaseDaily(map, user);
             }
 
             @Override
-            public void OnProfileSet() {
-            }
+            public void OnProfileSet() { }
 
             @Override
-            public void CreateNewUser() {
-
-            }
+            public void CreateNewUser() { }
 
             @Override
-            public void UserExists() {
-
-            }
+            public void UserExists() { }
 
             @Override
             public void OnIncrement(int value) {
                 purchaseCount = value;
                 checkProgressEXP(user);
                 Log.i("FUCK", "INSIDE purchaseCountCallBack");
-                // TODO move display achievement and exp allocation here
             }
         };
 

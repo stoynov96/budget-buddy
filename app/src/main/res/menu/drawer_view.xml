@@ -2,7 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:id="@+id/menuNavGrp">
         <item
-<<<<<<< HEAD
             android:id="@+id/achievementItem"
             android:title="Achievements" />
         <item
@@ -14,19 +13,7 @@
         <item
             android:id="@+id/testItem4"
             android:title="Manual Input" />
-=======
-            android:id="@+id/testItem"
-            android:title="Manual Entry" />
-        <item
-            android:id="@+id/testItem2"
-            android:title="Quick Entry" />
-        <item
-            android:id="@+id/testItem3"
-            android:title="Profile" />
-        <item
-            android:id="@+id/testItem4"
-            android:title="Find a goal" />
->>>>>>> master
+
     </group>
 
     <group android:id="@+id/logoutGrp">
