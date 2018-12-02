@@ -1,8 +1,8 @@
 package com.budget_buddy;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.constraint.Group;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -11,8 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 
 public class AchievementActivity extends AppCompatActivity {
 
@@ -20,8 +20,8 @@ public class AchievementActivity extends AppCompatActivity {
     BBUser currentUser = BBUser.GetInstance();
 
 
-    // Dailies ??? probs dont really need?
-    boolean FirstDailyPurchase = false;
+    // Dailies
+    ImageButton firstDailyPurchase;
 
     // Milestone Achievements ???
     boolean FirstLogin = false;
@@ -33,12 +33,22 @@ public class AchievementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_achievements);
         setUpDrawer();
-        checkAchievements();
+
+        setUpAchievements();
+
+        checkMilestones();
+        checkDailies();
+
+
 
     }
 
+    private void setUpAchievements(){
+        firstDailyPurchase = findViewById(R.id.daily_purchase_achievement);
 
-    public void checkAchievements(){
+    }
+
+    private void checkMilestones(){
         int loginCount = currentUser.userStats.loginCount;
         switch (loginCount) {
             case 10:
@@ -53,6 +63,14 @@ public class AchievementActivity extends AppCompatActivity {
         }
 
         //int purchaseCount = currentUser.userStats.purchaseCount
+    }
+
+    private void checkDailies(){
+        if (!currentUser.userStats.FirstDailyPurchase) {
+            //Log.i("FUCK", "checkDailies: ITS GRAY");
+            firstDailyPurchase.setColorFilter(0x77000000, PorterDuff.Mode.SRC_ATOP);
+            firstDailyPurchase.invalidate();
+        }
     }
 
 

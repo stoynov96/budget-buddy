@@ -35,6 +35,9 @@ public class UserStats implements DataNode {
         purchaseCount = 0;
     }
 
+    // Dailies
+    boolean FirstDailyPurchase = false;
+
     @Override
     public Map<String, Object> ToMap() {
         Map<String, Object> map = new HashMap<>();
@@ -133,7 +136,7 @@ public class UserStats implements DataNode {
             @Override
 
             public void OnCallback(HashMap<String, Object> map) {
-                checkFirstPurchaseDaily(map, user);
+                checkFirstPurchaseDaily(map, user, true);
             }
 
             @Override
@@ -156,11 +159,47 @@ public class UserStats implements DataNode {
         statCallBack =  statsChanged;
     }
 
-    private void checkFirstPurchaseDaily(HashMap<String, Object> map, BBUser currentUser) {
-        //Log.i("FUCK", "checkFirstPurchaseDaily: " + map.size());
+    /***
+     * Creates and sets a callback in regards to doing a read
+     * @param user holds reference for callback
+     ***/
+    public void readCallBack(final BBUser user){
+        MyCallback statsChanged = new MyCallback() {
+            @Override
+            public void OnCallback(float [] weeklySpending) { }
+
+            @Override
+            public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) { }
+            @Override
+
+            public void OnCallback(HashMap<String, Object> map) {
+                checkFirstPurchaseDaily(map, user, false);
+            }
+
+            @Override
+            public void OnProfileSet() { }
+
+            @Override
+            public void CreateNewUser() { }
+
+            @Override
+            public void UserExists() { }
+
+            @Override
+            public void OnIncrement(int value) { }
+        };
+
+        statCallBack =  statsChanged;
+    }
+
+    private void checkFirstPurchaseDaily(HashMap<String, Object> map, BBUser currentUser, boolean giving) {
+        Log.i("FUCK", "checkFirstPurchaseDaily: " + map.size());
         if (map.size() == 1) {
-            new BBToast(currentUser.currentContext, "First Purchase of the Day!", 100,Gravity.TOP);
-            currentUser.IncBudgetScore(100);
+            if (giving) {
+                new BBToast(currentUser.currentContext, "First Purchase of the Day!", 100, Gravity.TOP);
+                currentUser.IncBudgetScore(100);
+            }
+            FirstDailyPurchase = true;
         }
     }
 

@@ -9,12 +9,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.text.InputType;
-import android.util.ArraySet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,7 +32,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -304,7 +299,7 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
     private void achievementCheckPurchase(){
         try {
             user.IncStat(UserStats.Counters.PURCHASE_COUNT);
-            user.CheckDailies(UserStats.Dailies.FIRST_PURCHASE);
+            user.IncrementDaily(UserStats.Dailies.FIRST_PURCHASE);
         } catch (InvalidDataLabelException e) {
             Log.i("Error", "" + e);
         }

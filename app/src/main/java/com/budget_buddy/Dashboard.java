@@ -157,6 +157,7 @@ public class Dashboard extends AppCompatActivity {
         currentUser.currentContext = getApplicationContext();
 
         setContentView(R.layout.activity_dashboard);
+        currentUser.CheckDaily(UserStats.Dailies.FIRST_PURCHASE);
         currentUser.setUserInterfaceCallback(callback);
         setUpDrawer();
         setupExperienceBar();
