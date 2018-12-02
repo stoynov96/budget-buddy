@@ -1,6 +1,9 @@
 package com.budget_buddy;
 
+import android.content.Context;
+import android.icu.text.DateTimePatternGenerator;
 import android.util.Log;
+
 import com.budget_buddy.config.DataConfig;
 import com.budget_buddy.exception.InvalidDataLabelException;
 import com.budget_buddy.utils.Data.DataNode;
@@ -80,6 +83,11 @@ class BBUser implements DataNode {
     static private String USERNAME_KEY = "User Name";
     static private String SPENDING_CATEGORIES = "Spending Categories";
 
+    // Stats TODO Actually make achievement system - do this Kevin
+    public UserStats userStats;
+    //public int loginCount = 0;
+    public Context currentContext;
+
     static BBUser GetInstance() {
         return ourInstance;
     }
@@ -98,6 +106,7 @@ class BBUser implements DataNode {
     public void Initialize(final MyCallback newUserCallback) throws InvalidDataLabelException {
         user = authentication.getCurrentUser();
         if(user != null) {
+            userStats = new UserStats();
             userName = user.getDisplayName();
             tableReader.CheckForExistingUser(userPath.get(0), user.getUid(), userName, newUserCallback);
             // TODO: Add other initialization here as appropriate
@@ -333,6 +342,11 @@ class BBUser implements DataNode {
             public void UserExists() {
 
             }
+
+            @Override
+            public void OnIncrement(int value) {
+
+            }
         };
 
         tableReader.WeeklyExpenditures(path, purchaseCallback);
@@ -427,6 +441,10 @@ class BBUser implements DataNode {
             public void UserExists() {
 
             }
+
+            @Override
+            public void OnIncrement(int value) {
+            }
         };
 
         tableReader.WeeklyExpenditures(path, callbackInner);
@@ -469,6 +487,10 @@ class BBUser implements DataNode {
         budgetScore = temp != null ? (long) temp : budgetScore;
         temp = map.get(SAVINGS_GOAL_KEY);
         savingsGoal = temp != null ? (long) temp : savingsGoal;
+
+        // Workaround for odd bug where rent from DB is of type Long?
+        //temp = temp instanceof Long ? ((Long)temp).doubleValue() : temp;
+
         temp = map.get(RENT_KEY);
         rent = temp != null ? (long) temp : rent;
         temp = map.get(OTHER_EXPENSES_KEY);
@@ -500,6 +522,10 @@ class BBUser implements DataNode {
         // Add custom logic here to be executed when user data changes
         // as a result of a database read
         // Do not add anything if this is expected to be overridden
+
+        if (userInterfaceCallback != null) {
+            userInterfaceCallback.OnProfileSet();
+        }
     }
 
     // Only for testing purposes
@@ -521,5 +547,94 @@ class BBUser implements DataNode {
         userPath = new ArrayList<String>() {{
             add(DataConfig.DataLabels.USERS);
         }};
+    }
+
+    /***
+     * Increments User Stat that corresponds to statToInc and handles callback
+     * @param statToInc tag that corresponds to stat needed to be incremented
+     ***/
+    public void IncStat(UserStats.Counters statToInc) throws  InvalidDataLabelException {
+        // Set path to stat
+        String path = "";
+        switch (statToInc) {
+            case LOGIN_COUNT:
+                path = "login count";
+                userStats.loginCountCallBack(this);
+                break;
+            case PURCHASE_COUNT:
+                path = "purchase count";
+                userStats.purchaseCountCallBack(this);
+                break;
+            default:
+                Log.e("UserStats", "Increment: invalid stat to increase!");
+        }
+        tableWriter.Increment(userPath, "/" + user.getUid() + "/User Stats/" + path, userStats.statCallBack);
+    }
+
+    /***
+     * Increments BBUser's Score based on exp amount
+     * @param exp amount of experience to increase by
+     ***/
+    public void IncBudgetScore(long exp){
+        try {
+            tableWriter.IncrementBy( (int)exp, userPath, "/" + user.getUid() + "/User Parameters/Budget Score", new MyCallback() {
+                @Override
+                public void OnCallback(float[] weeklySpending) {
+
+                }
+
+                @Override
+                public void OnPurchases(HashMap<String, ArrayList<Expenditure>> purchases) {
+
+                }
+
+                @Override
+                public void OnCallback(HashMap<String, Object> map) {
+
+                }
+
+                @Override
+                public void OnProfileSet() {
+
+                }
+
+                @Override
+                public void CreateNewUser() {
+
+                }
+
+                @Override
+                public void UserExists() {
+
+                }
+
+                @Override
+                public void OnIncrement(int value) {
+                    //Log.i("FUCK", "OnCallback: " + value);
+                    setBudgetScore((long) value);
+                }
+            });
+        } catch (InvalidDataLabelException e1) {
+            Log.d("Parse error", e1.toString());
+        }
+    }
+
+    public void CheckDailies(UserStats.Dailies dailyToCheck){
+        String path = "";
+        switch (dailyToCheck) {
+            case FIRST_PURCHASE:
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                path = sdf.format(new Date());
+                //Log.i("FUCK", "CheckDailies: " + path + "/");
+                userStats.purchaseCountCallBack(this);
+                break;
+            default:
+                Log.e("UserStats", "Increment: invalid stat to increase!");
+        }
+        try {
+            tableReader.singleRead(userPath, "/" + user.getUid() + "/Purchases/" + path, userStats.statCallBack);
+        } catch (InvalidDataLabelException e1) {
+            Log.d("Parse error", e1.toString());
+        }
     }
 }

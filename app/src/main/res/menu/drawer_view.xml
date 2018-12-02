@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:id="@+id/menuNavGrp">
         <item
-            android:id="@+id/testItem"
-            android:title="Manual Entry" />
+            android:id="@+id/achievementItem"
+            android:title="Achievements" />
         <item
             android:id="@+id/testItem2"
-            android:title="Quick Entry" />
+            android:title="Set Goals" />
         <item
             android:id="@+id/testItem3"
-            android:title="Profile" />
+            android:title="Quick Input" />
         <item
             android:id="@+id/testItem4"
-            android:title="Find a goal" />
+            android:title="Manual Input" />
+
     </group>
 
     <group android:id="@+id/logoutGrp">

@@ -23,6 +23,7 @@ import com.budget_buddy.animations.ExperienceBarAnimation;
 import com.budget_buddy.charts.GoalProgressBar;
 
 import com.budget_buddy.charts.SpendingChart;
+import com.budget_buddy.components.BBToast;
 import com.budget_buddy.utils.Data.MyCallback;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
@@ -126,6 +127,9 @@ public class Dashboard extends AppCompatActivity {
                 // display profile setup dialog
                 Log.i("Profile", "needs set up");
             } else {
+                //Log.i("FUCK", "OnProfileSet: EXP FROM USER = " + currentUser.getBudgetScore());
+                experienceBarAnimation.setProgress((int)currentUser.getBudgetScore());
+
                 SetExperience(currentUser.getBudgetScore());
                 SetSavingsGoal(currentUser.getSavingsGoal());
             }
@@ -140,13 +144,19 @@ public class Dashboard extends AppCompatActivity {
         public void UserExists() {
 
         }
+
+        @Override
+        public void OnIncrement(int value) {
+
+        }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dashboard);
+        currentUser.currentContext = getApplicationContext();
 
+        setContentView(R.layout.activity_dashboard);
         currentUser.setUserInterfaceCallback(callback);
         setUpDrawer();
         setupExperienceBar();
@@ -163,7 +173,7 @@ public class Dashboard extends AppCompatActivity {
         experienceBar.setMax(2500);
         experienceProgressText = findViewById(R.id.experienceProgessFraction);
         experienceBarAnimation = new ExperienceBarAnimation(experienceBar, experienceProgressText);
-        experienceBarAnimation.setProgress(1675);
+        experienceBarAnimation.setProgress((int)currentUser.getBudgetScore());
     }
 
     public void gotoEntryMethodFor(View view) {
@@ -292,7 +302,8 @@ public class Dashboard extends AppCompatActivity {
                             case R.id.logoutButton:
                                 goToLogin();
                                 break;
-                            case R.id.testItem:
+                            case R.id.achievementItem:
+                                goToAchievements();
                                 // TODO: Other navigation items
                                 break;
                         }
@@ -317,4 +328,11 @@ public class Dashboard extends AppCompatActivity {
         loginIntent.putExtra("dashboard", true);
         startActivity(loginIntent);
     }
+
+    private void goToAchievements() {
+        Intent achievementIntent = new Intent(this, AchievementActivity.class);
+        startActivity(achievementIntent);
+    }
+
+
 }

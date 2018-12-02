@@ -8,6 +8,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.text.InputType;
 import android.util.ArraySet;
 import android.view.Gravity;
@@ -19,12 +20,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 
+import com.budget_buddy.components.BBToast;
 import com.budget_buddy.components.CurrencyEditTextFragment;
 import com.budget_buddy.exception.InvalidDataLabelException;
-import android.util.Log;
+
 import android.widget.DatePicker;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,6 +76,7 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         final DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
         purchaseDateField.setText(dateFormat.format(calendar.getTime()));
         context = getApplicationContext();
+        user.currentContext = context;
 
         // This contains the parsed lines from the receipt. Used to make a drop-down selector for
         // the item name. Could possibly do some fancy stuff here to make the options better, like
@@ -262,9 +263,7 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         }
 
         if(name.matches("") || date.matches("") || amount.matches("") ) {
-            toast = Toast.makeText(context, "Invalid Input", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.BOTTOM, 0, 1);
-            toast.show();
+            new BBToast(context, "Invalid Input");
             nameField.getText().clear();
             amountField.getText().clear();
             notesField.getText().clear();
@@ -274,9 +273,9 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
         amountField.validate();
         amount = amountField.CleanString();
         user.WriteNewExpenditure(name, date, amount, notes, type);
-        toast = Toast.makeText(context, "Added!", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.BOTTOM, 0, 1);
-        toast.show();
+        achievementCheckPurchase();
+        new BBToast(context, "Added!");
+
         nameField.getText().clear();
         amountField.getText().clear();
         notesField.getText().clear();
@@ -300,5 +299,14 @@ public class ManualEntry extends AppCompatActivity implements DatePickerFragment
     public void displayDatepicker(View view) {
         DialogFragment datePickerFragment = new DatePickerFragment();
         datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
+    private void achievementCheckPurchase(){
+        try {
+            user.IncStat(UserStats.Counters.PURCHASE_COUNT);
+            user.CheckDailies(UserStats.Dailies.FIRST_PURCHASE);
+        } catch (InvalidDataLabelException e) {
+            Log.i("Error", "" + e);
+        }
     }
 }
