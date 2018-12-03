@@ -1,10 +1,12 @@
 package com.budget_buddy.components;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,6 +66,30 @@ public class BBToast {
         TextView textView2 = customToast.findViewById(R.id.expToastText);
         textView.setText(message);
         textView2.setText("+" + exp);
+
+        // Set current context for new Toast
+        bbToast = new Toast(context);
+
+        // Set custom toast
+        bbToast.setView(customToast);
+        bbToast.setDuration(Toast.LENGTH_SHORT); // to appear
+        bbToast.setGravity(gravityLocation, 0, 1);
+        bbToast.show();
+    }
+
+    public BBToast(Drawable image, Context context, String message, int exp, int gravityLocation) {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View customToast = inflater.inflate(R.layout.bb_toast, null);
+
+        // Set message in toast
+        TextView textView = customToast.findViewById(R.id.customToastText);
+        TextView textView2 = customToast.findViewById(R.id.expToastText);
+        textView.setText(message);
+        textView2.setText("+" + exp);
+
+        // Set Image in toast
+        ImageView imageView = customToast.findViewById(R.id.customToastImage);
+        imageView.setImageDrawable(image);
 
         // Set current context for new Toast
         bbToast = new Toast(context);

@@ -167,6 +167,8 @@ public class Dashboard extends AppCompatActivity {
         TextView averageSpendingText = findViewById(R.id.average_spending_text);
         suggestedSpendingText.setText("");
         averageSpendingText.setText("");
+
+        getSupportActionBar().setTitle("Dashboard");
     }
 
     private void setupExperienceBar() {
