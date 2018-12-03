@@ -40,4 +40,6 @@
     <string name="purchaseType">Purchase Type</string>
     <string name="categoryName">Category Name: </string>
     <string name="categoryLimit">Monthly Spending Limit: </string>
+    <string name="daily_title">Dailies</string>
+    <string name="milestone_title">Milestones</string>
 </resources>

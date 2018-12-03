@@ -619,20 +619,39 @@ class BBUser implements DataNode {
         }
     }
 
-    public void CheckDailies(UserStats.Dailies dailyToCheck){
+    public void IncrementDaily(UserStats.Dailies dailyToCheck){
         String path = "";
         switch (dailyToCheck) {
             case FIRST_PURCHASE:
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                path = sdf.format(new Date());
-                //Log.i("FUCK", "CheckDailies: " + path + "/");
+                path = "/Purchases/" + sdf.format(new Date());
+                //Log.i("FUCK", "IncrementDaily: " + path + "/");
                 userStats.purchaseCountCallBack(this);
                 break;
             default:
                 Log.e("UserStats", "Increment: invalid stat to increase!");
         }
         try {
-            tableReader.singleRead(userPath, "/" + user.getUid() + "/Purchases/" + path, userStats.statCallBack);
+            tableReader.singleRead(userPath, "/" + user.getUid() + path, userStats.statCallBack);
+        } catch (InvalidDataLabelException e1) {
+            Log.d("Parse error", e1.toString());
+        }
+    }
+
+    public void CheckDaily(UserStats.Dailies dailyToCheck){
+        String path = "";
+        switch (dailyToCheck) {
+            case FIRST_PURCHASE:
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                path = "/Purchases/" + sdf.format(new Date());
+                //Log.i("FUCK", "IncrementDaily: " + path + "/");
+                userStats.readCallBack(this);
+                break;
+            default:
+                Log.e("UserStats", "Increment: invalid stat to increase!");
+        }
+        try {
+            tableReader.singleRead(userPath, "/" + user.getUid() + path, userStats.statCallBack);
         } catch (InvalidDataLabelException e1) {
             Log.d("Parse error", e1.toString());
         }

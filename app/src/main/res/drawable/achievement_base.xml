@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape android:shape="oval">
+            <size android:height="10dp"
+                android:width="10dp"/>
+            <gradient
+                android:startColor="@color/colorPrimary"
+                android:centerColor="#87bb87"
+                android:endColor="@color/colorPrimaryDark"
+                android:angle="90"/>
+
+            <stroke
+                android:width="2dp"
+                android:color="@color/colorAccent"/>
+        </shape>
+    </item>
+
+    <item
+        android:id="@+id/achievementImage"
+        android:drawable="@drawable/first_daily_purchase"/>
+
+</layer-list>
